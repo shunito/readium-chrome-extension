@@ -37,6 +37,12 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 		// Get all style sheets in the book dom
 		$bookStyleSheets = $("link[rel*='stylesheet']", bookDom);
 
+		// If the book does not have any stylesheets, do not change style sets
+		if ($bookStyleSheets.length === 0) {
+
+			return bookDom;
+		}
+
 		// Maintain original information about stylesheets
 		$bookStyleSheets = this._storeOriginalAttributes($bookStyleSheets);
 
