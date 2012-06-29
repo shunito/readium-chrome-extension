@@ -1500,7 +1500,7 @@ body.apple-fixed-layout {
   line-height: 1em;
   max-height: 99%;
   overflow: scroll;
-   }
+  }
 
   #viewer-settings-modal .clickable {
     -webkit-user-select: none;
