@@ -49,10 +49,19 @@
 
 	}
 
+	#margin-radio-wrapper {
+		width: 312px;
+		height: 63px;
+		position: relative;
+		left: 0px;
+		top: 0px;
+	}
+
 	.margin-radio {
 		display: inline-block;
+		position: absolute;
 		width: 43px;
-		height: 60px;
+		height: 63px;
 		margin: 0;
 		padding: 0;
 		background-repeat: no-repeat;
@@ -61,7 +70,7 @@
 
 	#margin-option-1 {
 		background-image: url($readium_image_path + 'settings_modal/margin1_off.png');
-		margin-right: 20px;
+		left: 0px;
 		&.selected {
 			background-image: url($readium_image_path + 'settings_modal/margin1_on.png');
 		}
@@ -69,7 +78,7 @@
 
 	#margin-option-2 {
 		background-image: url($readium_image_path + 'settings_modal/margin2_off.png');
-		margin-right: 20px;
+		left: 67px;
 		&.selected {
 			background-image: url($readium_image_path + 'settings_modal/margin2_on.png');
 		}
@@ -77,7 +86,7 @@
 
 	#margin-option-3 {
 		background-image: url($readium_image_path + 'settings_modal/margin3_off.png');
-		margin-right: 20px;
+		left: 134px;
 		&.selected {
 			background-image: url($readium_image_path + 'settings_modal/margin3_on.png');
 		}
@@ -85,7 +94,7 @@
 
 	#margin-option-4 {
 		background-image: url($readium_image_path + 'settings_modal/margin4_off.png');
-		margin-right: 20px;
+		left: 201px;
 		&.selected {
 			background-image: url($readium_image_path + 'settings_modal/margin4_on.png');
 		}
@@ -93,6 +102,7 @@
 
 	#margin-option-5 {
 		background-image: url($readium_image_path + 'settings_modal/margin5_off.png');
+		right: 1px;
 		&.selected {
 			background-image: url($readium_image_path + 'settings_modal/margin5_on.png');
 		}

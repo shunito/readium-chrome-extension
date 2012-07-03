@@ -1547,10 +1547,17 @@ body.apple-fixed-layout {
     float: right;
     width: 253px;
     margin-top: 7px; }
+  #viewer-settings-modal #margin-radio-wrapper {
+    width: 312px;
+    height: 63px;
+    position: relative;
+    left: 0px;
+    top: 0px; }
   #viewer-settings-modal .margin-radio {
     display: inline-block;
+    position: absolute;
     width: 43px;
-    height: 60px;
+    height: 63px;
     margin: 0;
     padding: 0;
     background-repeat: no-repeat;
@@ -1561,26 +1568,27 @@ body.apple-fixed-layout {
     user-select: none; }
   #viewer-settings-modal #margin-option-1 {
     background-image: url("/images/settings_modal/margin1_off.png");
-    margin-right: 20px; }
+    left: 0px; }
     #viewer-settings-modal #margin-option-1.selected {
       background-image: url("/images/settings_modal/margin1_on.png"); }
   #viewer-settings-modal #margin-option-2 {
     background-image: url("/images/settings_modal/margin2_off.png");
-    margin-right: 20px; }
+    left: 67px; }
     #viewer-settings-modal #margin-option-2.selected {
       background-image: url("/images/settings_modal/margin2_on.png"); }
   #viewer-settings-modal #margin-option-3 {
     background-image: url("/images/settings_modal/margin3_off.png");
-    margin-right: 20px; }
+    left: 134px; }
     #viewer-settings-modal #margin-option-3.selected {
       background-image: url("/images/settings_modal/margin3_on.png"); }
   #viewer-settings-modal #margin-option-4 {
     background-image: url("/images/settings_modal/margin4_off.png");
-    margin-right: 20px; }
+    left: 201px; }
     #viewer-settings-modal #margin-option-4.selected {
       background-image: url("/images/settings_modal/margin4_on.png"); }
   #viewer-settings-modal #margin-option-5 {
-    background-image: url("/images/settings_modal/margin5_off.png"); }
+    background-image: url("/images/settings_modal/margin5_off.png");
+    right: 1px; }
     #viewer-settings-modal #margin-option-5.selected {
       background-image: url("/images/settings_modal/margin5_on.png"); }
   #viewer-settings-modal .simple-radio {
