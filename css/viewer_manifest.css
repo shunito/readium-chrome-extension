@@ -1651,6 +1651,8 @@ body.apple-fixed-layout {
   -webkit-box-shadow: 10px 0px 11px rgba(100, 100, 104, 0.35);
   -moz-box-shadow: 10px 0px 11px rgba(100, 100, 104, 0.35);
   box-shadow: 10px 0px 11px rgba(100, 100, 104, 0.35); }
+  #readium-toc ol {
+    padding-left: 1.5em; }
 
 #toc-body, #toc-header {
   margin-right: 10px;

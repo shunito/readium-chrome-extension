@@ -13,6 +13,9 @@
 	overflow: hidden;
 	//border-right: 2px solid #999;
 	@include box-shadow(10px 0px 11px rgba(100, 100, 104, 0.35));
+	ol { 
+		padding-left: 1.5em; 
+	}
 }
 
 #toc-body, #toc-header {
