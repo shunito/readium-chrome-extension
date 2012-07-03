@@ -168,7 +168,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 						newPages[1] = displayed[0] + 1;
 					}
 
-					// TODO: Handle center pages and all adjacent left-left, right-right pages
+					// TODO: Handle center pages
 				}
 				// page progression is left-to-right
 				else {
@@ -182,7 +182,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 						newPages[1] = displayed[0];
 					}
 
-					// TODO: Handle center pages and all adjacent left-left, right-right pages
+					// TODO: Handle center pages
 				}
 			}
 
@@ -416,7 +416,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 					this.set("current_page", [nextPageNumber]);
 				}
 			}
-
 		}
 		// Reflowable section
 		else {
@@ -461,7 +460,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 						this.set("current_page", [pageNumber, pageNumber + 1]);
 					}
 
-					// Handle center pages
+					// TODO: Handle center pages
 				}
 				// Left-to-right page progression
 				else {

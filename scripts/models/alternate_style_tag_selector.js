@@ -80,13 +80,20 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 
 			// The stylesheets must all be set as preferred so that when enabled, they will be activated
 			$styleSheet.attr("rel", "stylesheet");
-			if ($.trim($styleSheet.attr('title')) === styleSetToActivate) {
+			// Always leave persistent style sets activated
+			if ($styleSheet.attr('title') === undefined) {
+
+				$styleSheet[0].disabled = false;
+			}
+			// Activate this style set
+			else if ($.trim($styleSheet.attr('title')) === styleSetToActivate) {
 
 				// Chrome is buggy and change to disabled = false is only
 				// picked up if you first set it to true
 				$styleSheet[0].disabled = true;
 				$styleSheet[0].disabled = false;
 			}
+			// De-activate other style sets
 			else {
 
 				$styleSheet[0].disabled = true;
