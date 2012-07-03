@@ -296,5 +296,5 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 		}
 
 		return styleSet;
-	},
+	}
 });
