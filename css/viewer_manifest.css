@@ -1331,11 +1331,11 @@ body {
 
 #next-page-button {
   right: 0;
-  background-image: url("./images/paginator/next_page.png"); }
+  background-image: url("/images/paginator/next_page.png"); }
 
 #prev-page-button {
   left: 0;
-  background-image: url("./images/paginator/previous_page.png"); }
+  background-image: url("/images/paginator/previous_page.png"); }
 
 #page-wrap {
   position: relative; }
@@ -1538,7 +1538,7 @@ body.apple-fixed-layout {
   #viewer-settings-modal #settings-margin {
     padding: 20px; }
   #viewer-settings-modal #font-size-icon {
-    background-image: url("./images/settings_modal/settings_fontsize.png");
+    background-image: url("/images/settings_modal/settings_fontsize.png");
     width: 37px;
     height: 32px;
     display: inline-block;
@@ -1558,40 +1558,40 @@ body.apple-fixed-layout {
     -o-user-select: none;
     user-select: none; }
   #viewer-settings-modal #margin-option-1 {
-    background-image: url("./images/settings_modal/margin1_off.png");
+    background-image: url("/images/settings_modal/margin1_off.png");
     margin-right: 20px; }
     #viewer-settings-modal #margin-option-1.selected {
-      background-image: url("./images/settings_modal/margin1_on.png"); }
+      background-image: url("/images/settings_modal/margin1_on.png"); }
   #viewer-settings-modal #margin-option-2 {
-    background-image: url("./images/settings_modal/margin2_off.png");
+    background-image: url("/images/settings_modal/margin2_off.png");
     margin-right: 20px; }
     #viewer-settings-modal #margin-option-2.selected {
-      background-image: url("./images/settings_modal/margin2_on.png"); }
+      background-image: url("/images/settings_modal/margin2_on.png"); }
   #viewer-settings-modal #margin-option-3 {
-    background-image: url("./images/settings_modal/margin3_off.png");
+    background-image: url("/images/settings_modal/margin3_off.png");
     margin-right: 20px; }
     #viewer-settings-modal #margin-option-3.selected {
-      background-image: url("./images/settings_modal/margin3_on.png"); }
+      background-image: url("/images/settings_modal/margin3_on.png"); }
   #viewer-settings-modal #margin-option-4 {
-    background-image: url("./images/settings_modal/margin4_off.png");
+    background-image: url("/images/settings_modal/margin4_off.png");
     margin-right: 20px; }
     #viewer-settings-modal #margin-option-4.selected {
-      background-image: url("./images/settings_modal/margin4_on.png"); }
+      background-image: url("/images/settings_modal/margin4_on.png"); }
   #viewer-settings-modal #margin-option-5 {
-    background-image: url("./images/settings_modal/margin5_off.png"); }
+    background-image: url("/images/settings_modal/margin5_off.png"); }
     #viewer-settings-modal #margin-option-5.selected {
-      background-image: url("./images/settings_modal/margin5_on.png"); }
+      background-image: url("/images/settings_modal/margin5_on.png"); }
   #viewer-settings-modal .simple-radio {
     font-family: Helvetica,Arial,sans-serif;
     color: #111;
     background-repeat: no-repeat;
     padding-left: 20px;
     background-position: 0px 0px;
-    background-image: url("./images/settings_modal/radiobutton_off.png");
+    background-image: url("/images/settings_modal/radiobutton_off.png");
     font-size: 15px;
     font-weight: 400; }
     #viewer-settings-modal .simple-radio.selected {
-      background-image: url("./images/settings_modal/radiobutton_on.png"); }
+      background-image: url("/images/settings_modal/radiobutton_on.png"); }
   #viewer-settings-modal #two-up-options {
     text-align: left; }
     #viewer-settings-modal #two-up-options .simple-radio {
@@ -1652,7 +1652,7 @@ body.apple-fixed-layout {
   #toc-header #close-toc-button {
     height: 36px;
     width: 36px;
-    background-image: url("./images/toc/ico_close.png");
+    background-image: url("/images/toc/ico_close.png");
     display: inline-block;
     position: absolute;
     right: 17px;
