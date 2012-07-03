@@ -1525,7 +1525,7 @@ body.apple-fixed-layout {
     -moz-border-radius: 2px;
     border-radius: 2px;
     padding: 5px;
-    height: 100px;
+    height: 80px;
     overflow: hidden;
     text-align: left; }
   #viewer-settings-modal .setting-header {
@@ -1533,7 +1533,7 @@ body.apple-fixed-layout {
     font-family: Helvetica,Arial,sans-serif;
     font-size: 12px;
     color: #777;
-    margin: 14px 0px;
+    margin: 12px 0px;
     padding: 0px; }
   #viewer-settings-modal #settings-margin {
     padding: 20px; }
@@ -1551,6 +1551,8 @@ body.apple-fixed-layout {
     display: inline-block;
     width: 43px;
     height: 60px;
+    margin: 0;
+    padding: 0;
     background-repeat: no-repeat;
     -webkit-user-select: none;
     -moz-user-select: none;

@@ -48,15 +48,13 @@ css/sass/viewer_settings_modal.scss:5
 /Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/lib/sass/plugin/compiler.rb:202:in `block in update_stylesheets'
 /Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/lib/sass/plugin/compiler.rb:200:in `each'
 /Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/lib/sass/plugin/compiler.rb:200:in `update_stylesheets'
-/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/lib/sass/plugin/compiler.rb:234:in `watch'
-/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/lib/sass/plugin.rb:107:in `method_missing'
-/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/lib/sass/exec.rb:431:in `watch_or_update'
-/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/lib/sass/exec.rb:302:in `process_result'
-/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/lib/sass/exec.rb:41:in `parse'
-/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/lib/sass/exec.rb:21:in `parse!'
-/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/bin/sass:8:in `<top (required)>'
-/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/bin/sass:23:in `load'
-/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/bin/sass:23:in `<main>'
+/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/lib/sass/plugin/compiler.rb:298:in `block in watch'
+/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/vendor/listen/lib/listen/multi_listener.rb:86:in `call'
+/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/vendor/listen/lib/listen/multi_listener.rb:86:in `on_change'
+/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/vendor/listen/lib/listen/multi_listener.rb:95:in `block in initialize_adapter'
+/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/vendor/listen/lib/listen/adapters/polling.rb:55:in `call'
+/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/vendor/listen/lib/listen/adapters/polling.rb:55:in `poll'
+/Users/matthewrobertson03/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.19/vendor/listen/lib/listen/adapters/polling.rb:31:in `block in start'
 */
 body:before {
   white-space: pre;
