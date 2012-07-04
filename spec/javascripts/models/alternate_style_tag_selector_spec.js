@@ -417,6 +417,46 @@ describe("alternate_style_tag_selector", function() {
 			expect($($('link[title="Horizontal Night"]', testEPubDom)[0])[0].disabled).toEqual(true);
 			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
 		});
+
+		it ("does not de-activate persistent style sheets", function () {
+
+			var testEPubDom = getEPubContentDom();
+
+			// Initialize a set of style sheets grouped into style sets
+			var styles = '<link rel="stylesheet" href="someStyle1.css"/>'
+					   + '<link rel="alternate stylesheet" href="vertical.css" class="vertical day" title="Vertical Day"/>'
+					   + '<link rel="alternate stylesheet" href="day.css"      class="vertical night" title="Vertical Day"/>'
+					   + '<link rel="stylesheet" href="someStyle2.css"/>'
+					   + '<link rel="alternate stylesheet" href="vertical.css" class="vertical night" title="Vertical Night"/>'
+					   + '<link rel="alternate stylesheet" href="night.css"    class="vertical night" title="Vertical Night"/>'
+					   + '<link rel="stylesheet" href="horizontal.css" class="horizontal day" title="Horizontal Day"/>'
+					   + '<link rel="stylesheet" href="day.css"        class="horizontal day"   title="Horizontal Day"/>'
+					   + '<link rel="stylesheet" href="someStyle3.css"/>'
+					   + '<link rel="stylesheet" href="horizontal.css" class="horizontal night" title="Horizontal Night"/>'
+					   + '<link rel="stylesheet" href="night.css"      class="horizontal night" title="Horizontal Night"/>'
+					   + '<link rel="stylesheet" href="someStyle4.css"/>';
+
+			$('head', testEPubDom)[0].appendChild($(styles)[0]);
+			$('head', testEPubDom)[0].appendChild($(styles)[1]);
+			$('head', testEPubDom)[0].appendChild($(styles)[2]);
+			$('head', testEPubDom)[0].appendChild($(styles)[3]);
+			$('head', testEPubDom)[0].appendChild($(styles)[4]);
+			$('head', testEPubDom)[0].appendChild($(styles)[5]);
+			$('head', testEPubDom)[0].appendChild($(styles)[6]);
+			$('head', testEPubDom)[0].appendChild($(styles)[7]);
+			$('head', testEPubDom)[0].appendChild($(styles)[8]);
+			$('head', testEPubDom)[0].appendChild($(styles)[9]);
+			$('head', testEPubDom)[0].appendChild($(styles)[10]);
+			$('head', testEPubDom)[0].appendChild($(styles)[11]);
+
+			selector = new Readium.Models.AlternateStyleTagSelector;
+			selector.activateAlternateStyleSet(["vertical", "night"], testEPubDom);
+
+			expect($('link[href="someStyle1.css"]', testEPubDom)[0].disabled).toEqual(false);
+			expect($('link[href="someStyle2.css"]', testEPubDom)[0].disabled).toEqual(false);
+			expect($('link[href="someStyle3.css"]', testEPubDom)[0].disabled).toEqual(false);
+			expect($('link[href="someStyle4.css"]', testEPubDom)[0].disabled).toEqual(false);
+		});
 	});
 
 	describe("activation of the correct style sheets", function () {
