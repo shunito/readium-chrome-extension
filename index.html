@@ -18,26 +18,26 @@
 			<div class="navbar-inner" id="inner-top-bar">
 				<div class="container" style="width: 100%">
 
-					<a class="brand" data-toggle="modal" href="#readium-info" id='bar-logo'>
-						<img src="/images/top_bar/readium_logo.png"/>
+					<a class="brand" data-toggle="modal" href="#readium-info" id='bar-logo' role="button">
+						<img src="/images/top_bar/readium_logo.png" alt="Readium logo"/>
 					</a>
 
 					<ul class="nav pull-right">
 						<li class="divider-vertical stubby"></li>
 						<li>
-							<a href="#" id="row-view-btn">
-								<img src="/images/top_bar/list_view.png" class="small"/>
+							<a href="#" id="row-view-btn" role="button">
+								<img src="/images/top_bar/list_view.png" class="small" alt="EBooks in list view"/>
 							</a>
 						</li>
 						<li>
-							<a href="#" id='block-view-btn'>
-								<img src="/images/top_bar/thumb_view.png" class="small"/>
+							<a href="#" id='block-view-btn' role="button">
+								<img src="/images/top_bar/thumb_view.png" class="small" alt="EBooks in thumbnail view"/>
 							</a>
 						</li>
 						<li class="divider-vertical stubby"></li>
 						<li style="margin-right: 15px" >
-							<a href="#readium-options-modal" id="options-btn" data-toggle="modal">
-								<img src="/images/top_bar/options.png" class="small"/>
+							<a href="#readium-options-modal" id="options-btn" data-toggle="modal" role="button">
+								<img src="/images/top_bar/options.png" class="small" alt="Options"/>
 							</a>
 						</li>
 
@@ -71,7 +71,7 @@
 				
 			<div class="modal fade" id="readium-info" style="display: none" ><!-- le info modal -->
 				<div>
-					<img src="/images/info_modal/about_readium_logo.png">
+					<img src="/images/info_modal/about_readium_logo.png" alt="About Readium logo">
 				</div>
 				<div>
 					<!-- UPDATE VERSION NUMBER -->
@@ -81,7 +81,7 @@
 				Readium<sup>TM</sup>, a project of the International Digital Publishing Forum (IDPF) and supporters, is an open source reference system and rendering engine for EPUB&reg; publications.  To learn more, visit the <a href="http://readium.org/">project homepage</a>. To date, the project development has been lead by <a href="http://evidentpoint.com/">Evident Point</a> and <a href="http://www.bluefirereader.com/">Bluefire Productions</a>. To contribute visit the <a href="https://github.com/readium/readium">github repository</a>
 				</p>
 				<div>
-					<img src="/images/info_modal/partner_logos.png">
+					<img src="/images/info_modal/partner_logos.png" alt="Readium partner logos">
 				</div>
 			</div><!-- end le info modal -->
 
@@ -144,7 +144,7 @@
 				<div class="modal-footer">
 					<!--<a href="#" class="btn btn-primary">Save changes</a> Help?-->
 					<button id='url-button' class='btn btn-primary'>Add Book</button>
-					<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+					<a href="#" class="btn" data-dismiss="modal" role="button">Cancel</a>
 				</div>
 
 			</div><!-- end add le book -->
@@ -197,8 +197,8 @@
       </div>
 			
 			<div class="modal-footer">
-                <a href="#" class="btn btn-primary" id="save-settings-btn">Save changes</a>
-                <a href="#" class="btn" data-dismiss="modal">Close</a>
+                <a href="#" class="btn btn-primary" id="save-settings-btn" role="button">Save changes</a>
+                <a href="#" class="btn" data-dismiss="modal" role="button">Close</a>
             </div>
 		</div><!-- end le settings modal -->
 
@@ -219,23 +219,23 @@
 					
 				</div>
 				
-				<img class='cover-image read' src='<%= data.cover_href %>' width='150' height='220' >
+				<img class='cover-image read' src='<%= data.cover_href %>' width='150' height='220' alt='Open ePUB <%= data.title %>'>
 				
-				<a href="#details-modal-<%= data.key %>" class="info-icon" data-toggle="modal">
-					<img class='info-icon pull-right' src='/images/library/info-icon.png' height="39px" width="39px"  >
+				<a href="#details-modal-<%= data.key %>" class="info-icon" data-toggle="modal" role="button">
+					<img class='info-icon pull-right' src='/images/library/info-icon.png' height="39px" width="39px" alt='<%= data.title %> information'>
 				</a>
 			</div>
 			
 			<div class="caption clearfix buttons">
-				<a href="#todo" class="btn read" data-book='<%= data.key %>'>Read</a>
-				<a href="#details-modal-<%= data.key %>" class="btn details" data-toggle="modal" >
+				<a href="#todo" class="btn read" data-book='<%= data.key %>' role='button'>Read</a>
+				<a href="#details-modal-<%= data.key %>" class="btn details" data-toggle="modal" role="button">
 					Details
 				</a>
 			</div>
 
 			<div id='details-modal-<%= data.key %>' class='modal fade details-modal'>
 				<div class="pull-left modal-cover-wrap">
-					<img class='details-cover-image' src='<%= data.cover_href %>' width='150' height='220' >
+					<img class='details-cover-image' src='<%= data.cover_href %>' width='150' height='220' alt='ePUB cover'>
 					<div class="caption clearfix modal-buttons">
 			</div>
 				</div>
@@ -262,7 +262,7 @@
 				<p id='empty-message-text' class='green'>
 					Add items to your</br>library here!
 				</p>
-				<img id='empty-arrow' src='/images/library/empty_library_arrow.png' />
+				<img id='empty-arrow' src='/images/library/empty_library_arrow.png' alt='Empty library arrow suggests adding an ePUB'/>
 				
 			</div>
 		</script>
