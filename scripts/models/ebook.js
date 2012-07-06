@@ -1,14 +1,5 @@
-// **Welcome the Annotated Readium Souce Code** 
-//
-// The content on these pages is generated directly from the comments in
-// Readium's souce code using a tool called [docco](http://jashkenas.github.com/docco/).
-// At the moment it is a bit of a work in progress but we are working hard
-// generate some comprehensive documentation for Readium.
-//
-// # Ebook
-// 
-// The **Ebook** class is the main buisness object used for maintaining
-// application state in the Readium viewer.
+// Description: This model is the "controller" for an ePUB, managing the interaction between the 
+// pagination views and the ePUB itself
 
 Readium.Models.Ebook = Backbone.Model.extend({
 
@@ -16,17 +7,21 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 		// capture context for use in callback functions
 		var that = this;
+
+		// ------ START: TEMPORARY REFACTORED CODE ---- //
+		// TODO: Perhaps pass all the initial state for the epub as an object rather than a set of properties
+		this.epub = new Readium.Models.ReadiumEPUBState(this.attributes);
+
+		// ------ END: TEMPORARY REFACTORED CODE ------ // 
 		
 		// create a [`Paginator`](/docs/paginator.html) object used to initialize
 		// pagination strategies for the spine items of this book
 		this.paginator = new Readium.Models.Paginator({book: this});
 
-		// intantiate a [`PackageDocument`](/docs/packageDocument.html)
-		this.packageDocument = new Readium.Models.PackageDocument({ book: that }, {
-			file_path: this.get("package_doc_path")
-		});
+		// Get the epub package document
+		this.packageDocument = this.epub.getPackageDocument();
 		
-		//  load the `packageDocument` from the HTML5 filesystem asynchroniously
+		// load the `packageDocument` from the HTML5 filesystem asynchroniously
 		this.packageDocument.fetch({
 
 			// success callback is executed once the filesSystem contents have 
@@ -43,7 +38,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				that.set("rendered_spine_items", items);
 				
 				// check if a TOC is specified in the `packageDocument`
-				that.set("has_toc", ( !!that.packageDocument.getTocItem() ) );
+				that.epub.set("has_toc", ( !!that.packageDocument.getTocItem() ) );
 			}
 		});
 
@@ -67,7 +62,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 		_.extend(ops,options);
 		var that = this;
-		this.set("updated_at", new Date());
+		this.epub.set("updated_at", new Date());
 		Lawnchair(function() {
 			this.save(that.toJSON(), ops.success);
 		});
@@ -186,7 +181,12 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				}
 			}
 
-			this.set({two_up: !twoUp, current_page: newPages});
+			//this.set({two_up: !twoUp, current_page: newPages});
+			// ------ START: REFACTORED CODE ---- //
+			
+			this.epub.set({two_up: !twoUp});
+			this.set({current_page: newPages});
+			// ------ END: REFACTORED CODE ------ // 
 		}	
 	},
 
