@@ -17,7 +17,13 @@ Readium.Routers.ViewerRouter = Backbone.Router.extend({
 					alert('Could not load book, try refeshing your browser.')
 					return;
 				}
-				window._book = new Readium.Models.Ebook(result);
+				// ------ START: REFACTORED CODE ---- //
+				
+				window._book = new Readium.Models.ReadiumEPUBState(result);
+
+				// ------ END: REFACTORED CODE ------ // 
+
+				window._book = new Readium.Models.Ebook({epub : window._book});
 				
 				window._applicationView = new Readium.Views.ViewerApplicationView({
 					model: window._book

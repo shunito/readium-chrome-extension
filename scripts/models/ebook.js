@@ -8,12 +8,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// capture context for use in callback functions
 		var that = this;
 
-		// ------ START: TEMPORARY REFACTORED CODE ---- //
-		// TODO: Perhaps pass all the initial state for the epub as an object rather than a set of properties
-		this.epub = new Readium.Models.ReadiumEPUBState(this.attributes);
+		this.epub = this.get("epub");
 
-		// ------ END: TEMPORARY REFACTORED CODE ------ // 
-		
 		// create a [`Paginator`](/docs/paginator.html) object used to initialize
 		// pagination strategies for the spine items of this book
 		this.paginator = new Readium.Models.Paginator({book: this});
@@ -87,36 +83,14 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
   		// only save attrs that should be persisted:
   		return {
-			"apple_fixed": this.epub.get("apple_fixed"),
-			"author": this.epub.get("author"),
-			"cover_href": this.epub.get("cover_href"),
-			"created_at": this.epub.get("created_at"),
-			"current_theme": this.epub.get("current_theme"),
-			"description": this.epub.get("description"),
-			"epub_version": this.epub.get("epub_version"),
-			"fixed_layout": this.epub.get("fixed_layout"),
-			"id": this.epub.get("id"),
-			"key": this.epub.get("key"),
-			"language": this.epub.get("language"),
-			"layout": this.epub.get("layout"),
-			"modified_date": this.epub.get("modified_date"),
-			"ncx": this.epub.get("ncx"),
-			"open_to_spread": this.epub.get("open_to_spread"),
-			"orientation": this.epub.get("orientation"),
-			"package_doc_path": this.epub.get("package_doc_path"),
-			"page_prog_dir": this.epub.get("page_prog_dir"),
-			"paginate_backwards": this.epub.get("paginate_backwards"),
-			"pubdate": this.epub.get("pubdate"),
-			"publisher": this.epub.get("publisher"),
-			"rights": this.epub.get("rights"),
-			"spread": this.epub.get("spread"),
-			"src_url": this.epub.get("src_url"),
-			"title": this.epub.get("title"),
-			"updated_at": this.epub.get("updated_at"),
-			"current_theme": this.epub.get("current_theme"),
-			"current_margin": this.epub.get("current_margin"),
-			"font_size": this.epub.get("font_size"),
-			"two_up": this.epub.get("two_up")
+			"current_theme": this.get("current_theme"),
+			"updated_at": this.get("updated_at"),
+			"current_theme": this.get("current_theme"),
+			"current_margin": this.get("current_margin"),
+			"font_size": this.get("font_size"),
+			"two_up": this.get("two_up"),
+			"font_size": this.get("font_size"),
+			"current_page": this.get("current_page")
 		};
 	},
 
@@ -124,8 +98,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	// between a single page and side-by-side page views and vice versa.
 	toggleTwoUp: function() {
 
-		if(this.epub.get("can_two_up")) {
-			var twoUp = this.epub.get("two_up");
+		if(this.get("can_two_up")) {
+			var twoUp = this.get("two_up");
 			var displayed = this.get("current_page");
 			var newPages = [];
 
@@ -181,12 +155,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				}
 			}
 
-			//this.set({two_up: !twoUp, current_page: newPages});
-			// ------ START: REFACTORED CODE ---- //
-			
-			this.epub.set({two_up: !twoUp});
-			this.set({current_page: newPages});
-			// ------ END: REFACTORED CODE ------ // 
+			this.set({two_up: !twoUp, current_page: newPages});
 		}	
 	},
 
@@ -220,13 +189,13 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	},
 
 	increaseFont: function() {
-		var size = this.epub.get("font_size");
-		this.epub.set({font_size: size + 1})
+		var size = this.get("font_size");
+		this.set({font_size: size + 1})
 	},
 
 	decreaseFont: function() {
-		var size = this.epub.get("font_size");
-		this.epub.set({font_size: size - 1})
+		var size = this.get("font_size");
+		this.set({font_size: size - 1})
 	},
 
 	toggleToc: function() {
@@ -267,7 +236,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// is displayed on the screen probably needs to change. 
 		if (this.getCurrentSection().isFixedLayout()) {
 
-			if (this.epub.get("two_up") && curr_pg[0] === 1) {
+			if (this.get("two_up") && curr_pg[0] === 1) {
 
 				return;
 			}
@@ -277,7 +246,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			this.goToPrevSection();
 		}
 		// Single page navigation
-		else if(!this.epub.get("two_up")){
+		else if(!this.get("two_up")){
 			this.set("current_page", [lastPage]);
 
 			// Reset spine position
@@ -347,7 +316,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// For fixed layout pubs, check if the last page is displayed; if so, end navigation
 		if (this.getCurrentSection().isFixedLayout()) {
 
-			if (this.epub.get("two_up") && 
+			if (this.get("two_up") && 
 				(curr_pg[0] === this.get("rendered_spine_items").length || 
 				 curr_pg[1] === this.get("rendered_spine_items").length)
 				) {
@@ -360,7 +329,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 			this.goToNextSection();
 		}
-		else if (!this.epub.get("two_up")) {
+		else if (!this.get("two_up")) {
 
 			this.set("current_page", [firstPage]);
 
@@ -444,7 +413,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 		// in two up mode we need to keep track of what side
 		// of the spine the odd pages go on
-		if(this.epub.get("two_up")) {
+		if(this.get("two_up")) {
 			
 			// Fixed layout page
 			if(this.getCurrentSection().isFixedLayout()) {
@@ -511,7 +480,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	adjustCurrentPage: function() {
 		var cp = this.get("current_page");
 		var num = this.get("num_pages");
-		var two_up = this.epub.get("two_up");
+		var two_up = this.get("two_up");
 		if(cp[cp.length - 1] > num) {
 			this.goToLastPage();
 		}
@@ -572,11 +541,13 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			// invalid position
 			return;
 		}
+
 		this.set("spine_position", pos);
 		if(this.get("rendered_spine_items").indexOf(pos) >= 0) {
 			// the spine item is already on the page, nothing to do
 			return;
 		}
+
 		var items = this.paginator.renderSpineItems(true);
 		this.set("rendered_spine_items", items);
 	},
@@ -599,23 +570,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			// to anyone who cares
 			this.set({hash_fragment: splitUrl[2]});
 		}
-		
 	},
-
-	/* TODO: I don't think this is required. Remove soon
-	changPageNumber: function(num) {
-		var cp = this.get("current_page");
-		var np = [];
-		var diff = num - cp[cp.length - 1];
-		if( diff > 0 ) {
-			diff = 0;
-		}
-		for(var i = 0; i < cp.length; i++) {
-			np[i] = cp[i] + diff;	
-		}
-		this.set({num_pages: num, current_page: np});
-	},
-	*/
 
 	getToc: function() {
 		var item = this.packageDocument.getTocItem();
@@ -732,5 +687,4 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	isFixedLayout: function() {
 		return this.epub.isFixedLayout();
 	}
-	
 });

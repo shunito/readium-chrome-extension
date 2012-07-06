@@ -7,7 +7,6 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		this.page_template = _.template( $('#fixed-page-template').html() );
 		this.empty_template = _.template( $('#empty-fixed-page-template').html() );
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
-		//this.model.on("first_render_ready", this.render, this);
 		this.model.on("change:two_up", this.setUpMode, this);
 		this.model.on("change:meta_size", this.setContainerSize, this);
 	},
@@ -35,10 +34,6 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		this.setContainerSize();
 		this.setUpMode();
 
-		// add the current section
-		//this.addPage( this.model.getCurrentSection(), 1 );
-		//currentPage = this.model.set("current_page", [1]);
-		
 		return this.renderPages();
 	},
 

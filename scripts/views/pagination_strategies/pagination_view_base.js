@@ -48,7 +48,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	},
 
 	getBindings: function() {
-		var packDoc = this.model.packageDocument;
+		var packDoc = this.model.epub.getPackageDocument();
 		var bindings = packDoc.get('bindings');
 		return bindings.map(function(binding) {
 			binding.selector = 'object[type="' + binding.media_type + '"]';

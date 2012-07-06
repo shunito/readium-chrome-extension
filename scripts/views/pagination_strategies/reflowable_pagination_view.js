@@ -11,7 +11,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 		// if this book does right to left pagination we need to set the
 		// offset on the right
-		if(this.model.get("page_prog_dir") === "rtl") {
+		if(this.model.epub.get("page_prog_dir") === "rtl") {
 			this.offset_dir = "right";
 		}
 		else {
@@ -27,7 +27,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.on("change:current_margin", this.marginCallback, this);
 		this.model.on("change:mo_playing", this.renderMoPlaying, this);
 		this.model.on("change:current_mo_frag", this.renderMoFragHighlight, this);
-
 	},
 
 	// we are using experimental styles so we need to 
