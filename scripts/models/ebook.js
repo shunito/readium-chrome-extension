@@ -87,36 +87,36 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
   		// only save attrs that should be persisted:
   		return {
-			"apple_fixed": this.get("apple_fixed"),
-			"author": this.get("author"),
-			"cover_href": this.get("cover_href"),
-			"created_at": this.get("created_at"),
-			"current_theme": this.get("current_theme"),
-			"description": this.get("description"),
-			"epub_version": this.get("epub_version"),
-			"fixed_layout": this.get("fixed_layout"),
-			"id": this.get("id"),
-			"key": this.get("key"),
-			"language": this.get("language"),
-			"layout": this.get("layout"),
-			"modified_date": this.get("modified_date"),
-			"ncx": this.get("ncx"),
-			"open_to_spread": this.get("open_to_spread"),
-			"orientation": this.get("orientation"),
-			"package_doc_path": this.get("package_doc_path"),
-			"page_prog_dir": this.get("page_prog_dir"),
-			"paginate_backwards": this.get("paginate_backwards"),
-			"pubdate": this.get("pubdate"),
-			"publisher": this.get("publisher"),
-			"rights": this.get("rights"),
-			"spread": this.get("spread"),
-			"src_url": this.get("src_url"),
-			"title": this.get("title"),
-			"updated_at": this.get("updated_at"),
-			"current_theme": this.get("current_theme"),
-			"current_margin": this.get("current_margin"),
-			"font_size": this.get("font_size"),
-			"two_up": this.get("two_up")
+			"apple_fixed": this.epub.get("apple_fixed"),
+			"author": this.epub.get("author"),
+			"cover_href": this.epub.get("cover_href"),
+			"created_at": this.epub.get("created_at"),
+			"current_theme": this.epub.get("current_theme"),
+			"description": this.epub.get("description"),
+			"epub_version": this.epub.get("epub_version"),
+			"fixed_layout": this.epub.get("fixed_layout"),
+			"id": this.epub.get("id"),
+			"key": this.epub.get("key"),
+			"language": this.epub.get("language"),
+			"layout": this.epub.get("layout"),
+			"modified_date": this.epub.get("modified_date"),
+			"ncx": this.epub.get("ncx"),
+			"open_to_spread": this.epub.get("open_to_spread"),
+			"orientation": this.epub.get("orientation"),
+			"package_doc_path": this.epub.get("package_doc_path"),
+			"page_prog_dir": this.epub.get("page_prog_dir"),
+			"paginate_backwards": this.epub.get("paginate_backwards"),
+			"pubdate": this.epub.get("pubdate"),
+			"publisher": this.epub.get("publisher"),
+			"rights": this.epub.get("rights"),
+			"spread": this.epub.get("spread"),
+			"src_url": this.epub.get("src_url"),
+			"title": this.epub.get("title"),
+			"updated_at": this.epub.get("updated_at"),
+			"current_theme": this.epub.get("current_theme"),
+			"current_margin": this.epub.get("current_margin"),
+			"font_size": this.epub.get("font_size"),
+			"two_up": this.epub.get("two_up")
 		};
 	},
 
@@ -124,8 +124,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	// between a single page and side-by-side page views and vice versa.
 	toggleTwoUp: function() {
 
-		if(this.get("can_two_up")) {
-			var twoUp = this.get("two_up");
+		if(this.epub.get("can_two_up")) {
+			var twoUp = this.epub.get("two_up");
 			var displayed = this.get("current_page");
 			var newPages = [];
 
@@ -152,7 +152,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			else {
 
 				// page progression is right-to-left
-				if (this.get("page_prog_dir") === "rtl") {
+				if (this.epub.get("page_prog_dir") === "rtl") {
 
 					if (this.displayedPageIsLeft(displayed[0])) {
 						newPages[0] = displayed[0] - 1;
@@ -220,13 +220,13 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	},
 
 	increaseFont: function() {
-		var size = this.get("font_size");
-		this.set({font_size: size + 1})
+		var size = this.epub.get("font_size");
+		this.epub.set({font_size: size + 1})
 	},
 
 	decreaseFont: function() {
-		var size = this.get("font_size");
-		this.set({font_size: size - 1})
+		var size = this.epub.get("font_size");
+		this.epub.set({font_size: size - 1})
 	},
 
 	toggleToc: function() {
@@ -238,7 +238,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	// ie progression direction is dependent on 
 	// page progression dir
 	goRight: function() {
-		if (this.get("page_prog_dir") === "rtl") {
+		if (this.epub.get("page_prog_dir") === "rtl") {
 			this.prevPage();
 		}
 		else {
@@ -250,7 +250,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	// ie progression direction is dependent on 
 	// page progression dir
 	goLeft: function() {
-		if (this.get("page_prog_dir") === "rtl") {
+		if (this.epub.get("page_prog_dir") === "rtl") {
 			this.nextPage();
 		}
 		else {
@@ -267,7 +267,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// is displayed on the screen probably needs to change. 
 		if (this.getCurrentSection().isFixedLayout()) {
 
-			if (this.get("two_up") && curr_pg[0] === 1) {
+			if (this.epub.get("two_up") && curr_pg[0] === 1) {
 
 				return;
 			}
@@ -277,7 +277,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			this.goToPrevSection();
 		}
 		// Single page navigation
-		else if(!this.get("two_up")){
+		else if(!this.epub.get("two_up")){
 			this.set("current_page", [lastPage]);
 
 			// Reset spine position
@@ -305,7 +305,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// If fixed layout
 		if (this.getCurrentSection().isFixedLayout()) {
 
-			if (this.get("page_prog_dir") === "rtl") {
+			if (this.epub.get("page_prog_dir") === "rtl") {
 
 				// If the first page is a left page in rtl progression, only one page 
 				// can be displayed, even in two-up mode
@@ -347,7 +347,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// For fixed layout pubs, check if the last page is displayed; if so, end navigation
 		if (this.getCurrentSection().isFixedLayout()) {
 
-			if (this.get("two_up") && 
+			if (this.epub.get("two_up") && 
 				(curr_pg[0] === this.get("rendered_spine_items").length || 
 				 curr_pg[1] === this.get("rendered_spine_items").length)
 				) {
@@ -360,7 +360,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 			this.goToNextSection();
 		}
-		else if (!this.get("two_up")) {
+		else if (!this.epub.get("two_up")) {
 
 			this.set("current_page", [firstPage]);
 
@@ -390,7 +390,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// If fixed layout
 		if (this.getCurrentSection().isFixedLayout()) {
 
-			if (this.get("page_prog_dir") === "rtl") {
+			if (this.epub.get("page_prog_dir") === "rtl") {
 
 				// If the first page is a left page in rtl progression, only one page 
 				// can be displayed, even in two-up mode
@@ -444,12 +444,12 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 		// in two up mode we need to keep track of what side
 		// of the spine the odd pages go on
-		if(this.get("two_up")) {
+		if(this.epub.get("two_up")) {
 			
 			// Fixed layout page
 			if(this.getCurrentSection().isFixedLayout()) {
 
-				if (this.get("page_prog_dir") === "rtl") {
+				if (this.epub.get("page_prog_dir") === "rtl") {
 
 					if (this.displayedPageIsLeft(pageNumber)) {
 
@@ -496,12 +496,12 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	},
 
 	restorePosition: function() {
-		var pos = Readium.Utils.getCookie(this.get("key"));
+		var pos = Readium.Utils.getCookie(this.epub.get("key"));
 		return parseInt(pos, 10) || 0;
 	},
 
 	savePosition: function() {
-		Readium.Utils.setCookie(this.get("key"), this.get("spine_position"), 365);
+		Readium.Utils.setCookie(this.epub.get("key"), this.get("spine_position"), 365);
 	},
 
 	resolvePath: function(path) {
@@ -511,7 +511,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	adjustCurrentPage: function() {
 		var cp = this.get("current_page");
 		var num = this.get("num_pages");
-		var two_up = this.get("two_up");
+		var two_up = this.epub.get("two_up");
 		if(cp[cp.length - 1] > num) {
 			this.goToLastPage();
 		}
@@ -602,6 +602,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		
 	},
 
+	/* TODO: I don't think this is required. Remove soon
 	changPageNumber: function(num) {
 		var cp = this.get("current_page");
 		var np = [];
@@ -614,6 +615,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 		this.set({num_pages: num, current_page: np});
 	},
+	*/
 
 	getToc: function() {
 		var item = this.packageDocument.getTocItem();
@@ -655,7 +657,9 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		var url = this.packageDocument.resolveUri(path);;
 		path = this.resolvePath(path);
 		this.set("current_section_url", url);
+
 		Readium.FileSystemApi(function(api) {
+
 			api.readTextFile(path, function(result) {
 				that.set( {current_content: result} );
 			}, function() {
@@ -723,8 +727,10 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	},
 
 	// is this book set to fixed layout at the meta-data level
+	// TODO: This is only passing through this data to avoid breaking code in viewer.js. Eventually
+	// this should probably be removed. 
 	isFixedLayout: function() {
-		return this.get("fixed_layout") || this.get("apple_fixed");
+		return this.epub.isFixedLayout();
 	}
 	
 });
