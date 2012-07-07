@@ -56,7 +56,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// and 
 		this.on("change:spine_position", this.savePosition, this);
 
-		// If a new fixed layout 
+		// If we encounter a new fixed layout section, we need to parse the 
+		// `<meta name="viewport">` to determine the size of the iframe
 		this.on("change:spine_position", this.setMetaSize, this);
 	},
 
@@ -88,6 +89,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
     	//"spine_position": 0
   	},
 
+  	// serialize this models state to `JSON` so that it can
+  	// be persisted and restored
   	toJSON: function() {
 
   		// only save attrs that should be persisted:
@@ -190,7 +193,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}	
 	},
 
-	// Description: The displayedPageIs** methods determine if the page is right, left or center.
+	// Description: The `displayedPageIs...` methods determine if a fixed layout page is right, left or center.
 	//
 	// Note: This is not an ideal approach, as we're pulling properties directly out of the dom, rather than
 	// out of our models. The rationale is that as of Readium 0.4.1, the page-spread-* value
@@ -198,7 +201,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	// would be to infer the left/right/center value from model attributes on ebook, or other objects in
 	// ebook's object hierarchy. However, this would duplicate the logic that exists elsewhere for determining right/left/center
 	// for a page, which is probably worse than pulling out of the dom. This approach also avoids having to convert
-	// from the page number (based on what is rendered on the screen) to spine index.   
+	// from the page number (based on what is rendered on the screen) to spine index. 
 	displayedPageIsRight: function (displayedPageNum) {
 
 		return $("#page-" + displayedPageNum).hasClass("right_page") ? true : false;
