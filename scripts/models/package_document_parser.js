@@ -51,7 +51,7 @@ Readium.Models.PackageDocumentParser.prototype.parse = function(xml_content) {
 	var json, manifest, cover, xmlDom;
 	if(typeof(xml_content) === "string" ) {
 		var parser = new window.DOMParser;
-  		xmlDom = parser.parseFromString(xmlDom, 'text/xml');
+  		xmlDom = parser.parseFromString(xml_content, 'text/xml');
 	}
 	else {
 		xmlDom = xml_content;
