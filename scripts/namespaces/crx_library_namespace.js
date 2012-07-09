@@ -22,7 +22,13 @@ window.Readium = {
 		// use it trigger a reset event on the library
 		_lawnchair = new Lawnchair(function() {
 			this.all(function(all) {
-				window._library.reset(all);							
+
+				// Exclude entries in the store that are for epubView properties. These should not be 
+				// rendered in the list of epubs in the library
+				var ePUBList = _.reject(all, function(element) { 
+					return element.key.split("_")[1] === "epubViewProperties";
+				});
+				window._library.reset(ePUBList);							
 			});
 		});
 
@@ -37,8 +43,6 @@ window.Readium = {
 			$('#library-items-container').addClass("row-view").removeClass("block-view");
 			Readium.Utils.setCookie("lib_view", "row", 1000);
 		});
-
-		
 	}
 };
 

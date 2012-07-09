@@ -47,5 +47,4 @@ Readium.Routers.ViewerRouter = Backbone.Router.extend({
 	splat_handler: function(splat) {
 		console.log(splat)
 	}
-
 });
