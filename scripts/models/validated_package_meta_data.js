@@ -32,18 +32,10 @@ Readium.Models.ValidatedPackageMetaData = Backbone.Model.extend({
 	// Apple created its own fixed layout spec for ibooks.
 	// this function parses the metadata used by this spec
 	parseIbooksDisplayOptions: function(content) {
-		var parseBool = function(string) {
-			return string.toLowerCase().trim() === 'true';	
-		}
-		var parser = new window.DOMParser();
-		var xmlDoc = parser.parseFromString(content, "text/xml");
-		var fixedLayout = xmlDoc.getElementsByName("fixed-layout")[0];
-		var openToSpread = xmlDoc.getElementsByName("open-to-spread")[0];
-		this.set({
-			fixed_layout: ( fixedLayout && parseBool(fixedLayout.textContent) ),
-			open_to_spread: ( openToSpread && parseBool(openToSpread.textContent) ),
-			apple_fixed: ( fixedLayout && parseBool(fixedLayout.textContent) )
-		})
+		var parser, result;
+		parser = new Readium.Models.IbooksOptionsParser();
+		result = parser.parse(content);
+		this.set(result);
 	},
 
 	parse: function(xmlDom) {
