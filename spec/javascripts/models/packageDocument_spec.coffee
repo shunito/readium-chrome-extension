@@ -4,7 +4,7 @@ describe 'PackageDocument', ->
 
 		beforeEach ->
 			stubFileSystem()
-			@packageDocument = new Readium.Models.PackageDocument({}, {file_path: "some/path"})
+			@packageDocument = new Readium.Models.PackageDocument({book: {}, file_path: "some/path"})
 
 		it 'exists in the namespace', ->
 			expect(Readium.Models.PackageDocument).toBeDefined()
@@ -17,13 +17,14 @@ describe 'PackageDocument', ->
 			spyOn(@packageDocument.onSpinePosChanged, "apply")
 			@packageDocument.trigger("change:spine_position")
 			expect(@packageDocument.onSpinePosChanged.apply).toHaveBeenCalled()
+
 	
 	describe "parsing the xml", ->
 
 		beforeEach ->
 			xml_string = jasmine.getFixtures().read('package_document.xml')
 			@xml = new window.DOMParser().parseFromString(xml_string, 'text/xml')
-			@packageDocument = new Readium.Models.PackageDocument()
+			@packageDocument = new Readium.Models.PackageDocument({file_path: "some/path"})
 			@packageDocument.uri_obj = new URI("http://google.ca")
 			spyOn(@packageDocument, "crunchSpine")
 			@json = @packageDocument.parse(@xml) 
