@@ -7,12 +7,13 @@ describe "Readium.Models.Ebook", ->
 		beforeEach ->
 			stubFileSystem()
 
+
 		
 		describe "without passing a file path", ->
 
 			it "throws an exeption", ->
 				createWithNoPath = -> new Readium.Models.Ebook()
-				expect(createWithNoPath).toThrow("Cannot sync the model to the fs without a path")
+				expect(createWithNoPath).toThrow("This class cannot be synced without a file path")
 
 		
 		describe "with valid params", ->
@@ -26,7 +27,7 @@ describe "Readium.Models.Ebook", ->
 				expect(ebook.packageDocument).toBeDefined()
 
 			it 'passes a reference to itself to the package document', ->
-				packDoc = new Readium.Models.PackageDocument({book: {}}, {"file_path": "some/path"})
+				packDoc = new Readium.Models.PackageDocument({book: {}, "file_path": "some/path"})
 				spyOn(Readium.Models, "PackageDocument").andReturn(packDoc)
 				ebook = new Readium.Models.Ebook({"package_doc_path": "some/file/path"})
 				args = Readium.Models.PackageDocument.mostRecentCall.args
@@ -34,7 +35,7 @@ describe "Readium.Models.Ebook", ->
 
 
 			it "calls fetch on the package document", ->
-				packDoc = new Readium.Models.PackageDocument({book: {}}, {"file_path": "some/path"})
+				packDoc = new Readium.Models.PackageDocument({book: {}, "file_path": "some/path"})
 				spyOn(Readium.Models, "PackageDocument").andReturn(packDoc)
 				spyOn(packDoc, "fetch")
 				ebook = new Readium.Models.Ebook({"package_doc_path": "some/file/path"})
