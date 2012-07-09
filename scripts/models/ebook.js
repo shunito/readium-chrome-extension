@@ -16,6 +16,9 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 		// Get the epub package document
 		this.packageDocument = this.epub.getPackageDocument();
+
+		// Instantiate an object to decide what to display
+		this.pageNumberDisplayLogic = new Readium.Models.PageNumberDisplayLogic();
 		
 		// TODO: this might have to change: Should this model load the package document or epub_state??
 		// load the `packageDocument` from the HTML5 filesystem asynchroniously
@@ -109,9 +112,15 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	toggleTwoUp: function() {
 
 		if(this.get("can_two_up")) {
-			var twoUp = this.get("two_up");
-			var displayed = this.get("current_page");
-			var newPages = [];
+
+			var newPages = this.pageNumberDisplayLogic.getPageNumbersForTwoUp (
+				this.get("two_up"), 
+				this.get("current_page"),
+				this.epub.get("page_prog_dir"),
+				this.epub.get("isFixedLayout")
+				);
+
+			/*
 
 			// Two pages are currently displayed; find the single page number to display
 			if(twoUp) {
@@ -165,7 +174,9 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				}
 			}
 
-			this.set({two_up: !twoUp, current_page: newPages});
+			*/
+
+			this.set({two_up: !this.get("two_up"), current_page: newPages});
 		}	
 	},
 
@@ -474,11 +485,13 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 	},
 
+	// TODO, which key should be used here? the epub or the viewer properties key? 
 	restorePosition: function() {
 		var pos = Readium.Utils.getCookie(this.epub.get("key"));
 		return parseInt(pos, 10) || 0;
 	},
 
+	// TODO, which key should be used here? the epub or the viewer properties key? 
 	savePosition: function() {
 		Readium.Utils.setCookie(this.epub.get("key"), this.get("spine_position"), 365);
 	},
