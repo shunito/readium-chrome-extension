@@ -1,5 +1,6 @@
 # load in the config file
 require './build/default_config.rb'
+require 'coffee-script'
 
 # load in custom config file if it exists
 if File.exists? './build/custom_config.rb'
@@ -15,6 +16,23 @@ rescue LoadError
     abort "Jasmine is not available. In order to run jasmine, you must: (sudo) gem install jasmine"
   end
 end
+
+namespace :spec do
+	desc "unhipsterify the *.coffee scripts into normal js scripts"
+	task :compile do
+		coffee_files = Dir.glob File.join(".", "spec", "javascripts", "**", "*.coffee")
+		coffee_files.each do |coffee_path| 
+			# this might not be the most robust way to do this, but think it does the job
+			js_path = coffee_path.gsub ".coffee", ".js"
+			puts "dehipsterifying #{coffee_path} => #{js_path}"
+			File.open js_path, "w" do |f|
+				f.puts CoffeeScript.compile File.read(coffee_path)
+			end
+		end
+	end
+end
+
+task :spec => ["spec:compile", "jasmine"]
 
 task :server do
 	`thin -R static.ru start`

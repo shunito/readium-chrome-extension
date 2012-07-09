@@ -11,7 +11,8 @@ Readium.Models.ReadiumEPUBState = Backbone.Model.extend({
 		var that = this;
 
 		// intantiate a [`PackageDocument`](/docs/packageDocument.html)
-		this.packageDocument = new Readium.Models.PackageDocument({ book: this }, {
+		this.packageDocument = new Readium.Models.PackageDocument(
+			{ book: this }, {
 			file_path: this.get("package_doc_path")
 		});
 		
