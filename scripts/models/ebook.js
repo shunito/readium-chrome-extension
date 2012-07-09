@@ -314,65 +314,21 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		return this.get("current_page").indexOf(pageNumber) > -1;
 	},
 
-	goToPage: function(pageNumber) {
+	goToPage: function(gotoPageNumber) {
 
 		// if the we are already at that page then there is no work to do
 		// break out eary to prevent page change events
-		if(this.isPageVisible(pageNumber)) {
+		if (this.isPageVisible(gotoPageNumber)) {
 			return;
 		}
 
-		// in two up mode we need to keep track of what side
-		// of the spine the odd pages go on
-		if(this.get("two_up")) {
-			
-			// Fixed layout page
-			if(this.getCurrentSection().isFixedLayout()) {
-
-				if (this.epub.get("page_prog_dir") === "rtl") {
-
-					if (this.displayedPageIsLeft(pageNumber)) {
-
-						this.set("current_page", [pageNumber - 1, pageNumber]);	
-					}
-					else if (this.displayedPageIsRight(pageNumber)) {
-
-						this.set("current_page", [pageNumber, pageNumber + 1]);
-					}
-
-					// TODO: Handle center pages
-				}
-				// Left-to-right page progression
-				else {
-
-					if (this.displayedPageIsLeft(pageNumber)) {
-
-						this.set("current_page", [pageNumber, pageNumber + 1]);	
-					}
-					else if (this.displayedPageIsRight(pageNumber)) {
-
-						this.set("current_page", [pageNumber - 1, pageNumber]);
-					}
-
-					// TODO: Handle center pages
-				}
-			}
-			// This is a reflowable page
-			else {
-				// in reflowable format, we want this config always:
-				// ODD_PAGE |spine| EVEN_PAGE
-				if(pageNumber % 2 === 1) {
-					this.set("current_page", [pageNumber, pageNumber + 1]);	
-				}
-				else {
-					this.set("current_page", [pageNumber - 1, pageNumber]);
-				}	
-			}
-			
-		}
-		else {
-			this.set("current_page", [pageNumber])
-		}
+		var pagesToGoto = this.pageNumberDisplayLogic.getGotoPageNumsToDisplay(
+							this.get("two_up"),
+							this.getCurrentSection().isFixedLayout(),
+							this.get("page_prog_dir"),
+							gotoPageNumber
+							);
+		this.set("current_page", pagesToGoto);
 	},
 
 	// TODO, which key should be used here? the epub or the viewer properties key? 

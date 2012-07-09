@@ -5,30 +5,24 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 
 	initialize: function () {},
 
-	getPagesToDisplay: function(pageNumber) {
-
-		// if the we are already at that page then there is no work to do
-		// break out eary to prevent page change events
-		if(this.isPageVisible(pageNumber)) {
-			return;
-		}
+	getGotoPageNumsToDisplay: function(twoUp, isFixedLayout, pageProgDirection, gotoPageNumber) {
 
 		// in two up mode we need to keep track of what side
 		// of the spine the odd pages go on
-		if(this.get("two_up")) {
+		if (twoUp) {
 			
 			// Fixed layout page
-			if(this.getCurrentSection().isFixedLayout()) {
+			if (isFixedLayout) {
 
-				if (this.epub.get("page_prog_dir") === "rtl") {
+				if (pageProgDirection === "rtl") {
 
-					if (this.displayedPageIsLeft(pageNumber)) {
+					if (this.displayedPageIsLeft(gotoPageNumber)) {
 
-						this.set("current_page", [pageNumber - 1, pageNumber]);	
+						return [gotoPageNumber - 1, gotoPageNumber];
 					}
 					else if (this.displayedPageIsRight(pageNumber)) {
 
-						this.set("current_page", [pageNumber, pageNumber + 1]);
+						return [gotoPageNumber, gotoPageNumber + 1];
 					}
 
 					// TODO: Handle center pages
@@ -36,13 +30,13 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 				// Left-to-right page progression
 				else {
 
-					if (this.displayedPageIsLeft(pageNumber)) {
+					if (this.displayedPageIsLeft(gotoPageNumber)) {
 
-						this.set("current_page", [pageNumber, pageNumber + 1]);	
+						return [gotoPageNumber, gotoPageNumber + 1];
 					}
-					else if (this.displayedPageIsRight(pageNumber)) {
+					else if (this.displayedPageIsRight(gotoPageNumber)) {
 
-						this.set("current_page", [pageNumber - 1, pageNumber]);
+						return [gotoPageNumber - 1, gotoPageNumber];
 					}
 
 					// TODO: Handle center pages
@@ -52,17 +46,20 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 			else {
 				// in reflowable format, we want this config always:
 				// ODD_PAGE |spine| EVEN_PAGE
-				if(pageNumber % 2 === 1) {
-					this.set("current_page", [pageNumber, pageNumber + 1]);	
+				if (gotoPageNumber % 2 === 1) {
+
+					return [gotoPageNumber, gotoPageNumber + 1];	
 				}
 				else {
-					this.set("current_page", [pageNumber - 1, pageNumber]);
+
+					return [gotoPageNumber - 1, gotoPageNumber];
 				}	
 			}
 			
 		}
 		else {
-			this.set("current_page", [pageNumber])
+			
+			return [pageNumber];
 		}
 	},
 
