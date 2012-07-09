@@ -1,76 +1,22 @@
-/**
- * This is root of all PackageDocument subclasses and the EBook class
- * it, contains only the logic for parsing a packagedoc.xml and 
- * convert the data to JSON.
- */
-Readium.Models.PackageDocumentBase = Backbone.Model.extend({
-	
-	initialize: function(attributes, options) {
-		if(options && options.file_path) {
-			this.file_path = options.file_path;
-			var that = this;
-			if(options.root_url) {
-				that.uri_obj = new URI(options.root_url);
-			}
-			else {
-				Readium.FileSystemApi(function(api) {
-					api.getFsUri(that.file_path, function(uri) {
-						that.uri_obj = new URI(uri);
-					})
-				});
-			}
-		}
-    },
-	
-	parse: function(xmlDom) {
-		var parser = new Readium.Models.PackageDocumentParser(this.uri_obj);
-		var json = parser.parse(xmlDom);
-		// return the parse result
-		return json;
-	},
+// Used to validate a freshly unzipped package doc. Once we have 
+// validated it one time, we don't care if it is valid any more, we
+// just want to do our best to display it without failing
+Readium.Models.ValidatedPackageMetaData = Backbone.Model.extend({
 
-	reset: function(data) {
-		var attrs = this.parse(data);
-		this.set(attrs);
-	},
-
-	resolveUri: function(rel_uri) {
-		uri = new URI(rel_uri);
-		return uri.resolve(this.uri_obj).toString();
-	},
-
-	// reslove a relative file path to relative to this the
-	// the path of this pack docs file path
-	resolvePath: function(path) {
-		var suffix;
-		var pack_doc_path = this.file_path;
-		if(path.indexOf("../") === 0) {
-			suffix = path.substr(3);
-		}
-		else {
-			suffix = path;
-		}
-		var ind = pack_doc_path.lastIndexOf("/")
-		return pack_doc_path.substr(0, ind) + "/" + suffix;
-	}
-
-});
-
-/**
- * Used to validate a freshly unzipped package doc. Once we have 
- * validated it one time, we don't care if it is valid any more, we
- * just want to do our best to display it without failing
- */
-Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.extend({
-
-	initialize: function(attributes, options) {
-		// call the super ctor
-		Readium.Models.PackageDocumentBase.prototype.initialize.call(this, attributes, options);
+	initialize: function(attributes) {
+		this.file_path = attributes.file_path;		
+		this.uri_obj = new URI(attributes.root_url);
 		this.set("package_doc_path", this.file_path);
     },
 
 	validate: function(attrs) {
 
+	},
+
+	// for ease of use call parse before we set the attrs
+	reset: function(data) {
+		var attrs = this.parse(data);
+		this.set(attrs);
 	},
 
 	defaults: {
@@ -100,9 +46,11 @@ Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.ext
 		})
 	},
 
-	parse: function(content) {
-		//call super
-		var json = Readium.Models.PackageDocumentBase.prototype.parse.call(this, content);
+	parse: function(xmlDom) {
+		// parse the xml
+		var parser = new Readium.Models.PackageDocumentParser(this.uri_obj);
+		var json = parser.parse(xmlDom);
+
 		//  only care about the metadata 
 		return json.metadata;
 	},
@@ -114,6 +62,28 @@ Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.ext
 		Lawnchair(function() {
 			this.save(that.toJSON(), options.success);
 		});
+	},
+
+	// TODO: confirm this needs to be here
+	resolveUri: function(rel_uri) {
+		uri = new URI(rel_uri);
+		return uri.resolve(this.uri_obj).toString();
+	},
+
+	// TODO: confirm this needs to be here
+	// reslove a relative file path to relative to this the
+	// the path of this pack docs file path
+	resolvePath: function(path) {
+		var suffix;
+		var pack_doc_path = this.file_path;
+		if(path.indexOf("../") === 0) {
+			suffix = path.substr(3);
+		}
+		else {
+			suffix = path;
+		}
+		var ind = pack_doc_path.lastIndexOf("/")
+		return pack_doc_path.substr(0, ind) + "/" + suffix;
 	}
 });
 
@@ -121,12 +91,29 @@ Readium.Models.ValidatedPackageMetaData = Readium.Models.PackageDocumentBase.ext
  * The working package doc, used to to navigate a package document
  * vai page turns, cfis, etc etc
  */
-Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
+Readium.Models.PackageDocument = Backbone.Model.extend({
 
 
 	initialize: function(attributes, options) {
-		// call the super ctor
-		Readium.Models.PackageDocumentBase.prototype.initialize.call(this, attributes, options);
+		var that = this;
+		
+		if(!attributes.file_path) {
+			// Sanity Check: we need to know where to fetch the data from
+			throw "This class cannot be synced without a file path";
+		}
+		else {
+			// set it as a property of `this` so that `BackboneFileSystemSync`
+			// knows how to find it
+			this.file_path = attributes.file_path;
+
+			// use the `FileSystemApi` to generate a fully resolved
+			// `filesytem:url`
+			Readium.FileSystemApi(function(api) {
+				api.getFsUri(that.file_path, function(uri) {
+					that.uri_obj = new URI(uri);
+				})
+			});
+		}
 		this.on('change:spine_position', this.onSpinePosChanged);
 		
     },
@@ -278,10 +265,31 @@ Readium.Models.PackageDocument = Readium.Models.PackageDocumentBase.extend({
 		return new Readium.Collections.Spine(bbSpine, {packageDocument: this});
 	},
 
-	parse: function(data) {
-		var json = Readium.Models.PackageDocumentBase.prototype.parse.call(this, data);
+	parse: function(xmlDom) {
+		var parser = new Readium.Models.PackageDocumentParser(this.uri_obj);
+		var json = parser.parse(xmlDom);
 		json.res_spine = this.crunchSpine(json.spine, json.manifest);
 		return json;
+	},
+
+	resolveUri: function(rel_uri) {
+		uri = new URI(rel_uri);
+		return uri.resolve(this.uri_obj).toString();
+	},
+
+	// reslove a relative file path to relative to this the
+	// the path of this pack docs file path
+	resolvePath: function(path) {
+		var suffix;
+		var pack_doc_path = this.file_path;
+		if(path.indexOf("../") === 0) {
+			suffix = path.substr(3);
+		}
+		else {
+			suffix = path;
+		}
+		var ind = pack_doc_path.lastIndexOf("/")
+		return pack_doc_path.substr(0, ind) + "/" + suffix;
 	}
 
 

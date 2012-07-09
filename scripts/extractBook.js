@@ -32,8 +32,7 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 		var rootFile = this.get("root_file_path");
 		this.packageDoc = new Readium.Models.ValidatedPackageMetaData({
 				key: this.base_dir_name,
-				src_url: this.get("src")
-			}, {
+				src_url: this.get("src"),
 				file_path: this.base_dir_name + "/" + rootFile,
 				root_url: this.get("root_url") + "/" + rootFile
 			}); 

@@ -22,7 +22,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.paginator = new Readium.Models.Paginator({book: this});
 
 		// intantiate a [`PackageDocument`](/docs/packageDocument.html)
-		this.packageDocument = new Readium.Models.PackageDocument({ book: that }, {
+		this.packageDocument = new Readium.Models.PackageDocument({ 
+			book: that, 
 			file_path: this.get("package_doc_path")
 		});
 		
