@@ -17,6 +17,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// Get the epub package document
 		this.packageDocument = this.epub.getPackageDocument();
 		
+		// TODO: this might have to change: Should this model load the package document or epub_state??
 		// load the `packageDocument` from the HTML5 filesystem asynchroniously
 		this.packageDocument.fetch({
 
@@ -34,7 +35,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				that.set("rendered_spine_items", items);
 				
 				// check if a TOC is specified in the `packageDocument`
-				that.epub.set("has_toc", ( !!that.packageDocument.getTocItem() ) );
+				that.set("has_toc", ( !!that.packageDocument.getTocItem() ) );
 			}
 		});
 

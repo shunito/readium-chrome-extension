@@ -21,9 +21,6 @@ Readium.Models.ReadiumEPUBState = Backbone.Model.extend({
 			// success callback is executed once the filesSystem contents have 
 			// been read and parsed
 			success: function() {
-
-				// check if a TOC is specified in the `packageDocument`
-				that.set("has_toc", ( !!that.packageDocument.getTocItem() ) );
 			}
 		});
 	},
@@ -31,19 +28,6 @@ Readium.Models.ReadiumEPUBState = Backbone.Model.extend({
 	getPackageDocument: function () {
 
 		return this.packageDocument;
-	},
-
-	save: function(attrs, options) {
-		// TODO: this should be done properly with a backbone sync
-		var ops = {
-			success: function() {}
-		}
-		_.extend(ops,options);
-		var that = this;
-		this.set("updated_at", new Date());
-		Lawnchair(function() {
-			this.save(that.toJSON(), ops.success);
-		});
 	},
 
 	defaults: {
@@ -77,68 +61,12 @@ Readium.Models.ReadiumEPUBState = Backbone.Model.extend({
 			"rights": this.get("rights"),
 			"spread": this.get("spread"),
 			"src_url": this.get("src_url"),
-			"title": this.get("title"),
-			"updated_at": this.get("updated_at"),
+			"title": this.get("title")
 		};
 	},
 
 	resolvePath: function(path) {
 		return this.packageDocument.resolvePath(path);
-	},
-
-	adjustCurrentPage: function() {
-		var cp = this.get("current_page");
-		var num = this.get("num_pages");
-		var two_up = this.get("two_up");
-		if(cp[cp.length - 1] > num) {
-			this.goToLastPage();
-		}
-	},	
-
-	hasNextSection: function() {
-		return this.get("spine_position") < (this.packageDocument.spineLength() - 1);
-	},
-
-	hasPrevSection: function() {
-		return this.get("spine_position") > 0;
-	},
-
-	setSpinePos: function(pos) {
-		if(pos < 0 || pos >= this.packageDocument.spineLength()) {
-			// invalid position
-			return;
-		}
-		var spineItems = this.get("rendered_spine_items");
-		this.set("spine_position", pos);
-		if(spineItems.indexOf(pos) >= 0) {
-			// the spine item is already on the page
-			if(spineItems.length > 1) {
-				// we are in fixed layout state, one spine item per page
-				this.goToPage(spineItems.indexOf(pos) + 1);
-			}
-			// else nothing to do, because the section is already rendered out
-			
-		}
-		else {
-			// the section is not rendered out, need to do so
-			var items = this.paginator.renderSpineItems(false);
-			this.set("rendered_spine_items", items);	
-		}
-		
-	},
-
-	setSpinePosBackwards: function(pos) {
-		if(pos < 0 || pos >= this.packageDocument.spineLength()) {
-			// invalid position
-			return;
-		}
-		this.set("spine_position", pos);
-		if(this.get("rendered_spine_items").indexOf(pos) >= 0) {
-			// the spine item is already on the page, nothing to do
-			return;
-		}
-		var items = this.paginator.renderSpineItems(true);
-		this.set("rendered_spine_items", items);
 	},
 
 	// is this book set to fixed layout at the meta-data level

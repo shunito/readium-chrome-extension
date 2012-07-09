@@ -19,14 +19,14 @@ Readium.Routers.ViewerRouter = Backbone.Router.extend({
 				}
 				// ------ START: REFACTORED CODE ---- //
 				
-				window._book = new Readium.Models.ReadiumEPUBState(result);
+				window._epub = new Readium.Models.ReadiumEPUBState(result);
 
 				// ------ END: REFACTORED CODE ------ // 
 
-				window._book = new Readium.Models.Ebook({epub : window._book});
+				window._epubController = new Readium.Models.Ebook({epub : window._epub});
 				
 				window._applicationView = new Readium.Views.ViewerApplicationView({
-					model: window._book
+					model: window._epubController
 				});
 				window._applicationView.render();
 			});		

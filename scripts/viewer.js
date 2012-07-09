@@ -17,7 +17,7 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		this.optionsView.render();
 
 		// the top bar
-		this.toolbar = new Readium.Views.ToolbarView({model: _book});
+		this.toolbar = new Readium.Views.ToolbarView({model: _epubController});
 		this.toolbar.render();
 
 		// the table of contents
