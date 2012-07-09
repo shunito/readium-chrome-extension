@@ -24,8 +24,7 @@ describe 'PackageDocument', ->
 			xml_string = jasmine.getFixtures().read('package_document.xml')
 			@xml = new window.DOMParser().parseFromString(xml_string, 'text/xml')
 			@packageDocument = new Readium.Models.PackageDocument()
-			spyOn(@packageDocument, "resolveUri").andReturn("a/resolved/uri")
-			spyOn(@packageDocument, "resolveMediaOverlays")
+			@packageDocument.uri_obj = new URI("http://google.ca")
 			spyOn(@packageDocument, "crunchSpine")
 			@json = @packageDocument.parse(@xml) 
 
