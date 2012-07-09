@@ -120,62 +120,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				this.epub.get("isFixedLayout")
 				);
 
-			/*
-
-			// Two pages are currently displayed; find the single page number to display
-			if(twoUp) {
-				if (displayed[0] === 0) {
-					newPages[0] = 1;
-				} else {
-					newPages[0] = displayed[0];
-				}
-			}
-			// A single reflowable page is currently displayed; find two pages to display
-			else if(!this.getCurrentSection().isFixedLayout()) {
-				if(displayed[0] % 2 === 1) {
-					newPages[0] = displayed[0];
-					newPages[1] = displayed[0] + 1;
-				}
-				else {
-					newPages[0] = displayed[0] - 1;
-					newPages[1] = displayed[0];
-				}
-			}
-			// A single fixed layout page is displayed
-			else {
-
-				// page progression is right-to-left
-				if (this.epub.get("page_prog_dir") === "rtl") {
-
-					if (this.displayedPageIsLeft(displayed[0])) {
-						newPages[0] = displayed[0] - 1;
-						newPages[1] = displayed[0];
-					}
-					else if (this.displayedPageIsRight(displayed[0])) {
-						newPages[0] = displayed[0];
-						newPages[1] = displayed[0] + 1;
-					}
-
-					// TODO: Handle center pages
-				}
-				// page progression is left-to-right
-				else {
-
-					if (this.displayedPageIsLeft(displayed[0])) {
-						newPages[0] = displayed[0];
-						newPages[1] = displayed[0] + 1;
-					}
-					else if (this.displayedPageIsRight(displayed[0])) {
-						newPages[0] = displayed[0] - 1;
-						newPages[1] = displayed[0];
-					}
-
-					// TODO: Handle center pages
-				}
-			}
-
-			*/
-
 			this.set({two_up: !this.get("two_up"), current_page: newPages});
 		}	
 	},
@@ -249,6 +193,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	},
 	
 	prevPage: function() {
+
 		var curr_pg = this.get("current_page");
 		var lastPage = curr_pg[0] - 1;
 
@@ -264,10 +209,12 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 
 		if(curr_pg[0] <= 1) {
+
 			this.goToPrevSection();
 		}
 		// Single page navigation
 		else if(!this.get("two_up")){
+
 			this.set("current_page", [lastPage]);
 
 			// Reset spine position
@@ -290,47 +237,19 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 	},
 
+	//TODO: Might not need to wrap these methods with setCurrentPagesForPrevPage method
 	setCurrentPagesForPrevPage: function (prevPageNumber) {
 
-		// If fixed layout
-		if (this.getCurrentSection().isFixedLayout()) {
-
-			if (this.epub.get("page_prog_dir") === "rtl") {
-
-				// If the first page is a left page in rtl progression, only one page 
-				// can be displayed, even in two-up mode
-				if (this.displayedPageIsLeft(prevPageNumber) && 
-					this.displayedPageIsRight(prevPageNumber - 1)) {
-
-					this.set("current_page", [prevPageNumber - 1, prevPageNumber]);
-				}
-				else {
-
-					this.set("current_page", [prevPageNumber]);
-				}
-			}
-			// Left-to-right progresion
-			else {
-
-				if (this.displayedPageIsRight(prevPageNumber) &&
-					this.displayedPageIsLeft(prevPageNumber - 1)) {
-
-					this.set("current_page", [prevPageNumber - 1, prevPageNumber]);
-				}
-				else {
-
-					this.set("current_page", [prevPageNumber]);
-				}
-			}
-		}
-		// A reflowable text
-		else {
-
-			this.set("current_page", [prevPageNumber - 1, prevPageNumber]);
-		}
+		var pagesToDisplay = this.pageNumberDisplayLogic.getPrevPageNumsToDisplay(
+								prevPageNumber,
+								this.getCurrentSection().isFixedLayout(),
+								this.epub.get("page_prog_dir")
+								);
+		this.set("current_page", pagesToDisplay);
 	},
 	
 	nextPage: function() {
+
 		var curr_pg = this.get("current_page");
 		var firstPage = curr_pg[curr_pg.length - 1] + 1;
 
@@ -377,41 +296,12 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 	setCurrentPagesForNextPage: function (nextPageNumber) {
 
-		// If fixed layout
-		if (this.getCurrentSection().isFixedLayout()) {
-
-			if (this.epub.get("page_prog_dir") === "rtl") {
-
-				// If the first page is a left page in rtl progression, only one page 
-				// can be displayed, even in two-up mode
-				if (this.displayedPageIsRight(nextPageNumber) &&
-					this.displayedPageIsLeft(nextPageNumber + 1)) {
-
-					this.set("current_page", [nextPageNumber, nextPageNumber + 1]);
-				}
-				else {
-
-					this.set("current_page", [nextPageNumber]);
-				}
-			}
-			else {
-
-				if (this.displayedPageIsLeft(nextPageNumber) && 
-					this.displayedPageIsRight(nextPageNumber + 1)) {
-
-					this.set("current_page", [nextPageNumber, nextPageNumber + 1]);
-				}
-				else {
-
-					this.set("current_page", [nextPageNumber]);
-				}
-			}
-		}
-		// Reflowable section
-		else {
-
-			this.set("current_page", [nextPageNumber, nextPageNumber + 1]);
-		}
+		var pagesToDisplay = this.pageNumberDisplayLogic.getNextPageNumsToDisplay(
+								nextPageNumber,
+								this.getCurrentSection().isFixedLayout(),
+								this.epub.get("page_prog_dir")
+								);
+		this.set("current_page", pagesToDisplay);
 	},
 
 	goToLastPage: function() {

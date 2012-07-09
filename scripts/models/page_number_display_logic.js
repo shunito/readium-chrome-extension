@@ -66,62 +66,23 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 		}
 	},
 
-	setCurrentPagesForNextPage: function (nextPageNumber) {
+	getPrevPageNumsToDisplay: function (prevPageNumber, isFixedLayout, pageProgDirection) {
 
 		// If fixed layout
-		if (this.getCurrentSection().isFixedLayout()) {
+		if (isFixedLayout) {
 
-			if (this.epub.get("page_prog_dir") === "rtl") {
-
-				// If the first page is a left page in rtl progression, only one page 
-				// can be displayed, even in two-up mode
-				if (this.displayedPageIsRight(nextPageNumber) &&
-					this.displayedPageIsLeft(nextPageNumber + 1)) {
-
-					this.set("current_page", [nextPageNumber, nextPageNumber + 1]);
-				}
-				else {
-
-					this.set("current_page", [nextPageNumber]);
-				}
-			}
-			else {
-
-				if (this.displayedPageIsLeft(nextPageNumber) && 
-					this.displayedPageIsRight(nextPageNumber + 1)) {
-
-					this.set("current_page", [nextPageNumber, nextPageNumber + 1]);
-				}
-				else {
-
-					this.set("current_page", [nextPageNumber]);
-				}
-			}
-		}
-		// Reflowable section
-		else {
-
-			this.set("current_page", [nextPageNumber, nextPageNumber + 1]);
-		}
-	},
-
-	setCurrentPagesForPrevPage: function (prevPageNumber) {
-
-		// If fixed layout
-		if (this.getCurrentSection().isFixedLayout()) {
-
-			if (this.epub.get("page_prog_dir") === "rtl") {
+			if (pageProgDirection === "rtl") {
 
 				// If the first page is a left page in rtl progression, only one page 
 				// can be displayed, even in two-up mode
 				if (this.displayedPageIsLeft(prevPageNumber) && 
 					this.displayedPageIsRight(prevPageNumber - 1)) {
 
-					this.set("current_page", [prevPageNumber - 1, prevPageNumber]);
+					return [prevPageNumber - 1, prevPageNumber];
 				}
 				else {
 
-					this.set("current_page", [prevPageNumber]);
+					return [prevPageNumber];
 				}
 			}
 			// Left-to-right progresion
@@ -130,18 +91,57 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 				if (this.displayedPageIsRight(prevPageNumber) &&
 					this.displayedPageIsLeft(prevPageNumber - 1)) {
 
-					this.set("current_page", [prevPageNumber - 1, prevPageNumber]);
+					return [prevPageNumber - 1, prevPageNumber];
 				}
 				else {
 
-					this.set("current_page", [prevPageNumber]);
+					return [prevPageNumber];
 				}
 			}
 		}
 		// A reflowable text
 		else {
 
-			this.set("current_page", [prevPageNumber - 1, prevPageNumber]);
+			return [prevPageNumber - 1, prevPageNumber];
+		}
+	},
+
+	getNextPageNumsToDisplay: function (nextPageNumber, isFixedLayout, pageProgDirection) {
+
+		// If fixed layout
+		if (isFixedLayout) {
+
+			if (pageProgDirection === "rtl") {
+
+				// If the first page is a left page in rtl progression, only one page 
+				// can be displayed, even in two-up mode
+				if (this.displayedPageIsRight(nextPageNumber) &&
+					this.displayedPageIsLeft(nextPageNumber + 1)) {
+
+					return [nextPageNumber, nextPageNumber + 1];
+				}
+				else {
+
+					return [nextPageNumber];
+				}
+			}
+			else {
+
+				if (this.displayedPageIsLeft(nextPageNumber) && 
+					this.displayedPageIsRight(nextPageNumber + 1)) {
+
+					return [nextPageNumber, nextPageNumber + 1];
+				}
+				else {
+
+					return [nextPageNumber];
+				}
+			}
+		}
+		// Reflowable section
+		else {
+
+			return [nextPageNumber, nextPageNumber + 1];
 		}
 	},
 
