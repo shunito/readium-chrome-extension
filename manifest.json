@@ -1,11 +1,14 @@
 {
+  "manifest_version": 2,
    "app": {
       "launch": {
          "local_path": "views/library.html"
       }
    },
    "update_url": "http://github.readium.org/releases/update.xml",
-   "background_page" : "background/background.html",
+   "background" : {
+      "page": "background/background.html"
+    },
    "description": "A reader for EPUB3 books.",
    
    "icons": {
