@@ -34,7 +34,7 @@ Readium.Views.NcxTocView = Readium.Views.TocViewBase.extend({
 
 	initialize: function() {
 		Readium.Views.TocViewBase.prototype.initialize.call(this);
-		this.nav_template = _.template( $("#ncx-nav-tempate").html() );
+		this.nav_template = Handlebars.templates.ncx_nav_template;
 	},
 
 	render: function() {

@@ -39,7 +39,7 @@ Readium.Views.LibraryItemView = Backbone.View.extend({
 	className: "book-item clearfix",
 
 	initialize: function() {
-		this.template = _.template( $('#library-item-template').html() );
+		this.template = Handlebars.templates.library_item_template;
 	},
 
 	render: function() {
@@ -80,7 +80,7 @@ Readium.Views.LibraryItemsView = Backbone.View.extend({
 	className: 'row-view clearfix',
 
 	initialize: function() {
-		this.template = _.template( $('#library-items-template').html() );
+		this.template = Handlebars.templates.library_items_template;
 		this.collection.bind('reset', this.render, this);
 		this.collection.bind('add',   this.addOne, this);
 	},
@@ -137,7 +137,7 @@ Readium.Views.ExtractItemView = Backbone.View.extend({
 	el: '#progress-container',
 
 	initialize: function() {	
-		this.template = _.template( $('#extracting-item-template').html() );
+		this.template = Handlebars.templates.extracting_item_template;
 		this.model.bind('change', this.render, this);
 		this.model.bind("change:error", this.extractionFailed, this);
 	},

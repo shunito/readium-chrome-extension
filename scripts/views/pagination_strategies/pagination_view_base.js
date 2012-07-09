@@ -12,7 +12,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.model.on("change:current_page", this.changePage, this);
 		this.model.on("change:font_size", this.setFontSize, this);
 		this.model.on("change:hash_fragment", this.goToHashFragment, this);
-		this.bindingTemplate = _.template( $('#binding-template').html() );
+		this.bindingTemplate = Handlebars.templates.binding_template;
 	},
 
 	// sometimes these views hang around in memory before
