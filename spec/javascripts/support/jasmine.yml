@@ -33,6 +33,7 @@ src_files:
   - scripts/models/smilModel.js
   - scripts/models/mediaOverlay.js
   - scripts/models/audioClipPlayer.js
+  - scripts/models/ibooks_options_parser.js
 
 # stylesheets
 #
