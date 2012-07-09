@@ -7,29 +7,40 @@ Readium.Routers.ViewerRouter = Backbone.Router.extend({
 	},
 
 	openBook: function(key) {
-		// the "right" way to do this is probably to call fetch()
-		// on the book, but I needed to know what kind of book to 
-		// initialize at early on. This is a pragmatic solution
-		// NOT TRUE ANY MORE TODO: fixme
+
+		var ePUBWasLoaded = false;
+		var ePUBViewPrefKey = key + "_epubViewProperties";
+
+		// Get the saved ePUB and the ePUB's view preferences
 		Lawnchair(function() {
+
+			// Get saved ePUB
 			this.get(key, function(result) {
+				
 				if(result === null) {
-					alert('Could not load book, try refeshing your browser.')
+					
+					alert('Could not load ePUB, try refeshing your browser.');
 					return;
 				}
-				// ------ START: REFACTORED CODE ---- //
-				
+
 				window._epub = new Readium.Models.ReadiumEPUBState(result);
+				ePUBWasLoaded = true;
+			});
 
-				// ------ END: REFACTORED CODE ------ // 
-
-				window._epubController = new Readium.Models.Ebook({epub : window._epub});
+			// Get saved ePUB view preferences, if they exist,
+			this.get(ePUBViewPrefKey, function(result) {
 				
-				window._applicationView = new Readium.Views.ViewerApplicationView({
-					model: window._epubController
-				});
-				window._applicationView.render();
-			});		
+				// Open the viewer for the specified ePUB
+				if (ePUBWasLoaded) {
+					
+					// Instantiate the ePUB controller 
+					window._epubController = new Readium.Models.Ebook(_.extend({epub : window._epub}, result));
+					window._applicationView = new Readium.Views.ViewerApplicationView({
+								model: window._epubController
+							});
+					window._applicationView.render();
+				}
+			});
 		});
 	},
 

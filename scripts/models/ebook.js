@@ -60,7 +60,12 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 		_.extend(ops,options);
 		var that = this;
-		this.epub.set("updated_at", new Date());
+
+		// Set attributes required to persist Readium info
+		this.set("updated_at", new Date());
+		this.set("key", this.epub.get("key") + "_epubViewProperties");
+
+		// Save
 		Lawnchair(function() {
 			this.save(that.toJSON(), ops.success);
 		});
@@ -94,7 +99,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			"font_size": this.get("font_size"),
 			"two_up": this.get("two_up"),
 			"font_size": this.get("font_size"),
-			"current_page": this.get("current_page")
+			"current_page": this.get("current_page"),
+			"key": this.get("key")
 		};
 	},
 
