@@ -33,7 +33,7 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 
 						return [gotoPageNumber - 1, gotoPageNumber];
 					}
-					else if (this.displayedPageIsRight(pageNumber)) {
+					else if (this.displayedPageIsRight(gotoPageNumber)) {
 
 						return [gotoPageNumber, gotoPageNumber + 1];
 					}
@@ -71,7 +71,7 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 		}
 		else {
 			
-			return [pageNumber];
+			return [gotoPageNumber];
 		}
 	},
 

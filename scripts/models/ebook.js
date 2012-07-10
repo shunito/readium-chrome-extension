@@ -64,11 +64,11 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		_.extend(ops,options);
 		var that = this;
 
-		// Set attributes required to persist Readium info
+		// Set attributes required to persist the epub-specific viewer properties
 		this.set("updated_at", new Date());
 		this.set("key", this.epub.get("key") + "_epubViewProperties");
 
-		// Save
+		// Persist viewer properties
 		Lawnchair(function() {
 			this.save(that.toJSON(), ops.success);
 		});
@@ -86,7 +86,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
     	"rendered_spine_items": [],
     	"current_theme": "default-theme",
     	"current_margin": 3
-    	//"spine_position": 0
   	},
 
   	// serialize this models state to `JSON` so that it can
@@ -282,16 +281,16 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	goToPage: function(gotoPageNumber) {
 
 		// if the we are already at that page then there is no work to do
-		// break out eary to prevent page change events
+		// break out early to prevent page change events
 		if (this.isPageVisible(gotoPageNumber)) {
 			return;
 		}
 
 		var pagesToGoto = this.pageNumberDisplayLogic.getGotoPageNumsToDisplay(
+							gotoPageNumber,
 							this.get("two_up"),
 							this.getCurrentSection().isFixedLayout(),
-							this.get("page_prog_dir"),
-							gotoPageNumber
+							this.get("page_prog_dir")
 							);
 		this.set("current_page", pagesToGoto);
 	},
@@ -302,7 +301,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		return parseInt(pos, 10) || 0;
 	},
 
-	// TODO, which key should be used here? the epub or the viewer properties key? 
+	// TODO: which key should be used here? the epub or the viewer properties key? 
 	savePosition: function() {
 		Readium.Utils.setCookie(this.epub.get("key"), this.get("spine_position"), 365);
 	},

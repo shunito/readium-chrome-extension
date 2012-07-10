@@ -1,12 +1,26 @@
-/*
-	Base class from which all pagination strategy classes are derived. This
-	class should not bet intialized (if it could be it would be abstract). It
-	exists for the purpose of sharing behaviour between the different strategies.
-*/
+// Description: Base class from which all pagination strategy classes are derived. This
+//	 class should not be intialized (if it could be it would be abstract). It
+//	 exists for the purpose of sharing behaviour between the different pagination strategies.
+
 Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 	// all strategies are linked to the same dom elem
 	el: "#readium-book-view-el",
+
+	// this doesn't seem to be working...
+	events: {
+		"click #page-margin": function(e) {
+			this.trigger("toggle_ui");
+		},
+
+		"click #readium-content-container a": function(e) {
+			this.linkClickHandler(e);
+		}
+	},
+
+	/**************************************************************************************/
+	/* PUBLIC METHODS (THE API)                                                           */
+	/**************************************************************************************/
 
 	initialize: function(options) {
 		this.model.on("change:current_page", this.changePage, this);
@@ -15,20 +29,19 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.bindingTemplate = _.template( $('#binding-template').html() );
 	},
 
-	// sometimes these views hang around in memory before
-	// the GC gets them. we need to remove all of the handlers
-	// that were registered on the model
-	destruct: function() {
-		console.log("Pagination base destructor called");
-
-		// remove any listeners registered on the model
-		this.model.off("change:current_page", this.changePage);
-		this.model.off("change:font_size", this.setFontSize);
-		this.model.off("change:hash_fragment", this.goToHashFragment);
-		this.resetEl();
+	// Note: One of the primary members of the public interface; called by all three pagination views
+    iframeLoadCallback: function(e) {
+		
+		this.applyBindings( $(e.srcElement).contents() );
+		this.applySwitches( $(e.srcElement).contents() );
+		this.addSwipeHandlers( $(e.srcElement).contents() );
+        this.injectMathJax(e.srcElement);
+        this.injectLinkHandler(e.srcElement);
+        var trigs = this.parseTriggers(e.srcElement.contentDocument);
+		this.applyTriggers(e.srcElement.contentDocument, trigs);
 	},
 
-	// handle  clicks of anchor tags by navigating to
+	// handle clicks of anchor tags by navigating to
 	// the proper location in the epub spine, or opening
 	// a new window for external links
 	linkClickHandler: function(e) {
@@ -42,11 +55,87 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 	},
 
+	// TODO: Only used in reflowable view
 	goToHashFragment: function() {
 		// stub this in to the super class as a no-op for now
 		// just to prevent "no method error"s
 	},
 
+	// TODO: This method is only called by the reflowable view and should be moved there
+	/*
+     * Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
+     * only the day-night alternate tags are available as an option. 
+    */
+	activateEPubStyle: function(bookDom) {
+
+	    var selector;
+		
+		// Apply night theme for the book; nothing will be applied if the ePub's style sheets do not contain a style
+		// set with the 'night' tag
+	    if (this.model.get("current_theme") === "night-theme") {
+
+	    	selector = new Readium.Models.AlternateStyleTagSelector;
+	    	bookDom = selector.activateAlternateStyleSet(["night"], bookDom);
+
+	    }
+	    else {
+
+			selector = new Readium.Models.AlternateStyleTagSelector;
+	    	bookDom = selector.activateAlternateStyleSet([""], bookDom);
+	    }
+	},
+
+	// Description: Changes between having one or two pages displayed. 
+	setUpMode: function() {
+		var two_up = this.model.get("two_up");
+		this.$el.toggleClass("two-up", two_up);
+		this.$('#spine-divider').toggle(two_up);
+	},
+
+	// Description: Return true if the pageNum argument is a currently visible 
+	// page. Return false if it is not; which will occur if it cannot be found in 
+	// the array.
+	isPageVisible: function(pageNum, currentPages) {
+		return currentPages.indexOf(pageNum) !== -1;
+	},
+
+	changePage: function() {
+		var that = this;
+		var currentPage = this.model.get("current_page");
+		var two_up = this.model.get("two_up");
+		this.$(".page-wrap").each(function(index) {
+			if(!two_up) { 
+				index += 1;
+			}
+			$(this).toggleClass("hidden-page", !that.isPageVisible(index, currentPage));
+		});
+	},
+
+	// REFACTORING CANDIDATE: Child models "override" this; investigate this
+	setFontSize: function() {
+		var size = this.model.get("font_size") / 10;
+		$('#readium-content-container').css("font-size", size + "em");
+		this.renderPages();
+	},
+
+
+	/**************************************************************************************/
+	/* "PRIVATE" HELPERS                                                                  */
+	/**************************************************************************************/
+
+	// sometimes these views hang around in memory before
+	// the GC gets them. we need to remove all of the handlers
+	// that were registered on the model
+	destruct: function() {
+		console.log("Pagination base destructor called");
+
+		// remove any listeners registered on the model
+		this.model.off("change:current_page", this.changePage);
+		this.model.off("change:font_size", this.setFontSize);
+		this.model.off("change:hash_fragment", this.goToHashFragment);
+		this.resetEl();
+	},
+	
 	getBindings: function() {
 		var packDoc = this.model.epub.getPackageDocument();
 		var bindings = packDoc.get('bindings');
@@ -143,31 +232,6 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		})
 	},
 
-    /*
-     * Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
-     * only the day-night alternate tags are available as an option. 
-     * TODO: Create a transition from day to night and vice-versa to prevent flickering.
-     * TODO: If Readium is initialized in night mode, the night style may not be applied on initialization
-    */
-	activateEPubStyle: function(bookDom) {
-
-	    var selector;
-		
-		// Apply night theme for the book; nothing will be applied if the ePub's style sheets do not contain a style
-		// set with the 'night' tag
-	    if (this.model.get("current_theme") === "night-theme") {
-
-	    	selector = new Readium.Models.AlternateStyleTagSelector;
-	    	bookDom = selector.activateAlternateStyleSet(["night"], bookDom);
-
-	    }
-	    else {
-
-			selector = new Readium.Models.AlternateStyleTagSelector;
-	    	bookDom = selector.activateAlternateStyleSet([""], bookDom);
-	    }
-	},
-
 	addSwipeHandlers: function(dom) {
 		var that = this;
 		$(dom).on("swipeleft", function(e) {
@@ -182,43 +246,6 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		});
 	},
 
-	// Description: Changes between having one or two pages displayed. 
-	setUpMode: function() {
-		var two_up = this.model.get("two_up");
-		this.$el.toggleClass("two-up", two_up);
-		this.$('#spine-divider').toggle(two_up);
-	},
-
-	// this doesn't seem to be working...
-	events: {
-		"click #page-margin": function(e) {
-			this.trigger("toggle_ui");
-		},
-
-		"click #readium-content-container a": function(e) {
-			this.linkClickHandler(e);
-		}
-	},
-
-	// Description: Return true if the pageNum argument is a currently visible 
-	// page. Return false if it is not; which will occur if it cannot be found in 
-	// the array.
-	isPageVisible: function(pageNum, currentPages) {
-		return currentPages.indexOf(pageNum) !== -1;
-	},
-
-	changePage: function() {
-		var that = this;
-		var currentPage = this.model.get("current_page");
-		var two_up = this.model.get("two_up");
-		this.$(".page-wrap").each(function(index) {
-			if(!two_up) { 
-				index += 1;
-			}
-			$(this).toggleClass("hidden-page", !that.isPageVisible(index, currentPage));
-		});
-	},
-	
 	replaceContent: function(content) {
 		// TODO: put this where it belongs
 		this.$('#readium-content-container').
@@ -226,14 +253,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		html(content).append("<div id='content-end'></div>");
 	},
 
+	// TODO: This appears to be dead code
 	toggleTwoUp: function() {
 		//this.render();
-	},
-
-	setFontSize: function() {
-		var size = this.model.get("font_size") / 10;
-		$('#readium-content-container').css("font-size", size + "em");
-		this.renderPages();
 	},
 
 	// inject mathML parsing code into an iframe
@@ -265,17 +287,5 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
     		"top": "0px",
     		"-webkit-transform": "scale(1.0) translate(0px, 0px)"
     	});
-    },
-
-    iframeLoadCallback: function(e) {
-		
-		this.applyBindings( $(e.srcElement).contents() );
-		this.applySwitches( $(e.srcElement).contents() );
-		this.addSwipeHandlers( $(e.srcElement).contents() );
-        this.injectMathJax(e.srcElement);
-        this.injectLinkHandler(e.srcElement);
-        var trigs = this.parseTriggers(e.srcElement.contentDocument);
-		this.applyTriggers(e.srcElement.contentDocument, trigs);
-	}
-	
+    }
 });

@@ -1,6 +1,10 @@
 
 Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend({
 
+	/**************************************************************************************/
+	/* PUBLIC METHODS (THE API)                                                           */
+	/**************************************************************************************/
+
 	initialize: function() {
 		// call the super ctor
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
@@ -29,45 +33,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.on("change:current_mo_frag", this.renderMoFragHighlight, this);
 	},
 
-	// we are using experimental styles so we need to 
-	// use modernizr to generate prefixes
-	stashModernizrPrefixedProps: function() {
-		var cssIfy = function(str) {
-			return str.replace(/([A-Z])/g, function(str,m1){ 
-				return '-' + m1.toLowerCase(); 
-			}).replace(/^ms-/,'-ms-');
-		};
-
-		// ask modernizr for the vendor prefixed version
-		this.columAxis =  Modernizr.prefixed('columnAxis') || 'columnAxis';
-		this.columGap =  Modernizr.prefixed('columnGap') || 'columnGap';
-		this.columWidth =  Modernizr.prefixed('columnWidth') || 'columnWidth';
-
-		// we are interested in the css prefixed version
-		this.cssColumAxis =  cssIfy(this.columAxis);
-		this.cssColumGap =  cssIfy(this.columGap);
-		this.cssColumWidth =  cssIfy(this.columWidth);
-	},
-
-	// sometimes these views hang around in memory before
-	// the GC's get them. we need to remove all of the handlers
-	// that were registered on the model
-	destruct: function() {
-		
-		this.model.off("change:current_page", this.pageChangeHandler);
-		this.model.off("change:toc_visible", this.windowSizeChangeHandler);
-		this.model.off("repagination_event", this.windowSizeChangeHandler);
-		this.model.off("change:current_theme", this.windowSizeChangeHandler);
-		this.model.off("change:two_up", this.setUpMode);
-		this.model.off("change:two_up", this.adjustIframeColumns);
-		this.model.off("change:current_margin", this.marginCallback);
-		this.model.off("change:mo_playing", this.renderMoPlaying);
-		this.model.off("change:current_mo_frag", this.renderMoFragHighlight);
-
-		// call the super destructor
-		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
-	},
-
+	// REFACTORING CANDIDATE: Part of the public interface
 	render: function(goToLastPage) {
 		var that = this;
 		var json = this.model.getCurrentSection().toJSON();
@@ -90,7 +56,102 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 				that.model.goToPage(1);
 			}		
 		});
+		
 		return this;
+	},
+
+
+	/**************************************************************************************/
+	/* "PRIVATE" HELPERS                                                                  */
+	/**************************************************************************************/
+
+	// sometimes these views hang around in memory before
+	// the GC's get them. we need to remove all of the handlers
+	// that were registered on the model
+	destruct: function() {
+		
+		this.model.off("change:current_page", this.pageChangeHandler);
+		this.model.off("change:toc_visible", this.windowSizeChangeHandler);
+		this.model.off("repagination_event", this.windowSizeChangeHandler);
+		this.model.off("change:current_theme", this.windowSizeChangeHandler);
+		this.model.off("change:two_up", this.setUpMode);
+		this.model.off("change:two_up", this.adjustIframeColumns);
+		this.model.off("change:current_margin", this.marginCallback);
+		this.model.off("change:mo_playing", this.renderMoPlaying);
+		this.model.off("change:current_mo_frag", this.renderMoFragHighlight);
+
+		// call the super destructor
+		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
+	},
+
+	// REFACTORING CANDIDATE: This appears to be a private member, although there is a similarly named 
+	//   member in another class
+	goToPage: function(page) {
+		var offset = this.calcPageOffset(page).toString() + "px";
+		$(this.getBody()).css(this.offset_dir, "-" + offset);
+		this.showContent();
+	},
+
+	// REFACTORING CANDIDATE: This is a private member, although it's not clear that this is the method used in this model. 
+	//   the base class method may be used instead.
+	// Description: navigate to a url hash fragment by calculating the page of
+	// the corresponding elem and setting the page number on `this.model`
+	// as precondition the hash fragment should identify an element in the
+	// section rendered by this view
+	goToHashFragment: function() {
+
+		// this method is triggered in response to 
+		var fragment = this.model.get("hash_fragment");
+		if(fragment) {
+			var el = $("#" + fragment, this.getBody())[0];
+
+			if(!el) {
+				// couldn't find the el. just give up
+				return;
+			}
+
+			// we get more precise results if we look at the first children
+			while(el.children.length > 0) {
+				el = el.children[0];
+			}
+
+			var page = this.getElemPageNumber(el);
+			if(page > 0) {
+				this.model.goToPage(page);	
+			}
+		}
+		// else false alarm no work to do
+	},
+
+	// REFACTORING CANDIDATE: A private member, although a method with this name exists in the base class,
+	//   so it's not clear which is to be used.
+	setFontSize: function() {
+		var size = this.model.get("font_size") / 10;
+		$(this.getBody()).css("font-size", size + "em");
+
+		// the content size has changed so recalc the number of 
+		// pages
+		this.setNumPages();
+	},
+
+	// Description: we are using experimental styles so we need to 
+	// use modernizr to generate prefixes
+	stashModernizrPrefixedProps: function() {
+		var cssIfy = function(str) {
+			return str.replace(/([A-Z])/g, function(str,m1){ 
+				return '-' + m1.toLowerCase(); 
+			}).replace(/^ms-/,'-ms-');
+		};
+
+		// ask modernizr for the vendor prefixed version
+		this.columAxis =  Modernizr.prefixed('columnAxis') || 'columnAxis';
+		this.columGap =  Modernizr.prefixed('columnGap') || 'columnGap';
+		this.columWidth =  Modernizr.prefixed('columnWidth') || 'columnWidth';
+
+		// we are interested in the css prefixed version
+		this.cssColumAxis =  cssIfy(this.columAxis);
+		this.cssColumGap =  cssIfy(this.columGap);
+		this.cssColumWidth =  cssIfy(this.columWidth);
 	},
 
 	getBodyColumnCss: function() {
@@ -130,9 +191,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.goToPage(page);
 	},
 
-	// helper method to get the a reference to the documentElement
+	// Description: helper method to get the a reference to the documentElement
 	// of the document in this strategy's iFrame.
-	// TODO this is a bad name for this function
+	// TODO: this is a bad name for this function
 	getBody: function() {
 		return this.$('#readium-flowing-content').contents()[0].documentElement;
 	},
@@ -149,7 +210,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		return (page_num - 1) * (this.page_width + this.gap_width);
 	},
 
-	// on iOS frames are automatically expanded to fit the content dom
+	// Rationale: on iOS frames are automatically expanded to fit the content dom
 	// thus we cannot use relative size for the iframe and must set abs 
 	// pixel size
 	setFrameSize: function() {
@@ -189,7 +250,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		return $('#flowing-wrapper').height();
 	},
 
-	// calculate the number of pages in the current section,
+	// Description: calculate the number of pages in the current section,
 	// based on section length : page size ratio
 	calcNumPages: function() {
 
@@ -229,42 +290,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		}, 150);
 	},
 
-	goToPage: function(page) {
-		var offset = this.calcPageOffset(page).toString() + "px";
-		$(this.getBody()).css(this.offset_dir, "-" + offset);
-		this.showContent();
-	},
-
-	// navigate to a url hash fragment by calculating the page of
-	// the corresponding elem and setting the page number on `this.model`
-	//
-	// as precondition the hash fragment should identify an element in the
-	// section rendered by this view
-	goToHashFragment: function() {
-
-		// this method is triggered in response to 
-		var fragment = this.model.get("hash_fragment");
-		if(fragment) {
-			var el = $("#" + fragment, this.getBody())[0];
-
-			if(!el) {
-				// couldn't find the el. just give up
-				return;
-			}
-
-			// we get more precise results if we look at the first children
-			while(el.children.length > 0) {
-				el = el.children[0];
-			}
-
-			var page = this.getElemPageNumber(el);
-			if(page > 0) {
-				this.model.goToPage(page);	
-			}
-		}
-		// else false alarm no work to do
-	},
-
 	getElemPageNumber: function(elem) {
 
 		var rects, shift;
@@ -292,20 +317,11 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.adjustIframeColumns();
 	},
 
-	setFontSize: function() {
-		var size = this.model.get("font_size") / 10;
-		$(this.getBody()).css("font-size", size + "em");
-
-		// the content size has changed so recalc the number of 
-		// pages
-		this.setNumPages();
-	},
-
 	marginCallback: function() {
 		this.adjustIframeColumns();
 	},
 
-	// sadly this is just a reprint of what is already in the
+	// Rationale: sadly this is just a reprint of what is already in the
 	// themes stylesheet. It isn't very DRY but the implementation is
 	// cleaner this way
 	themes: {
@@ -358,8 +374,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			$("#flowing-wrapper").css("visibility", "visible");	
 		}, 100);
 		
-		
-		
 		this.renderMoPlaying();
 	},
 
@@ -369,6 +383,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.set("num_pages", num);
 	},
 
+	// REFACTORING CANDIDATE: should be moved into an MO-specific another model
 	renderMoPlaying: function() {
 		var theme = this.model.get("current_theme");
 		if(theme === "default") theme = "default-theme";
@@ -383,6 +398,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		}
 	},
 
+	// REFACTORING CANDIDATE: should be moved into an MO-specific another model
 	renderMoFragHighlight: function() {
 
 		var theme = this.model.get("current_theme");
@@ -399,9 +415,5 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 				toggleClass('current-mo-content', true).
 				css("color", this.themes[theme]["color"]);
 		}
-
 	}
-
-
-
 });

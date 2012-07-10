@@ -2,6 +2,10 @@
 
 Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
+	/**************************************************************************************/
+	/* PUBLIC METHODS (THE API)                                                           */
+	/**************************************************************************************/
+
 	initialize: function() {
 		// call the super ctor
 		this.page_template = _.template( $('#fixed-page-template').html() );
@@ -9,20 +13,6 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
 		this.model.on("change:two_up", this.setUpMode, this);
 		this.model.on("change:meta_size", this.setContainerSize, this);
-	},
-
-	// sometimes these views hang around in memory before
-	// the GC's get them. we need to remove all of the handlers
-	// that were registered on the model
-	destruct: function() {
-		console.log("Fixed paginator destructor called");
-
-		// call the super constructor
-		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
-
-		// remove any listeners registered on the model
-		this.model.off("change:two_up", this.setUpMode);
-		this.model.off("change:meta_size", this.setUpMode);
 	},
 
 	render: function() {
@@ -67,12 +57,14 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		return this;
 	},
 
+	// REFACTORING CANDIDATE: This appears to be called in the base model??
 	renderPages: function() {
 		// lost myself in the complexity here but this seems right
 		this.changePage();
 		return this;
 	},
 
+	// REFACTORING CANDIDATE: A method with this name exists in the base class; investigate the difference
 	// Description: For each fixed-page-wrap(per), if it is one of the current pages, toggle it as visible. If it is not
 	// Toggle it as invisible.
 	// Note: current_page is an array containing the page numbers (as of 25June2012, a maximum of two pages) of the 
@@ -84,6 +76,24 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		this.$(".fixed-page-wrap").each(function(index) {
 			$(this).toggle(that.isPageVisible(index + 1, currentPage));
 		});
+	},
+
+	/**************************************************************************************/
+	/* "PRIVATE" HELPERS                                                                  */
+	/**************************************************************************************/
+
+	// sometimes these views hang around in memory before
+	// the GC's get them. we need to remove all of the handlers
+	// that were registered on the model
+	destruct: function() {
+		console.log("Fixed paginator destructor called");
+
+		// call the super constructor
+		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
+
+		// remove any listeners registered on the model
+		this.model.off("change:two_up", this.setUpMode);
+		this.model.off("change:meta_size", this.setUpMode);
 	}
 });
 

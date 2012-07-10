@@ -6,6 +6,10 @@ Readium.Models.Paginator = Backbone.Model.extend({
 
 	renderToLastPage: false,
 	
+	/**************************************************************************************/
+	/* PUBLIC METHODS (THE API)                                                           */
+	/**************************************************************************************/
+
 	initialize: function() {
 
 		this.rendered_spine_positions = [];
@@ -23,14 +27,15 @@ Readium.Models.Paginator = Backbone.Model.extend({
 		this.rendered_spine_positions = [];
 
 		// clean up the old view if there is one
-		if(this.v) {
+		if (this.v) {
 			this.v.destruct();
 		}
 
 		// Spine items as found in the package document can have attributes that override global settings for the ebook. This 
 		// requires checking/creating the correct pagination strategy for each spine item
 		var spineItem = book.getCurrentSection();
-		if(spineItem.isFixedLayout()) {
+		if (spineItem.isFixedLayout()) {
+
 			this.should_two_up = book.get("two_up");
 			
 			this.v = new Readium.Views.FixedPaginationView({model: book});
@@ -76,6 +81,10 @@ Readium.Models.Paginator = Backbone.Model.extend({
 		return this.rendered_spine_positions;
 	},
   
+	/**************************************************************************************/
+	/* "PRIVATE" HELPERS                                                                  */
+	/**************************************************************************************/
+
 	findPrerenderStart: function() {
 		var i = 0;
 		while( this.shouldPreRender( this.model.getCurrentSection(i) ) ) {

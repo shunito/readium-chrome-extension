@@ -4,10 +4,7 @@
  * 
  * Notes: The convention in this model is to prepend the names of "private" methods with an underscore ('_')
  */
- // TODO: shorcut the processing if persistent style sheets exist? 
  // TODO: More validation for style sets with mixed rel="alternate ..." and rel="stylesheet"?
- // TODO: Handling <style> elements
- // TODO: Tagging of persistent sets
  // TODO: Ensure that the "default" style set (the default in the ePub) is activated if no tags are supplied
  
 
