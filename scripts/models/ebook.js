@@ -124,30 +124,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}	
 	},
 
-	// Description: The `displayedPageIs...` methods determine if a fixed layout page is right, left or center.
-	//
-	// Note: This is not an ideal approach, as we're pulling properties directly out of the dom, rather than
-	// out of our models. The rationale is that as of Readium 0.4.1, the page-spread-* value
-	// is not maintained in the model hierarchy accessible from an ebook object. An alternative
-	// would be to infer the left/right/center value from model attributes on ebook, or other objects in
-	// ebook's object hierarchy. However, this would duplicate the logic that exists elsewhere for determining right/left/center
-	// for a page, which is probably worse than pulling out of the dom. This approach also avoids having to convert
-	// from the page number (based on what is rendered on the screen) to spine index. 
-	displayedPageIsRight: function (displayedPageNum) {
-
-		return $("#page-" + displayedPageNum).hasClass("right_page") ? true : false;
-	},
-
-	displayedPageIsLeft: function (displayedPageNum) {
-
-		return $("#page-" + displayedPageNum).hasClass("left_page") ? true : false;
-	},
-
-	displayedPageIsCenter: function (displayedPageNum) {
-
-		return $("#page-" + displayedPageNum).hasClass("center_page") ? true : false;
-	},
-
 	toggleFullScreen: function() {
 		var fullScreen = this.get("full_screen");
 		this.set({full_screen: !fullScreen});
@@ -226,7 +202,12 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// Move to previous page with two side-by-side pages
 		else {
 
-			this.setCurrentPagesForPrevPage(lastPage);
+			var pagesToDisplay = this.pageNumberDisplayLogic.getPrevPageNumsToDisplay(
+								lastPage,
+								this.getCurrentSection().isFixedLayout(),
+								this.epub.get("page_prog_dir")
+								);
+		this.set("current_page", pagesToDisplay);
 
 			// Reset spine position
 			if(this.get("rendered_spine_items").length > 1) {
@@ -237,17 +218,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 	},
 
-	//TODO: Might not need to wrap these methods with setCurrentPagesForPrevPage method
-	setCurrentPagesForPrevPage: function (prevPageNumber) {
-
-		var pagesToDisplay = this.pageNumberDisplayLogic.getPrevPageNumsToDisplay(
-								prevPageNumber,
-								this.getCurrentSection().isFixedLayout(),
-								this.epub.get("page_prog_dir")
-								);
-		this.set("current_page", pagesToDisplay);
-	},
-	
 	nextPage: function() {
 
 		var curr_pg = this.get("current_page");
@@ -283,7 +253,12 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// Two pages are being displayed
 		else {
 
-			this.setCurrentPagesForNextPage(firstPage);
+			var pagesToDisplay = this.pageNumberDisplayLogic.getNextPageNumsToDisplay(
+								firstPage,
+								this.getCurrentSection().isFixedLayout(),
+								this.epub.get("page_prog_dir")
+								);
+			this.set("current_page", pagesToDisplay);
 
 			// Reset the spine position
 			if (this.get("rendered_spine_items").length > 1) {
@@ -292,16 +267,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				this.set("spine_position", pos);
 			}
 		}
-	},
-
-	setCurrentPagesForNextPage: function (nextPageNumber) {
-
-		var pagesToDisplay = this.pageNumberDisplayLogic.getNextPageNumsToDisplay(
-								nextPageNumber,
-								this.getCurrentSection().isFixedLayout(),
-								this.epub.get("page_prog_dir")
-								);
-		this.set("current_page", pagesToDisplay);
 	},
 
 	goToLastPage: function() {
