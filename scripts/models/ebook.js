@@ -3,6 +3,10 @@
 
 Readium.Models.Ebook = Backbone.Model.extend({
 
+	/**************************************************************************************/
+	/* PUBLIC METHODS (THE API)                                                           */
+	/**************************************************************************************/
+
 	initialize: function() {
 
 		// capture context for use in callback functions
@@ -143,6 +147,9 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.set("toc_visible", !vis);
 	},
 
+	// REFACTORING CANDIDATE: This needs to be investigated, but I bet if the prevPage and nextPage methods were 
+	//   called directly (goRight and goLeft were removed), the new page number display logic would account for the 
+	//   page progression direction and that that logic could also be simplified.
 	// turn pages in the rightward direction
 	// ie progression direction is dependent on 
 	// page progression dir
@@ -167,6 +174,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 	},
 	
+	// REFACTORING CANDIDATE: This is public but not sure it should be; it's called from the navwidget and viewer.js
 	prevPage: function() {
 
 		var curr_pg = this.get("current_page");
@@ -206,7 +214,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 								this.getCurrentSection().isFixedLayout(),
 								this.epub.get("page_prog_dir")
 								);
-		this.set("current_page", pagesToDisplay);
+			this.set("current_page", pagesToDisplay);
 
 			// Reset spine position
 			if(this.get("rendered_spine_items").length > 1) {
@@ -268,14 +276,11 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		}
 	},
 
+	// REFACTORING CANDIDATE: this is strange in that it does not seem to account for 
+	//   possibly crossing over a section boundary
 	goToLastPage: function() {
 		var page = this.get("num_pages");
 		this.goToPage(page);
-	},
-
-	// is the param pageNumber currenly displayed
-	isPageVisible: function(pageNumber) {
-		return this.get("current_page").indexOf(pageNumber) > -1;
 	},
 
 	goToPage: function(gotoPageNumber) {
@@ -290,9 +295,120 @@ Readium.Models.Ebook = Backbone.Model.extend({
 							gotoPageNumber,
 							this.get("two_up"),
 							this.getCurrentSection().isFixedLayout(),
-							this.get("page_prog_dir")
+							this.epub.get("page_prog_dir")
 							);
 		this.set("current_page", pagesToGoto);
+	},
+
+	goToHref: function(href) {
+		// URL's with hash fragments require special treatment, so
+		// first thing is to split off the hash frag from the rest
+		// of the url:
+		var splitUrl = href.match(/([^#]*)(?:#(.*))?/);
+
+		// handle the base url first:
+		if(splitUrl[1]) {
+			var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
+			this.setSpinePos(spine_pos);
+		}
+
+		// now try to handle the fragment if there was one,
+		if(splitUrl[2]) {
+			// just set observable property to broadcast event
+			// to anyone who cares
+			this.set({hash_fragment: splitUrl[2]});
+		}
+	},
+
+	getToc: function() {
+		var item = this.packageDocument.getTocItem();
+		if(!item) {
+			return null;
+		}
+		else {
+			var that = this;
+			return Readium.Models.Toc.getToc(item, {
+				file_path: that.resolvePath(item.get("href")),
+				book: that
+			});
+		}
+	},
+
+	// Info: "Section" actually refers to a spine item
+	getCurrentSection: function(offset) {
+		if(!offset) {
+			offset = 0;
+		}
+		var spine_pos = this.get("spine_position") + offset;
+		return this.packageDocument.getSpineItem(spine_pos);
+	},
+
+	// REFACTORING CANDIDATE: this should be refactored into its own model
+	playMo: function(forceFromStart) {
+		// there is way too much code in this method that does
+		// does not belong here. TODO: Clean up
+		var mo = this.getCurrentSection().getMediaOverlay();
+		if(mo) {
+			this.set("mo_playing", mo);
+			var that = this;
+			mo.on("change:current_text_document_url", function () {
+                that.goToHref(mo.get("current_text_document_url"));
+			});
+			mo.on("change:current_text_element_id", function () {
+				var frag = mo.get("current_text_element_id")
+				that.set("hash_fragment", frag);
+				that.set("current_mo_frag", frag);
+			});
+            mo.on("change:is_document_done", function() {
+                that.pauseMo();
+                // advance the spine position
+                if (that.hasNextSection()) {
+                    that.goToNextSection();
+                    that.playMo(true);
+                }
+            });
+            if (mo.get("has_started_playback") && forceFromStart == false) {
+                mo.resume();
+            }
+            else {
+                mo.startPlayback(null);
+            }
+		}
+		else {
+			alert("Sorry, the current EPUB does not contain a media overlay for this content");
+		}
+	},
+
+	// REFACTORING CANDIDATE: this should be refactored into its own model
+	pauseMo: function() {
+		var mo = this.get("mo_playing");
+		if(mo) {
+
+			// mo.off() and mo.pause() seem like they should be in the same call
+			mo.off();
+			mo.pause();
+			this.set("mo_playing", null);
+		}
+	},
+
+	// REFACTORING CANDIDATE: this should be renamed to indicate it applies to the entire epub
+	// is this book set to fixed layout at the meta-data level
+	// TODO: This is only passing through this data to avoid breaking code in viewer.js. Eventually
+	// this should probably be removed. 
+	isFixedLayout: function() {
+		return this.epub.isFixedLayout();
+	},
+
+
+	/**************************************************************************************/
+	/* "PRIVATE" HELPERS                                                                  */
+	/**************************************************************************************/
+
+	// REFACTORING CANDIDATE: Used privately in this model, but method with the same name is used in the
+	//   pagination view hierarchy. 
+	// is the param pageNumber currenly displayed
+	isPageVisible: function(pageNumber) {
+		return this.get("current_page").indexOf(pageNumber) > -1;
 	},
 
 	// TODO, which key should be used here? the epub or the viewer properties key? 
@@ -318,6 +434,14 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			this.goToLastPage();
 		}
 	},	
+
+	hasNextSection: function() {
+		return this.get("spine_position") < (this.packageDocument.spineLength() - 1);
+	},
+
+	hasPrevSection: function() {
+		return this.get("spine_position") > 0;
+	},
 	
 	goToNextSection: function() {
 		// Is this check even necessary?
@@ -335,14 +459,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			var pos = this.get("spine_position");
 			this.setSpinePosBackwards(pos - 1);	
 		}
-	},
-
-	hasNextSection: function() {
-		return this.get("spine_position") < (this.packageDocument.spineLength() - 1);
-	},
-
-	hasPrevSection: function() {
-		return this.get("spine_position") > 0;
 	},
 
 	setSpinePos: function(pos) {
@@ -385,40 +501,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.set("rendered_spine_items", items);
 	},
 
-	goToHref: function(href) {
-		// URL's with hash fragments require special treatment, so
-		// first thing is to split off the hash frag from the rest
-		// of the url:
-		var splitUrl = href.match(/([^#]*)(?:#(.*))?/);
-
-		// handle the base url first:
-		if(splitUrl[1]) {
-			var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
-			this.setSpinePos(spine_pos);
-		}
-
-		// now try to handle the fragment if there was one,
-		if(splitUrl[2]) {
-			// just set observable property to broadcast event
-			// to anyone who cares
-			this.set({hash_fragment: splitUrl[2]});
-		}
-	},
-
-	getToc: function() {
-		var item = this.packageDocument.getTocItem();
-		if(!item) {
-			return null;
-		}
-		else {
-			var that = this;
-			return Readium.Models.Toc.getToc(item, {
-				file_path: that.resolvePath(item.get("href")),
-				book: that
-			});
-		}
-	},
-
 	setMetaSize: function() {
 
 		if(this.meta_section) {
@@ -434,6 +516,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.meta_section.on("change:meta_height", this.setMetaSize, this);
 	},
 
+	// REFACTORING CANDIDATE: This method may not be used for anything.
 	// when the spine position changes we need to update the
 	// state of this, this involes setting attributes that reflect
 	// the current section's url and content etc, and then we need
@@ -457,67 +540,5 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		
 		// save the position
 		this.savePosition();
-	},
-
-	// Info: "Section" actually refers to a spine item
-	getCurrentSection: function(offset) {
-		if(!offset) {
-			offset = 0;
-		}
-		var spine_pos = this.get("spine_position") + offset;
-		return this.packageDocument.getSpineItem(spine_pos);
-	},
-
-	playMo: function(forceFromStart) {
-		// there is way too much code in this method that does
-		// does not belong here. TODO: Clean up
-		var mo = this.getCurrentSection().getMediaOverlay();
-		if(mo) {
-			this.set("mo_playing", mo);
-			var that = this;
-			mo.on("change:current_text_document_url", function () {
-                that.goToHref(mo.get("current_text_document_url"));
-			});
-			mo.on("change:current_text_element_id", function () {
-				var frag = mo.get("current_text_element_id")
-				that.set("hash_fragment", frag);
-				that.set("current_mo_frag", frag);
-			});
-            mo.on("change:is_document_done", function() {
-                that.pauseMo();
-                // advance the spine position
-                if (that.hasNextSection()) {
-                    that.goToNextSection();
-                    that.playMo(true);
-                }
-            });
-            if (mo.get("has_started_playback") && forceFromStart == false) {
-                mo.resume();
-            }
-            else {
-                mo.startPlayback(null);
-            }
-		}
-		else {
-			alert("Sorry, the current EPUB does not contain a media overlay for this content");
-		}
-	},
-
-	pauseMo: function() {
-		var mo = this.get("mo_playing");
-		if(mo) {
-
-			// mo.off() and mo.pause() seem like they should be in the same call
-			mo.off();
-			mo.pause();
-			this.set("mo_playing", null);
-		}
-	},
-
-	// is this book set to fixed layout at the meta-data level
-	// TODO: This is only passing through this data to avoid breaking code in viewer.js. Eventually
-	// this should probably be removed. 
-	isFixedLayout: function() {
-		return this.epub.isFixedLayout();
 	}
 });
