@@ -23,10 +23,19 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	/**************************************************************************************/
 
 	initialize: function(options) {
-		this.model.on("change:current_page", this.changePage, this);
+		
+		this.pages = new Readium.Models.EPUBPagination({epubController : this.model});
+
+		this.pages.on("change:current_page", this.changePage, this);
 		this.model.on("change:font_size", this.setFontSize, this);
 		this.model.on("change:hash_fragment", this.goToHashFragment, this);
 		this.bindingTemplate = _.template( $('#binding-template').html() );
+
+		// START: Refactored from ebook.js
+		// if content reflows and the number of pages in the section changes
+		// we need to adjust the the current page
+		this.model.on("change:num_pages", this.adjustCurrentPage, this);
+		// END: Refactored from ebook.js
 	},
 
 	// Note: One of the primary members of the public interface; called by all three pagination views
@@ -92,22 +101,15 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.$('#spine-divider').toggle(two_up);
 	},
 
-	// Description: Return true if the pageNum argument is a currently visible 
-	// page. Return false if it is not; which will occur if it cannot be found in 
-	// the array.
-	isPageVisible: function(pageNum, currentPages) {
-		return currentPages.indexOf(pageNum) !== -1;
-	},
-
 	changePage: function() {
 		var that = this;
-		var currentPage = this.model.get("current_page");
+		var currentPage = this.pages.get("current_page");
 		var two_up = this.model.get("two_up");
 		this.$(".page-wrap").each(function(index) {
 			if(!two_up) { 
 				index += 1;
 			}
-			$(this).toggleClass("hidden-page", !that.isPageVisible(index, currentPage));
+			$(this).toggleClass("hidden-page", !that.pages.isPageVisible(index, currentPage));
 		});
 	},
 
@@ -117,7 +119,6 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		$('#readium-content-container').css("font-size", size + "em");
 		this.renderPages();
 	},
-
 
 	/**************************************************************************************/
 	/* "PRIVATE" HELPERS                                                                  */
@@ -130,9 +131,10 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		console.log("Pagination base destructor called");
 
 		// remove any listeners registered on the model
-		this.model.off("change:current_page", this.changePage);
+		this.pages.off("change:current_page", this.changePage);
 		this.model.off("change:font_size", this.setFontSize);
 		this.model.off("change:hash_fragment", this.goToHashFragment);
+		this.model.off("change:num_pages", this.adjustCurrentPage, this);
 		this.resetEl();
 	},
 	
@@ -208,12 +210,10 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 			return _.include(supportedNamespaces, ns);
 		};
 
-
 		$('switch', dom).each(function(ind) {
 			
 			// keep track of whether or now we found one
 			var found = false;
-
 
 			$('case', this).each(function() {
 
@@ -236,13 +236,13 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		var that = this;
 		$(dom).on("swipeleft", function(e) {
 			e.preventDefault();
-			that.model.goRight();
+			that.pages.goRight();
 			
 		});
 
 		$(dom).on("swiperight", function(e) {
 			e.preventDefault();
-			that.model.goLeft();
+			that.pages.goLeft();
 		});
 	},
 

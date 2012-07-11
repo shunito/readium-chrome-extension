@@ -22,7 +22,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			this.offset_dir = "left";
 		}
 
-		this.model.on("change:current_page", this.pageChangeHandler, this);
+		this.pages.on("change:current_page", this.pageChangeHandler, this);
 		this.model.on("change:toc_visible", this.windowSizeChangeHandler, this);
 		this.model.on("repagination_event", this.windowSizeChangeHandler, this);
 		this.model.on("change:current_theme", this.injectTheme, this);
@@ -50,10 +50,10 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			that.setNumPages();
 
 			if(goToLastPage) {
-				that.model.goToLastPage();
+				that.pages.goToLastPage();
 			}
 			else {
-				that.model.goToPage(1);
+				that.pages.goToPage(1);
 			}		
 		});
 		
@@ -70,7 +70,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	// that were registered on the model
 	destruct: function() {
 		
-		this.model.off("change:current_page", this.pageChangeHandler);
+		this.pages.off("change:current_page", this.pageChangeHandler);
 		this.model.off("change:toc_visible", this.windowSizeChangeHandler);
 		this.model.off("repagination_event", this.windowSizeChangeHandler);
 		this.model.off("change:current_theme", this.windowSizeChangeHandler);
@@ -117,7 +117,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 			var page = this.getElemPageNumber(el);
 			if(page > 0) {
-				this.model.goToPage(page);	
+				this.pages.goToPage(page);	
 			}
 		}
 		// else false alarm no work to do
@@ -187,7 +187,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		$(this.getBody()).css( this.getBodyColumnCss() );
 
 		this.setNumPages();
-		var page = this.model.get("current_page")[0] || 1;
+		var page = this.pages.get("current_page")[0] || 1;
 		this.goToPage(page);
 	},
 
@@ -282,11 +282,12 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		return num;
 	},
 
+	// REFACTORING CANDIDATE: this was that.model.goToPage
 	pageChangeHandler: function() {
 		var that = this;
 		this.hideContent();
 		setTimeout(function() {
-			that.goToPage(that.model.get("current_page")[0]);
+			that.goToPage(that.pages.get("current_page")[0]);
 		}, 150);
 	},
 
