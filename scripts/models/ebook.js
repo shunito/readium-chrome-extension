@@ -11,6 +11,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 		// capture context for use in callback functions
 		var that = this;
+		this.set("current_page", [1]);
 
 		this.epub = this.get("epub");
 
@@ -105,7 +106,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			"font_size": this.get("font_size"),
 			"two_up": this.get("two_up"),
 			"font_size": this.get("font_size"),
-			"current_page": this.get("current_page"),
+			//"current_page": this.get("current_page"),
 			"key": this.get("key")
 		};
 	},
