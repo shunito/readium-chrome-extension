@@ -8,9 +8,9 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 	initialize: function () {
 
 		// TODO: This should be a temporary hack until the persistence for current_page/spine_position can be
-		//   worked out. 
+		//   worked out. 		
+		this.epubController = this.get("model");
 		this.set("current_page", [1]);
-		this.epubController = this.get("epubController");
 	},
 
 	// START: Methods that have been added as a result of refactoring
@@ -81,8 +81,8 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 	// Description: Return true if the pageNum argument is a currently visible 
 	// page. Return false if it is not; which will occur if it cannot be found in 
 	// the array.
-	isPageVisible: function(pageNum, currentPages) {
-		return currentPages.indexOf(pageNum) !== -1;
+	isPageVisible: function(pageNum) {
+		return this.get("current_page").indexOf(pageNum) !== -1;
 	},
 
 	/**************************************************************************************/
