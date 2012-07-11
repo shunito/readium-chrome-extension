@@ -121,7 +121,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				this.get("two_up"), 
 				this.get("current_page"),
 				this.epub.get("page_prog_dir"),
-				this.epub.get("isFixedLayout")
+				this.getCurrentSection().isFixedLayout()
 				);
 
 			this.set({two_up: !this.get("two_up"), current_page: newPages});
@@ -399,7 +399,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	isFixedLayout: function() {
 		return this.epub.isFixedLayout();
 	},
-
 
 	/**************************************************************************************/
 	/* "PRIVATE" HELPERS                                                                  */
