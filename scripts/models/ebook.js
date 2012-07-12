@@ -283,8 +283,9 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		//   how it accesses the new spine_position. This would be clearer if the spine_position to set were passed 
 		//   explicitly to the paginator. 
 		this.set("spine_position", pos);
+		this.trigger("FXL_goToPage");
 
-		// Render the new spine position if it is not already renderedd
+		// Render the new spine position if it is not already rendered. 
 		if (!spinePosIsRendered) {
 
 			var renderedItems = this.paginator.renderSpineItems(false);

@@ -12,6 +12,9 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		this.page_template = _.template( $('#fixed-page-template').html() );
 		this.empty_template = _.template( $('#empty-fixed-page-template').html() );
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
+
+		var spinePos = this.model.get("spine_position");
+		this.model.on("FXL_goToPage", this.spinePositionChangeHandler, this);
 		this.model.on("change:two_up", this.setUpMode, this);
 		this.model.on("change:meta_size", this.setContainerSize, this);
 	},
@@ -58,6 +61,12 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 	/**************************************************************************************/
 	/* "PRIVATE" HELPERS                                                                  */
 	/**************************************************************************************/
+
+	spinePositionChangeHandler: function () {
+
+		var pageNumber = this.model.get("spine_position") + 1;
+		this.pages.goToPage(pageNumber);
+	},
 
 	// Description: Creates/gets an iFrame, which contains a page view to represent a spine item, and appends it to an 
 	// element that contains the content of the current ePub. Each of these spine item views is not necessarily displayed

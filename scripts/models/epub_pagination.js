@@ -25,8 +25,6 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 		this.on("change:num_pages", this.adjustCurrentPage, this);
 	},
 
-	// START: Methods that have been added as a result of refactoring
-
 	// Description: This method determines which page numbers to display when switching
 	// between a single page and side-by-side page views and vice versa.
 	toggleTwoUp: function() {
@@ -218,6 +216,4 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 		var page = this.get("num_pages");
 		this.goToPage(page);
 	}
-
-	// END: Methods that have been added as a result of refactoring
 });

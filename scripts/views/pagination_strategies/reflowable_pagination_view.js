@@ -92,8 +92,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.showContent();
 	},
 
-	// REFACTORING CANDIDATE: This is a private member, although it's not clear that this is the method used in this model. 
-	//   the base class method may be used instead.
 	// Description: navigate to a url hash fragment by calculating the page of
 	// the corresponding elem and setting the page number on `this.model`
 	// as precondition the hash fragment should identify an element in the
@@ -111,12 +109,12 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			}
 
 			// we get more precise results if we look at the first children
-			while(el.children.length > 0) {
+			while (el.children.length > 0) {
 				el = el.children[0];
 			}
 
 			var page = this.getElemPageNumber(el);
-			if(page > 0) {
+			if (page > 0) {
 				this.pages.goToPage(page);	
 			}
 		}
