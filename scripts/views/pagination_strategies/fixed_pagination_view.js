@@ -53,14 +53,14 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		var content = spineItem.getPageView().render().el;
 		$(content).attr("id", "page-" + pageNum.toString());
 		this.$('#container').append(content);
-		this.changePage();
+		this.showCurrentPages();
 		return this;
 	},
 
 	// REFACTORING CANDIDATE: This appears to be called in the base model??
 	renderPages: function() {
 		// lost myself in the complexity here but this seems right
-		this.changePage();
+		this.showCurrentPages();
 		return this;
 	},
 
@@ -69,7 +69,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 	// Toggle it as invisible.
 	// Note: current_page is an array containing the page numbers (as of 25June2012, a maximum of two pages) of the 
 	// currently visible pages
-	changePage: function() {
+	showCurrentPages: function() {
 		var that = this;
 
 		this.$(".fixed-page-wrap").each(function(index) {

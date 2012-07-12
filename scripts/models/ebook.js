@@ -21,9 +21,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// Get the epub package document
 		this.packageDocument = this.epub.getPackageDocument();
 
-		// Instantiate an object to decide what to display
-		this.pageNumberDisplayLogic = new Readium.Models.PageNumberDisplayLogic();
-		
 		// TODO: this might have to change: Should this model load the package document or epub_state??
 		// load the `packageDocument` from the HTML5 filesystem asynchroniously
 		this.packageDocument.fetch({
@@ -76,8 +73,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 	defaults: {
 		"font_size": 10,
-    	"current_page": [1],
-    	"num_pages": 0,
     	"two_up": false,
     	"full_screen": false,
     	"toolbar_visible": true,
@@ -228,15 +223,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	/**************************************************************************************/
 	/* "PRIVATE" HELPERS                                                                  */
 	/**************************************************************************************/
-
-	// REFACTORING CANDIDATE: Used privately in this model, but method with the same name is used in the
-	//   pagination view hierarchy. 
-	// is the param pageNumber currenly displayed
-	/*
-	isPageVisible: function(pageNumber) {
-		return this.get("current_page").indexOf(pageNumber) > -1;
-	},
-	*/
 
 	// TODO, which key should be used here? the epub or the viewer properties key? 
 	restorePosition: function() {

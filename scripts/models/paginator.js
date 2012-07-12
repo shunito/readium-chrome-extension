@@ -57,7 +57,7 @@ Readium.Models.Paginator = Backbone.Model.extend({
 
 			// set the page we should be on
 			var page = this.rendered_spine_positions.indexOf(spine_position) + 1;
-			book.set("num_pages", pageNum - 1);
+			this.v.pages.set("num_pages", pageNum - 1);
 			this.v.pages.goToPage(page);
 			setTimeout(function() {
 				that.v.setContainerSize();

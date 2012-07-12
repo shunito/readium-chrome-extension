@@ -25,17 +25,11 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	initialize: function(options) {
 		
 		this.pages = new Readium.Models.EPUBPagination({model : this.model});
+		this.pages.on("change:current_page", this.showCurrentPages, this);
 
-		this.pages.on("change:current_page", this.changePage, this);
 		this.model.on("change:font_size", this.setFontSize, this);
 		this.model.on("change:hash_fragment", this.goToHashFragment, this);
 		this.bindingTemplate = _.template( $('#binding-template').html() );
-
-		// START: Refactored from ebook.js
-		// if content reflows and the number of pages in the section changes
-		// we need to adjust the the current page
-		this.model.on("change:num_pages", this.pages.adjustCurrentPage, this.pages);
-		// END: Refactored from ebook.js
 	},
 
 	// Note: One of the primary members of the public interface; called by all three pagination views
@@ -101,7 +95,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.$('#spine-divider').toggle(two_up);
 	},
 
-	changePage: function() {
+	showCurrentPages: function() {
 		var that = this;
 		var two_up = this.model.get("two_up");
 		this.$(".page-wrap").each(function(index) {
@@ -130,10 +124,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		console.log("Pagination base destructor called");
 
 		// remove any listeners registered on the model
-		this.pages.off("change:current_page", this.changePage);
+		this.pages.off("change:current_page", this.showCurrentPages);
 		this.model.off("change:font_size", this.setFontSize);
 		this.model.off("change:hash_fragment", this.goToHashFragment);
-		this.model.off("change:num_pages", this.pages.adjustCurrentPage, this.pages);
 		this.resetEl();
 	},
 	

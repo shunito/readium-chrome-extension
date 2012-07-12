@@ -380,8 +380,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	setNumPages: function() {
 		var num = this.calcNumPages();
-		console.log('num pages is: ' + num);
-		this.model.set("num_pages", num);
+		this.pages.set("num_pages", num);
 	},
 
 	// REFACTORING CANDIDATE: should be moved into an MO-specific another model

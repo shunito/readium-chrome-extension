@@ -1,6 +1,11 @@
 
 Readium.Models.EPUBPagination = Backbone.Model.extend({ 
 
+	defaults: {
+		"num_pages" : 0,
+		"current_page" : [1]
+	},
+
 	/**************************************************************************************/
 	/* PUBLIC METHODS (THE API)                                                           */
 	/**************************************************************************************/
@@ -11,6 +16,13 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 		//   worked out. 		
 		this.epubController = this.get("model");
 		this.set("current_page", [1]);
+
+		// Instantiate an object to decide what to display
+		this.pageNumberDisplayLogic = new Readium.Models.PageNumberDisplayLogic();
+		
+		// if content reflows and the number of pages in the section changes
+		// we need to adjust the the current page
+		this.on("change:num_pages", this.adjustCurrentPage, this);
 	},
 
 	// START: Methods that have been added as a result of refactoring
@@ -22,7 +34,7 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 		if (this.epub.get("can_two_up")) {
 
 			// REFACTORING CANDIDATE: refactor page number display logic to this model
-			var newPages = this.epub.pageNumberDisplayLogic.getPageNumbersForTwoUp (
+			var newPages = this.pageNumberDisplayLogic.getPageNumbersForTwoUp (
 				this.epubController.get("two_up"), 
 				this.get("current_page"),
 				this.epubController.epub.get("page_prog_dir"),
@@ -69,7 +81,7 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 			return;
 		}
 
-		var pagesToGoto = this.epubController.pageNumberDisplayLogic.getGotoPageNumsToDisplay(
+		var pagesToGoto = this.pageNumberDisplayLogic.getGotoPageNumsToDisplay(
 							gotoPageNumber,
 							this.epubController.get("two_up"),
 							this.epubController.getCurrentSection().isFixedLayout(),
@@ -124,7 +136,7 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 		// Move to previous page with two side-by-side pages
 		else {
 
-			var pagesToDisplay = this.epubController.pageNumberDisplayLogic.getPrevPageNumsToDisplay(
+			var pagesToDisplay = this.pageNumberDisplayLogic.getPrevPageNumsToDisplay(
 								lastPage,
 								this.epubController.getCurrentSection().isFixedLayout(),
 								this.epubController.epub.get("page_prog_dir")
@@ -157,7 +169,7 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 			}
 		}
 
-		if (curr_pg[curr_pg.length - 1] >= this.epubController.get("num_pages")) {
+		if (curr_pg[curr_pg.length - 1] >= this.get("num_pages")) {
 
 			this.epubController.goToNextSection();
 		}
@@ -175,7 +187,7 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 		// Two pages are being displayed
 		else {
 
-			var pagesToDisplay = this.epubController.pageNumberDisplayLogic.getNextPageNumsToDisplay(
+			var pagesToDisplay = this.pageNumberDisplayLogic.getNextPageNumsToDisplay(
 								firstPage,
 								this.epubController.getCurrentSection().isFixedLayout(),
 								this.epubController.epub.get("page_prog_dir")
@@ -193,7 +205,7 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 
 	adjustCurrentPage: function() {
 		var cp = this.get("current_page");
-		var num = this.epubController.get("num_pages");
+		var num = this.get("num_pages");
 		var two_up = this.epubController.get("two_up");
 		if(cp[cp.length - 1] > num) {
 			this.goToLastPage();
@@ -203,7 +215,7 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 	// REFACTORING CANDIDATE: this is strange in that it does not seem to account for 
 	//   possibly crossing over a section boundary
 	goToLastPage: function() {
-		var page = this.epubController.get("num_pages");
+		var page = this.get("num_pages");
 		this.goToPage(page);
 	}
 
