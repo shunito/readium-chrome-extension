@@ -1,4 +1,5 @@
 .DS_Store
 .sass-cache/
 intermediate/
+readium/
 build/custom_config.rb
