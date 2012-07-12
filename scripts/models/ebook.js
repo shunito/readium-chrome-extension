@@ -120,6 +120,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.set("toc_visible", !vis);
 	},
 
+	// REFACTORING CANDIDATE: I'm not sure if it makes sense to have this on the epub controller or as part of 
+	//   the views "what is on the page thing." 
 	goToHref: function(href) {
 		// URL's with hash fragments require special treatment, so
 		// first thing is to split off the hash frag from the rest
@@ -260,46 +262,34 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// I think package doc validations takes care of it
 		if(this.hasPrevSection() ) {
 			var pos = this.get("spine_position");
-			this.setSpinePosBackwards(pos - 1);	
+			this.setSpinePos(pos - 1);	
 		}
 	},
 
 	setSpinePos: function(pos) {
-		if(pos < 0 || pos >= this.packageDocument.spineLength()) {
-			// invalid position
+
+		// check for invalid spine position
+		if (pos < 0 || pos >= this.packageDocument.spineLength()) {
+			
 			return;
 		}
+
 		var spineItems = this.get("rendered_spine_items");
+		var spinePosIsRendered = spineItems.indexOf(pos) >=0 ? true : false;
+
+		// REFACTORING CANDIDATE: There is a somewhat hidden dependency here between the paginator
+		//   and the setting of the spine_position. The paginator re-renders based on the currently
+		//   set spine_position on this model; the paginator has a reference to this model, which is 
+		//   how it accesses the new spine_position. This would be clearer if the spine_position to set were passed 
+		//   explicitly to the paginator. 
 		this.set("spine_position", pos);
-		if(spineItems.indexOf(pos) >= 0) {
-			// the spine item is already on the page
-			if(spineItems.length > 1) {
-				// we are in fixed layout state, one spine item per page
-				this.goToPage(spineItems.indexOf(pos) + 1);
-			}
-			// else nothing to do, because the section is already rendered out
-		}
-		else {
-			// the section is not rendered out, need to do so
-			var items = this.paginator.renderSpineItems(false);
-			this.set("rendered_spine_items", items);	
-		}
-	},
 
-	setSpinePosBackwards: function(pos) {
-		if(pos < 0 || pos >= this.packageDocument.spineLength()) {
-			// invalid position
-			return;
-		}
+		// Render the new spine position if it is not already renderedd
+		if (!spinePosIsRendered) {
 
-		this.set("spine_position", pos);
-		if(this.get("rendered_spine_items").indexOf(pos) >= 0) {
-			// the spine item is already on the page, nothing to do
-			return;
+			var renderedItems = this.paginator.renderSpineItems(false);
+			this.set("rendered_spine_items", renderedItems);
 		}
-
-		var items = this.paginator.renderSpineItems(true);
-		this.set("rendered_spine_items", items);
 	},
 
 	setMetaSize: function() {

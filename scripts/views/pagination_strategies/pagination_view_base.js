@@ -29,6 +29,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 		this.model.on("change:font_size", this.setFontSize, this);
 		this.model.on("change:hash_fragment", this.goToHashFragment, this);
+		this.model.on("change:two_up", this.pages.toggleTwoUp, this.pages);
 		this.bindingTemplate = _.template( $('#binding-template').html() );
 	},
 
@@ -42,20 +43,6 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
         this.injectLinkHandler(e.srcElement);
         var trigs = this.parseTriggers(e.srcElement.contentDocument);
 		this.applyTriggers(e.srcElement.contentDocument, trigs);
-	},
-
-	// handle clicks of anchor tags by navigating to
-	// the proper location in the epub spine, or opening
-	// a new window for external links
-	linkClickHandler: function(e) {
-		e.preventDefault();
-
-		var href = e.srcElement.attributes["href"].value;
-		if(href.match(/^http(s)?:/)) {
-			chrome.tabs.create({"url": href});
-		} else {
-			this.model.goToHref(href);
-		}
 	},
 
 	// TODO: Only used in reflowable view
@@ -106,16 +93,23 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		});
 	},
 
-	// REFACTORING CANDIDATE: Child models "override" this; this method might not be necessary
-	setFontSize: function() {
-		var size = this.model.get("font_size") / 10;
-		$('#readium-content-container').css("font-size", size + "em");
-		this.renderPages();
-	},
-
 	/**************************************************************************************/
 	/* "PRIVATE" HELPERS                                                                  */
 	/**************************************************************************************/
+
+	// handle clicks of anchor tags by navigating to
+	// the proper location in the epub spine, or opening
+	// a new window for external links
+	linkClickHandler: function(e) {
+		e.preventDefault();
+
+		var href = e.srcElement.attributes["href"].value;
+		if(href.match(/^http(s)?:/)) {
+			chrome.tabs.create({"url": href});
+		} else {
+			this.model.goToHref(href);
+		}
+	},
 
 	// sometimes these views hang around in memory before
 	// the GC gets them. we need to remove all of the handlers
@@ -243,11 +237,6 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.$('#readium-content-container').
 		css('visibility', 'hidden').
 		html(content).append("<div id='content-end'></div>");
-	},
-
-	// TODO: This appears to be dead code
-	toggleTwoUp: function() {
-		//this.render();
 	},
 
 	// inject mathML parsing code into an iframe

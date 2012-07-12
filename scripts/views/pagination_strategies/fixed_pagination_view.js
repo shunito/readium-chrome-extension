@@ -99,15 +99,6 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		}
 	},	
 
-	/*
-	// REFACTORING CANDIDATE: This appears to be called in the base model??
-	renderPages: function() {
-		// lost myself in the complexity here but this seems right
-		this.showCurrentPages();
-		return this;
-	},
-	*/
-
 	findPrerenderStart: function() {
 		
 		var i = 0;
@@ -146,6 +137,12 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		// remove any listeners registered on the model
 		this.model.off("change:two_up", this.setUpMode);
 		this.model.off("change:meta_size", this.setUpMode);
+	},
+
+	setFontSize: function() {
+		var size = this.model.get("font_size") / 10;
+		$('#readium-content-container').css("font-size", size + "em");
+		this.showCurrentPages();
 	}
 });
 

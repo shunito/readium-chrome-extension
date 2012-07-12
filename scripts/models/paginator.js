@@ -1,6 +1,14 @@
 
-// Description: Chooses a pagination strategy based on the ePub ebook passed in
-// Inputs: This model references an ebook
+// Description: Chooses a pagination strategy based on the ePub passed in
+// Inputs: This model references an epub
+
+// REFACTORING CANDIDATE: There is an issue here that is a bit hidden. Having this pagination strategy model attached to the 
+//   epub makes sense in that each spine item within an epub can be either reflowable or fixed. As such, when navigating through
+//   the epub, a decisions as to the type of pagination view must be made dynamically. However, at the moment, while it appears that
+//   this is how the pagination strategy is set up, in actual fact, an entire fixed layout epub is rendered based on the type of spine item
+//   found at the current spine_position. Since all the other spine items are then rendered assuming they are also fixed layout, the 
+//   pagination strategy is never called again when navigating to the other (possibly reflowable) spine items. This will have to be addressed
+//   at some point. 
 
 Readium.Models.Paginator = Backbone.Model.extend({
 

@@ -31,7 +31,7 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 	// between a single page and side-by-side page views and vice versa.
 	toggleTwoUp: function() {
 
-		if (this.epub.get("can_two_up")) {
+		if (this.epubController.get("can_two_up")) {
 
 			// REFACTORING CANDIDATE: refactor page number display logic to this model
 			var newPages = this.pageNumberDisplayLogic.getPageNumbersForTwoUp (
@@ -41,7 +41,7 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 				this.epubController.getCurrentSection().isFixedLayout()
 				);
 
-			this.epubController.set({two_up: !this.epubController.get("two_up")});
+			//this.epubController.set({two_up: !this.epubController.get("two_up")});
 			this.set({current_page: newPages});
 		}	
 	},
@@ -118,17 +118,17 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 			}
 		}
 
-		if(curr_pg[0] <= 1) {
+		if (curr_pg[0] <= 1) {
 
 			this.epubController.goToPrevSection();
 		}
 		// Single page navigation
-		else if(!this.epubController.get("two_up")){
+		else if (!this.epubController.get("two_up")){
 
 			this.set("current_page", [lastPage]);
 
 			// Reset spine position
-			if(this.epubController.get("rendered_spine_items").length > 1) {
+			if (this.epubController.get("rendered_spine_items").length > 1) {
 				var pos = this.epubController.get("rendered_spine_items")[lastPage - 1];
 				this.epubController.set("spine_position", pos);
 			}
@@ -144,7 +144,7 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 			this.set("current_page", pagesToDisplay);
 
 			// Reset spine position
-			if(this.epubController.get("rendered_spine_items").length > 1) {
+			if (this.epubController.get("rendered_spine_items").length > 1) {
 				var ind = (lastPage > 1 ? lastPage - 2 : 0);
 				var pos = this.epubController.get("rendered_spine_items")[ind];
 				this.epubController.set("spine_position", pos);
