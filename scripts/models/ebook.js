@@ -96,7 +96,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			"font_size": this.get("font_size"),
 			"two_up": this.get("two_up"),
 			"font_size": this.get("font_size"),
-			//"current_page": this.get("current_page"),
 			"key": this.get("key")
 		};
 	},
@@ -279,14 +278,12 @@ Readium.Models.Ebook = Backbone.Model.extend({
 				this.goToPage(spineItems.indexOf(pos) + 1);
 			}
 			// else nothing to do, because the section is already rendered out
-			
 		}
 		else {
 			// the section is not rendered out, need to do so
 			var items = this.paginator.renderSpineItems(false);
 			this.set("rendered_spine_items", items);	
 		}
-		
 	},
 
 	setSpinePosBackwards: function(pos) {

@@ -106,7 +106,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		});
 	},
 
-	// REFACTORING CANDIDATE: Child models "override" this; investigate this
+	// REFACTORING CANDIDATE: Child models "override" this; this method might not be necessary
 	setFontSize: function() {
 		var size = this.model.get("font_size") / 10;
 		$('#readium-content-container').css("font-size", size + "em");

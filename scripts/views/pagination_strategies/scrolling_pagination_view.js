@@ -18,14 +18,16 @@ Readium.Views.ScrollingPaginationView = Readium.Views.PaginationViewBase.extend(
 		this.$('.content-sandbox').on("load", function(e) {
 			that.iframeLoadCallback(e);
 		});
-		return this;
+
+		return [this.model.get("spine_position")];
 	},
 
-	// REFACTORING CANDIDATE: A method with this name exists on the base model; 
+	// REFACTORING CANDIDATE: A method with this name exists on the base model;
+	/*
 	injectLinkHandler: function (iframe) {
         var doc = iframe.contentDocument;
 		$("a", doc).click(this.linkClickHandler);
-	},
+	},*/
 
 	/**************************************************************************************/
 	/* "PRIVATE" HELPERS                                                                  */

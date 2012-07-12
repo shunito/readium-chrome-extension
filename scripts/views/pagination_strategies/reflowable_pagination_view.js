@@ -57,7 +57,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			}		
 		});
 		
-		return this;
+		return [this.model.get("spine_position")];
 	},
 
 
@@ -221,7 +221,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.$('#readium-flowing-content').attr("height", height);
 		this.$('#readium-flowing-content').css("width", width);
 		this.$('#readium-flowing-content').css("height", height);
-		
 	},
 
 	getFrameWidth: function() {
