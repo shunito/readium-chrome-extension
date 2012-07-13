@@ -7,12 +7,12 @@ body {
 
 #next-page-button {
 	right: 0;
-	background-image: url('/images/paginator/next_page.png');
+	background-image: url($readium_image_path + 'paginator/next_page.png');
 }
 
 #prev-page-button {
 	left: 0;
-	background-image: url('/images/paginator/previous_page.png');
+	background-image: url($readium_image_path + 'paginator/previous_page.png');
 }
 
 #page-wrap {

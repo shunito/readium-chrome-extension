@@ -33,6 +33,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		// wipe the html
 		this.$('#container').html("");
 		this.setContainerSize();
+		this.setUpMode();
 
 		// add the current section
 		//this.addPage( this.model.getCurrentSection(), 1 );
@@ -55,13 +56,16 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		}
 	},
 
-	addPage: function(sec, pageNum) {
+	// Description: Creates/gets an iFrame, which contains a page view to represent a spine item, and appends it to an 
+	// element that contains the content of the current ePub. Each of these spine item views is not necessarily displayed
+	// immediately. 
+	addPage: function(spineItem, pageNum) {
 		var that = this;
-		var view = sec.getPageView();
+		var view = spineItem.getPageView();
 		view.on("iframe_loaded", function() {
 			this.iframeLoadCallback({srcElement: view.iframe()});
 		}, this);
-		var content = sec.getPageView().render().el;
+		var content = spineItem.getPageView().render().el;
 		$(content).attr("id", "page-" + pageNum.toString());
 		this.$('#container').append(content);
 		this.changePage();
@@ -74,15 +78,18 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		return this;
 	},
 
+	// Description: For each fixed-page-wrap(per), if it is one of the current pages, toggle it as visible. If it is not
+	// Toggle it as invisible.
+	// Note: current_page is an array containing the page numbers (as of 25June2012, a maximum of two pages) of the 
+	// currently visible pages
 	changePage: function() {
 		var that = this;
 		var currentPage = this.model.get("current_page");
-		var two_up = this.model.get("two_up")
+
 		this.$(".fixed-page-wrap").each(function(index) {
 			$(this).toggle(that.isPageVisible(index + 1, currentPage));
 		});
 	}
-
 });
 
 
@@ -103,7 +110,7 @@ Readium.Views.FixedPageView = Backbone.View.extend({
 		var that = this;
 		var json = this.model.toJSON();
 		this.$el.html( this.template( json ) );
-		this.$el.addClass( this.model.getPositionClass() );
+		this.$el.addClass( this.model.getPageSpreadClass() );
 		this.$('.content-sandbox').on("load", function() {
 			that.trigger("iframe_loaded");
 		});

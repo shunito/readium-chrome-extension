@@ -37,6 +37,12 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 		// Get all style sheets in the book dom
 		$bookStyleSheets = $("link[rel*='stylesheet']", bookDom);
 
+		// If the book does not have any stylesheets, do not change style sets
+		if ($bookStyleSheets.length === 0) {
+
+			return bookDom;
+		}
+
 		// Maintain original information about stylesheets
 		$bookStyleSheets = this._storeOriginalAttributes($bookStyleSheets);
 
@@ -74,13 +80,20 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 
 			// The stylesheets must all be set as preferred so that when enabled, they will be activated
 			$styleSheet.attr("rel", "stylesheet");
-			if ($.trim($styleSheet.attr('title')) === styleSetToActivate) {
+			// Always leave persistent style sets activated
+			if ($styleSheet.attr('title') === undefined) {
+
+				$styleSheet[0].disabled = false;
+			}
+			// Activate this style set
+			else if ($.trim($styleSheet.attr('title')) === styleSetToActivate) {
 
 				// Chrome is buggy and change to disabled = false is only
 				// picked up if you first set it to true
 				$styleSheet[0].disabled = true;
 				$styleSheet[0].disabled = false;
 			}
+			// De-activate other style sets
 			else {
 
 				$styleSheet[0].disabled = true;
@@ -283,5 +296,5 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 		}
 
 		return styleSet;
-	},
+	}
 });

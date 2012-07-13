@@ -1,3 +1,19 @@
+/**
+ * Within this file all sass variables to the Readium Project are defined
+ */
+/**
+ * Dependent on the location of the calling html file (e. g. viewer.html) the 
+ * file hirarchy may be broken and images are out of range. Also relative 
+ * paths may be preferred to absolute ones. All this can be done with this 
+ * preceding path. As images start from document root with the naming of 
+ * their folder, the path in the path variable should end with a "/".
+ * 
+ * Affected sass files:
+ *   readium_paginator
+ *   toc
+ *   viewer_settings_modal
+ * 
+ */
 .clearfix {
   *zoom: 1; }
   .clearfix:before, .clearfix:after {
@@ -1481,10 +1497,7 @@ body.apple-fixed-layout {
   height: 100%;
   margin: 0 auto;
   margin-top: 1%;
-  height: 90%;
-  -webkit-box-shadow: 0 0 5px 5px #888888;
-  -moz-box-shadow: 0 0 5px 5px #888888;
-  box-shadow: 0 0 5px 5px #888888; }
+  height: 90%; }
 
 #viewer-settings-modal {
   text-align: center;
@@ -1512,7 +1525,7 @@ body.apple-fixed-layout {
     -moz-border-radius: 2px;
     border-radius: 2px;
     padding: 5px;
-    height: 100px;
+    height: 80px;
     overflow: hidden;
     text-align: left; }
   #viewer-settings-modal .setting-header {
@@ -1520,7 +1533,7 @@ body.apple-fixed-layout {
     font-family: Helvetica,Arial,sans-serif;
     font-size: 12px;
     color: #777;
-    margin: 14px 0px;
+    margin: 12px 0px;
     padding: 0px; }
   #viewer-settings-modal #settings-margin {
     padding: 20px; }
@@ -1534,10 +1547,19 @@ body.apple-fixed-layout {
     float: right;
     width: 253px;
     margin-top: 7px; }
+  #viewer-settings-modal #margin-radio-wrapper {
+    width: 312px;
+    height: 63px;
+    position: relative;
+    left: 0px;
+    top: 0px; }
   #viewer-settings-modal .margin-radio {
     display: inline-block;
+    position: absolute;
     width: 43px;
-    height: 60px;
+    height: 63px;
+    margin: 0;
+    padding: 0;
     background-repeat: no-repeat;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -1546,26 +1568,27 @@ body.apple-fixed-layout {
     user-select: none; }
   #viewer-settings-modal #margin-option-1 {
     background-image: url("/images/settings_modal/margin1_off.png");
-    margin-right: 20px; }
+    left: 0px; }
     #viewer-settings-modal #margin-option-1.selected {
       background-image: url("/images/settings_modal/margin1_on.png"); }
   #viewer-settings-modal #margin-option-2 {
     background-image: url("/images/settings_modal/margin2_off.png");
-    margin-right: 20px; }
+    left: 67px; }
     #viewer-settings-modal #margin-option-2.selected {
       background-image: url("/images/settings_modal/margin2_on.png"); }
   #viewer-settings-modal #margin-option-3 {
     background-image: url("/images/settings_modal/margin3_off.png");
-    margin-right: 20px; }
+    left: 134px; }
     #viewer-settings-modal #margin-option-3.selected {
       background-image: url("/images/settings_modal/margin3_on.png"); }
   #viewer-settings-modal #margin-option-4 {
     background-image: url("/images/settings_modal/margin4_off.png");
-    margin-right: 20px; }
+    left: 201px; }
     #viewer-settings-modal #margin-option-4.selected {
       background-image: url("/images/settings_modal/margin4_on.png"); }
   #viewer-settings-modal #margin-option-5 {
-    background-image: url("/images/settings_modal/margin5_off.png"); }
+    background-image: url("/images/settings_modal/margin5_off.png");
+    right: 1px; }
     #viewer-settings-modal #margin-option-5.selected {
       background-image: url("/images/settings_modal/margin5_on.png"); }
   #viewer-settings-modal .simple-radio {
@@ -1628,6 +1651,8 @@ body.apple-fixed-layout {
   -webkit-box-shadow: 10px 0px 11px rgba(100, 100, 104, 0.35);
   -moz-box-shadow: 10px 0px 11px rgba(100, 100, 104, 0.35);
   box-shadow: 10px 0px 11px rgba(100, 100, 104, 0.35); }
+  #readium-toc ol {
+    padding-left: 1.5em; }
 
 #toc-body, #toc-header {
   margin-right: 10px;

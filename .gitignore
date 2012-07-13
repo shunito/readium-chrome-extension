@@ -3,3 +3,4 @@
 intermediate/
 readium/
 build/custom_config.rb
+.jhw-cache/

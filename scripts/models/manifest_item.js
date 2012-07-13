@@ -82,7 +82,7 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 		section.width = this.get("meta_width") || 0;
 		section.height = this.get("meta_height") || 0;
 		section.uri = this.packageDocument.resolveUri(manifest_item.get('href'));
-		section.page_class = this.getPositionClass(manifest_item, spine_index);
+		section.page_class = this.getPageSpreadClass(manifest_item, spine_index);
 		return section;
 	},
 
@@ -94,7 +94,7 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 		json.width = this.get("meta_width") || 0;
 		json.height = this.get("meta_height") || 0;
 		json.uri = this.resolveUri(this.get('href'));
-		json.page_class = this.getPositionClass();
+		json.page_class = this.getPageSpreadClass();
 		return json;
 	},
 
@@ -103,9 +103,11 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 	// 	left_page: 		render on the left side
 	//	right_page: 	render on the right side
 	//	center_page: 	always center the page horizontally
-	getPositionClass: function() {
+	getPageSpreadClass: function() {
 		var book = this.collection.packageDocument.get("book");
 		var spine_index = this.get("spine_index");
+		var pageSpreadProperty;
+
 		if(book.get("apple_fixed")) {
 			// the logic for apple fixed layout is a little different:
 			/*
@@ -122,7 +124,7 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 				return "center_page";
 			}
 			else if (spine_index % 2 === 1 && 
-				spine_index === this.collection.length ) {
+				spine_index === this.collection.length) {
 
 				// if the last spine item in the book would be on the left, then
 				// it would have no left counterpart, so center it
@@ -135,7 +137,45 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 			}
 		}
 		else {
-			return (spine_index % 2 === 0 ? "right_page" : "left_page");
+
+			// If the page spread property has been set for this spine item, return 
+			// the name of the appropriate spread class. 
+			// Note: As there are only three valid values (left, right, center) for the page
+			// spread property in ePub 3.0, if the property is set and 
+			// it is not "left" or "right, "center" will always be assumed. 
+			if (this.get("page_spread")) {
+
+				pageSpreadProperty = this.get("page_spread");
+				if (pageSpreadProperty === "left") {
+
+					return "left_page";
+				}
+				else if (pageSpreadProperty === "right") {
+
+					return "right_page";
+				}
+				else {
+
+					return "center_page";
+				}
+			}
+			// If the page spread property is not set, use a even/odd page index heuristic that depends on the 
+			// page progression order:
+			//   - Even-numbered pages on the right for rtl text
+			//   - Odd-numbered pages on the left for ltr text
+			else {
+
+				// Check for right-to-left page progression direction
+				if (this.get("page_prog_dir") === "rtl") {
+
+					return (spine_index % 2 === 0 ? "right_page" : "left_page");
+				}
+				// Text is left-to-right
+				else {
+
+					return (spine_index % 2 === 0 ? "left_page" : "right_page");
+				}
+			}
 		}
 	},
 

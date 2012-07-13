@@ -13,6 +13,9 @@
 	overflow: hidden;
 	//border-right: 2px solid #999;
 	@include box-shadow(10px 0px 11px rgba(100, 100, 104, 0.35));
+	ol { 
+		padding-left: 1.5em; 
+	}
 }
 
 #toc-body, #toc-header {
@@ -27,7 +30,7 @@
 	#close-toc-button {
 		height: 36px;
 		width: 36px;
-		background-image: url("/images/toc/ico_close.png");
+		background-image: url($readium_image_path + 'toc/ico_close.png');
 		display: inline-block;
 		position: absolute;
 		right: 17px;

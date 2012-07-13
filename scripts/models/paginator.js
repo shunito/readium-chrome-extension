@@ -1,3 +1,7 @@
+
+// Description: Chooses a pagination strategy based on the ePub ebook passed in
+// Inputs: This model references an ebook
+
 Readium.Models.Paginator = Backbone.Model.extend({
 
 	renderToLastPage: false,
@@ -8,7 +12,8 @@ Readium.Models.Paginator = Backbone.Model.extend({
 		this.model = this.get("book");
 	},
 
-	// determine what the current spine item is and render it out
+	// Description: Determine what the current spine item is and render it
+	// Updates which spine items have been rendered in an array of rendered spine items
 	renderSpineItems: function(renderToLast) {
 		var book = this.model;
 		var spine_position = book.get("spine_position");
@@ -22,12 +27,12 @@ Readium.Models.Paginator = Backbone.Model.extend({
 			this.v.destruct();
 		}
 
-
+		// Spine items as found in the package document can have attributes that override global settings for the ebook. This 
+		// requires checking/creating the correct pagination strategy for each spine item
 		var spineItem = book.getCurrentSection();
-		if(this.shouldRenderAsFixed(spineItem)) {
+		if(spineItem.isFixedLayout()) {
 			this.should_two_up = book.get("two_up");
-			book.set("two_up", false);
-			//this.rendered_spine_positions.push(spine_position);
+			
 			this.v = new Readium.Views.FixedPaginationView({model: book});
 
 			// throw down the UI
@@ -36,6 +41,8 @@ Readium.Models.Paginator = Backbone.Model.extend({
 			var pageNum = 1; // start from page 1
 			var offset = this.findPrerenderStart();
 
+			// (I think) Gets each page of the current pub and injects it into the page, then 
+			// keeps track of what has been pre-rendered
 			while( this.shouldPreRender( this.model.getCurrentSection(offset) ) ) {
 				this.v.addPage(book.getCurrentSection(offset), pageNum );
 				this.rendered_spine_positions.push(spine_position + offset);
@@ -51,6 +58,8 @@ Readium.Models.Paginator = Backbone.Model.extend({
 				that.v.setContainerSize();
 			}, 5);
 		}
+		// This is either an ePub that should be rendered in a scrolling container, or with a fully
+		// reflowable presentation
 		else {
 			if(this.shouldScroll()) {
 				this.v = new Readium.Views.ScrollingPaginationView({model: book});
@@ -66,7 +75,7 @@ Readium.Models.Paginator = Backbone.Model.extend({
 		}
 		return this.rendered_spine_positions;
 	},
-
+  
 	findPrerenderStart: function() {
 		var i = 0;
 		while( this.shouldPreRender( this.model.getCurrentSection(i) ) ) {
@@ -75,12 +84,9 @@ Readium.Models.Paginator = Backbone.Model.extend({
 		return i + 1; // sloppy fix for an off by one error
 	},
 
-	shouldRenderAsFixed: function(spineItem) {
-		return spineItem.isFixedLayout();
-	},
-
-	shouldPreRender: function(sec) {
-		return sec && this.shouldRenderAsFixed(sec);
+	// A spine item should pre-render if it is not undefined and should render as a fixed item
+	shouldPreRender: function(spineItem) {
+		return spineItem && spineItem.isFixedLayout(); 
 	},
 
 	shouldScroll: function() {

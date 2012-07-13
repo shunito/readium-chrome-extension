@@ -18,7 +18,7 @@ Readium.Views.TocViewBase = Backbone.View.extend({
 
 	handleClick: function(e) {
 		e.preventDefault();
-		href = $(e.target).attr("href");
+		href = $(e.currentTarget).attr("href");
 		this.model.handleLink(href);
 	},
 

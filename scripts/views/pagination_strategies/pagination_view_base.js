@@ -182,6 +182,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		});
 	},
 
+	// Description: Changes between having one or two pages displayed. 
 	setUpMode: function() {
 		var two_up = this.model.get("two_up");
 		this.$el.toggleClass("two-up", two_up);
@@ -199,6 +200,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 	},
 
+	// Description: Return true if the pageNum argument is a currently visible 
+	// page. Return false if it is not; which will occur if it cannot be found in 
+	// the array.
 	isPageVisible: function(pageNum, currentPages) {
 		return currentPages.indexOf(pageNum) !== -1;
 	},
