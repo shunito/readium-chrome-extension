@@ -32,5 +32,8 @@
     }
   ],
    "options_page": "views/library.html#options",
+   "web_accessible_resources": [
+    "lib/mathjax/MathJax.js"
+   ],
    "version": "0.4.2" // UPDATE VERSION NUMBER 
 }
