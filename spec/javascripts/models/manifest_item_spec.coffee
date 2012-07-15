@@ -84,10 +84,16 @@ describe "Readium.Models.SpineItem", ->
 			spine_item = new Readium.Models.SpineItem @spine_item_attrs
 			expect(spine_item.isImage).toBeDefined()
 
-		it "calls loadContent()", ->
+		it "calls loadContent() if the content is fixed layout", ->
 			spyOn(Readium.Models.SpineItem.prototype, "loadContent")
 			spine_item = new Readium.Models.SpineItem @spine_item_attrs
 			expect(Readium.Models.SpineItem.prototype.loadContent).toHaveBeenCalled()
+
+		it "call does not call loadContent() if the content is reflowable", ->
+			spyOn(Readium.Models.SpineItem.prototype, "loadContent")
+			spyOn(Readium.Models.SpineItem.prototype, "isFixedLayout").andReturn(false)
+			spine_item = new Readium.Models.SpineItem @spine_item_attrs
+			expect(Readium.Models.SpineItem.prototype.loadContent).not.toHaveBeenCalled()
 
 
 	describe "isFixedLayout()", ->

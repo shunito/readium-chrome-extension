@@ -124,9 +124,9 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 	initialize: function() {
 		if(this.isFixedLayout()) {
 			this.on("change:content", this.parseMetaTags, this);
+			this.loadContent();
 		}
-		// TODO should we only do this for fixed layout now?
-		this.loadContent();
+		
 	},
 
 	// this method creates the JSON representation of a manifest item
