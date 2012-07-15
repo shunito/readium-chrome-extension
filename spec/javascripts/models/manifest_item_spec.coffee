@@ -47,16 +47,18 @@ describe "Readium.Models.ManifestItem", ->
 			xml_string = jasmine.getFixtures().read('manifest_item.svg')
 			parser = new window.DOMParser();
 			@dom = parser.parseFromString(xml_string, 'text/xml');
-			spyOn(@man_item, "getContentDom").andReturn(@dom)
 			@man_item = new Readium.Models.ManifestItem @man_item_attrs
-
-		it "works", ->
-			expect(@dom.document).toBeDefined()
-			dom.documentElement.getAttribute("viewBox")
-
-
+			spyOn(@man_item, "getContentDom").andReturn(@dom)
 			
 
+		it "loads the dom", ->
+			@man_item.parseViewboxTag()
+			expect(@man_item.getContentDom).toHaveBeenCalled()
+
+		it "parses the tag", ->
+			result = @man_item.parseViewboxTag()
+			expect(result.width).toEqual(368)
+			expect(result.height).toEqual(581)
 
 
 
@@ -81,6 +83,12 @@ describe "Readium.Models.SpineItem", ->
 		it "works", ->
 			spine_item = new Readium.Models.SpineItem @spine_item_attrs
 			expect(spine_item.isImage).toBeDefined()
+
+		it "calls loadContent()", ->
+			spyOn(Readium.Models.SpineItem.prototype, "loadContent")
+			spine_item = new Readium.Models.SpineItem @spine_item_attrs
+			expect(Readium.Models.SpineItem.prototype.loadContent).toHaveBeenCalled()
+
 
 	describe "isFixedLayout()", ->
 

@@ -125,6 +125,7 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 		if(this.isFixedLayout()) {
 			this.on("change:content", this.parseMetaTags, this);
 		}
+		// TODO should we only do this for fixed layout now?
 		this.loadContent();
 	},
 
