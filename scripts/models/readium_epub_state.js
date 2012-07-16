@@ -1,9 +1,17 @@
-// Description: This model is responsible for maintaining epub state in the Readium viewer. It has no knowledge of other
-//  models that might utilize its data and behaviour. 
-// Rationale: This is designed as a model to represent the state of an epub as it is maintained by the Readium application
-// Notes:
+// Description: This model is responsible for attributes of an epub. 
+// Rationale: This is designed as a model to represent the state of an epub as it is maintained by the Readium application.
+//   As Readium does not have any authoring capabilities (a saved epub is not modified), this model essentially represents the 
+//   epub in a read-only fashion (although this is not enforced).
 
 Readium.Models.ReadiumEPUBState = Backbone.Model.extend({
+
+	defaults: {
+    	"can_two_up": true
+  	},
+
+	/**************************************************************************************/
+	/* PUBLIC METHODS (THE API)                                                           */
+	/**************************************************************************************/
 
 	initialize: function() {
 
@@ -17,6 +25,7 @@ Readium.Models.ReadiumEPUBState = Backbone.Model.extend({
 			});
 		
 		//  load the `packageDocument` from the HTML5 filesystem asynchroniously
+		// REFACTORING CANDIDATE: this can be removed; the controller will be responsible for this
 		this.packageDocument.fetch({
 
 			// success callback is executed once the filesSystem contents have 
@@ -30,10 +39,6 @@ Readium.Models.ReadiumEPUBState = Backbone.Model.extend({
 
 		return this.packageDocument;
 	},
-
-	defaults: {
-    	"can_two_up": true,
-  	},
 
   	toJSON: function() {
 

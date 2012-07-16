@@ -1,13 +1,15 @@
-// Description: Base class from which all pagination strategy classes are derived. This
-//	 class should not be intialized (if it could be it would be abstract). It
-//	 exists for the purpose of sharing behaviour between the different pagination strategies.
+// Description: The base model for the set of different pagination view strategies: Reflowable, fixed layout and scrolling
+// Rationale: The intention behind this model is to provide implementations for behaviour common to all the pagination 
+//   strategies. 
+// Notes: This model has a reference to the model for the epub currently being rendered, as well as a "pages" object that
+//   contains data and behaviour related to the current set of rendered "pages."
 
 Readium.Views.PaginationViewBase = Backbone.View.extend({
 
-	// all strategies are linked to the same dom elem
+	// Description: All strategies are linked to the same dom element
 	el: "#readium-book-view-el",
 
-	// this doesn't seem to be working...
+	// REFACTORING CANDIDATE: this doesn't seem to be working...
 	events: {
 		"click #page-margin": function(e) {
 			this.trigger("toggle_ui");
@@ -33,7 +35,6 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.bindingTemplate = _.template( $('#binding-template').html() );
 	},
 
-	// Note: One of the primary members of the public interface; called by all three pagination views
     iframeLoadCallback: function(e) {
 		
 		this.applyBindings( $(e.srcElement).contents() );
@@ -45,17 +46,16 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.applyTriggers(e.srcElement.contentDocument, trigs);
 	},
 
-	// TODO: Only used in reflowable view
-	goToHashFragment: function() {
-		// stub this in to the super class as a no-op for now
-		// just to prevent "no method error"s
-	},
+	// Rationale: Only the reflowable view has an implementation for this method. It is 
+	//   stubbed into the base model as a no-op for now
+	//   just to prevent no method errors
+	goToHashFragment: function() {},
 
 	// TODO: This method is only called by the reflowable view and should be moved there
-	/*
-     * Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
-     * only the day-night alternate tags are available as an option. 
-    */
+	///
+    // Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
+    // only the day-night alternate tags are available as an option. 
+    //
 	activateEPubStyle: function(bookDom) {
 
 	    var selector;
@@ -75,13 +75,16 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	    }
 	},
 
-	// Description: Changes between having one or two pages displayed. 
+	// REFACTORING CANDIDATE: This method could use a better name
+	// Description: Changes the display between having one or two pages displayed. 
 	setUpMode: function() {
 		var two_up = this.model.get("two_up");
 		this.$el.toggleClass("two-up", two_up);
 		this.$('#spine-divider').toggle(two_up);
 	},
 
+	// Description: Iterates through the list of rendered pages and displays those that 
+	//   should be visible in the viewer.
 	showCurrentPages: function() {
 		var that = this;
 		var two_up = this.model.get("two_up");
@@ -97,7 +100,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	/* "PRIVATE" HELPERS                                                                  */
 	/**************************************************************************************/
 
-	// handle clicks of anchor tags by navigating to
+	// Description: Handles clicks of anchor tags by navigating to
 	// the proper location in the epub spine, or opening
 	// a new window for external links
 	linkClickHandler: function(e) {
@@ -111,13 +114,10 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 	},
 
-	// sometimes these views hang around in memory before
+	// Description: Sometimes views hang around in memory before
 	// the GC gets them. we need to remove all of the handlers
 	// that were registered on the model
 	destruct: function() {
-		console.log("Pagination base destructor called");
-
-		// remove any listeners registered on the model
 		this.pages.off("change:current_page", this.showCurrentPages);
 		this.model.off("change:font_size", this.setFontSize);
 		this.model.off("change:hash_fragment", this.goToHashFragment);
@@ -162,8 +162,8 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 	},
 
-	// for reflowable content we only add what is in the body tag.
-	// lots of times the triggers are in the head of the dom
+	// Description: For reflowable content we only add what is in the body tag.
+	// Lots of times the triggers are in the head of the dom
 	parseTriggers: function(dom) {
 		var triggers = [];
 		$('trigger', dom).each(function() {
@@ -175,7 +175,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		return triggers;
 	},	
 
-	// parse the epub "switch" tags and hide
+	// Description: Parse the epub "switch" tags and hide
 	// cases that are not supported
 	applySwitches: function(dom) {
 

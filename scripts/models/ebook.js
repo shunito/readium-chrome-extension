@@ -1,5 +1,14 @@
-// Description: This model is the "controller" for an ePUB, managing the interaction between the 
-// pagination views and the ePUB itself
+// Description: This model is a sort of "controller" for an ePUB, managing the interaction between calling code
+//   and the saved epub. This model also exposes and persists properties that determine how an epub is displayed in 
+//   Readium. Some of these properties are determined by the user, such as whether two pages are being displayed, the font size etc.
+//   Other properties are determined by the user's interaction with the reader and the structure of the book. These include
+//   the current spine item rendered in the viewer, as well the logic that governs changing the current spine item.  
+//
+// Rationale: This model is designed to expose a useful concept of an "epub" to the rest of Readium. This includes the contents
+//   of the epub itself, as well as view properties (mentioned above) and the logic governing interaction with epub properties and 
+//   contents. It is the intention for this model that it have little to no knowledge of how an epub is rendered. It is intended 
+//   that Backbone attributes (getting/setting) and the backbone attribute event model (events fired on attribute changes) should 
+//   the primary ways of interacting with this model.
 
 Readium.Models.Ebook = Backbone.Model.extend({
 
@@ -53,6 +62,14 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.on("change:spine_position", this.setMetaSize, this);
 	},
 
+	// Description: Persists the attributes of this model
+	// Arguments (
+	//   attrs: Probably not used
+	//   options: 
+	//	)
+	// Rationale: Each epub unpacked and saved to the filesystem in Readium has a unique
+	//   key. "_epubViewProperties" is appended to this unique key to persist the read/write
+	//   attributes separately from the read-only attributes of the epub.
 	save: function(attrs, options) {
 		// TODO: this should be done properly with a backbone sync
 		var ops = {
@@ -83,8 +100,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
     	"current_margin": 3
   	},
 
-  	// serialize this models state to `JSON` so that it can
-  	// be persisted and restored
+  	// Description: serialize this models state to `JSON` so that it can
+  	//   be persisted and restored
   	toJSON: function() {
 
   		// only save attrs that should be persisted:
@@ -120,8 +137,13 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		this.set("toc_visible", !vis);
 	},
 
-	// REFACTORING CANDIDATE: I'm not sure if it makes sense to have this on the epub controller or as part of 
-	//   the views "what is on the page thing." 
+	// Description: Obtains the href and hash (if it exists) to set as the current "position"
+	//    of the epub. Any views and models listening to epub attributes are informed through
+	//    the backbone event broadcast.
+	// Arguments (
+	//   href (URL): The url and hash fragment that indicates the position in the epub to set as
+	//   the epub's current position.
+	// )
 	goToHref: function(href) {
 		// URL's with hash fragments require special treatment, so
 		// first thing is to split off the hash frag from the rest
@@ -225,13 +247,11 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	/* "PRIVATE" HELPERS                                                                  */
 	/**************************************************************************************/
 
-	// TODO, which key should be used here? the epub or the viewer properties key? 
 	restorePosition: function() {
 		var pos = Readium.Utils.getCookie(this.epub.get("key"));
 		return parseInt(pos, 10) || 0;
 	},
 
-	// TODO: which key should be used here? the epub or the viewer properties key? 
 	savePosition: function() {
 		Readium.Utils.setCookie(this.epub.get("key"), this.get("spine_position"), 365);
 	},
@@ -249,24 +269,27 @@ Readium.Models.Ebook = Backbone.Model.extend({
 	},
 	
 	goToNextSection: function() {
-		// Is this check even necessary?
-		// I think package doc validations takes care of it
-		if(this.hasNextSection() ) {
+
+		if (this.hasNextSection() ) {
 			var pos = this.get("spine_position");
-			this.setSpinePos(pos + 1);
+			this.setSpinePos(pos + 1, false);
 		}
 	},
 	
 	goToPrevSection: function() {
-		// Is this check even necessary?
-		// I think package doc validations takes care of it
-		if(this.hasPrevSection() ) {
+
+		if (this.hasPrevSection() ) {
 			var pos = this.get("spine_position");
-			this.setSpinePos(pos - 1);	
+			this.setSpinePos(pos - 1, true);	
 		}
 	},
 
-	setSpinePos: function(pos) {
+	// Description: Sets the current spine position for the epub, checking if the spine
+	//   item is already rendered.
+	// Arguments (
+	//	 pos (integer): The index of the spine element to set as the current spine position
+	//	)
+	setSpinePos: function(pos, goToLastPageOfSection) {
 
 		// check for invalid spine position
 		if (pos < 0 || pos >= this.packageDocument.spineLength()) {
@@ -288,7 +311,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// Render the new spine position if it is not already rendered. 
 		if (!spinePosIsRendered) {
 
-			var renderedItems = this.paginator.renderSpineItems(false);
+			var renderedItems = this.paginator.renderSpineItems(goToLastPageOfSection);
 			this.set("rendered_spine_items", renderedItems);
 		}
 	},

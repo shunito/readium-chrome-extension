@@ -2,8 +2,7 @@
 Readium.Models.EPUBPagination = Backbone.Model.extend({ 
 
 	defaults: {
-		"num_pages" : 0,
-		"current_page" : [1]
+		"num_pages" : 0
 	},
 
 	/**************************************************************************************/
@@ -15,7 +14,7 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 		// TODO: This should be a temporary hack until the persistence for current_page/spine_position can be
 		//   worked out. 		
 		this.epubController = this.get("model");
-		this.set("current_page", [1]);
+		this.set("current_page", [this.epubController.get("spine_position") + 1]);
 
 		// Instantiate an object to decide what to display
 		this.pageNumberDisplayLogic = new Readium.Models.PageNumberDisplayLogic();
@@ -59,9 +58,9 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 		}
 	},
 
-	// turn pages in the leftward direction
-	// ie progression direction is dependent on 
-	// page progression dir
+	// Description: Turn pages in the leftward direction
+	//   ie progression direction is dependent on 
+	//   page progression dir
 	goLeft: function() {
 		if (this.epubController.epub.get("page_prog_dir") === "rtl") {
 			this.nextPage();
@@ -72,12 +71,6 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 	},
 
 	goToPage: function(gotoPageNumber) {
-
-		// if the we are already at that page then there is no work to do
-		// break out early to prevent page change events
-		if (this.isPageVisible(gotoPageNumber)) {
-			return;
-		}
 
 		var pagesToGoto = this.pageNumberDisplayLogic.getGotoPageNumsToDisplay(
 							gotoPageNumber,
