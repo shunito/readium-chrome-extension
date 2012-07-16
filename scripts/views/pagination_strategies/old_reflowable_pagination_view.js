@@ -13,7 +13,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		//this.model.on("change:current_content", this.render, this);
 		this.model.on("change:two_up", this.renderPages, this);
 		this.model.on("change:mo_playing", this.renderMoPlaying, this);
-		this.model.on("change:current_mo_frag", this.renderMoFragHighlight, this);
+		//this.model.on("change:current_mo_frag", this.renderMoFragHighlight, this);
 		this.section.on("change:content", function() { 
 			this.render(!!this.render_to_last) 
 		}, this);

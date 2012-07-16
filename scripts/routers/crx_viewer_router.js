@@ -22,7 +22,7 @@ Readium.Routers.ViewerRouter = Backbone.Router.extend({
 					return;
 				}
 
-				window._epub = new Readium.Models.ReadiumEPUBState(result);
+				window._epub = new Readium.Models.EPUB(result);
 
 				// TODO: The structure of this method is potentially problematic: A lawnchair call nested in another.
 				//   Investigate changes and asynchronicity. 
@@ -30,7 +30,7 @@ Readium.Routers.ViewerRouter = Backbone.Router.extend({
 				this.get(ePUBViewPrefKey, function(result) {
 				
 					// Instantiate the ePUB controller 
-					window._epubController = new Readium.Models.Ebook(_.extend({epub : window._epub}, result));
+					window._epubController = new Readium.Models.EPUBController(_.extend({epub : window._epub}, result));
 					window._applicationView = new Readium.Views.ViewerApplicationView({
 								model: window._epubController
 							});

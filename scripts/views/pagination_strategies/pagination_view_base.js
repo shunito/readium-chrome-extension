@@ -26,7 +26,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 	initialize: function(options) {
 		
-		this.pages = new Readium.Models.EPUBPagination({model : this.model});
+		this.pages = new Readium.Models.ReadiumPagination({model : this.model});
 		this.pages.on("change:current_page", this.showCurrentPages, this);
 
 		this.model.on("change:font_size", this.setFontSize, this);

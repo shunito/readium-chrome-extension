@@ -4,7 +4,7 @@ Factory = {}
 Factory.create = function(type) {
 
 	if(type === "ebook") {
-		return new Readium.Models.Ebook({"package_doc_path": "something"});
+		return new Readium.Models.EPUBController({"package_doc_path": "something"});
 	}
 
 }

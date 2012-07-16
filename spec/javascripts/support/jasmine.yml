@@ -24,9 +24,9 @@ src_files:
   - scripts/utils/bb_file_system_sync.js
   - scripts/utils/cookie_utils.js
   - scripts/models/manifest_item.js
-  - scripts/models/paginator.js
+  - scripts/models/pagination_strategy_selector.js
   - scripts/models/packageDocument.js
-  - scripts/models/ebook.js
+  - scripts/models/epub_controller.js
   - scripts/models/toc.js
   - scripts/models/alternate_style_tag_selector.js
   - scripts/models/package_document_parser.js
