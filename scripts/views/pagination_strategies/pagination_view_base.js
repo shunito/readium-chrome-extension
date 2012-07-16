@@ -32,7 +32,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.model.on("change:font_size", this.setFontSize, this);
 		this.model.on("change:hash_fragment", this.goToHashFragment, this);
 		this.model.on("change:two_up", this.pages.toggleTwoUp, this.pages);
-		this.bindingTemplate = _.template( $('#binding-template').html() );
+		this.bindingTemplate = Handlebars.templates.binding_template;
 	},
 
     iframeLoadCallback: function(e) {

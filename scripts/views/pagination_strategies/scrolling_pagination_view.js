@@ -7,7 +7,7 @@ Readium.Views.ScrollingPaginationView = Readium.Views.PaginationViewBase.extend(
 	initialize: function() {
 		// call the super ctor
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
-		this.page_template = _.template( $('#scrolling-page-template').html() );
+		this.page_template = Handlebars.templates.scrolling_page_template;
 	},
 
 	render: function() {

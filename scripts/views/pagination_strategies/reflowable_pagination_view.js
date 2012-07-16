@@ -8,7 +8,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	initialize: function() {
 		// call the super ctor
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
-		this.page_template = _.template( $('#reflowing-template').html() );
+		this.page_template = Handlebars.templates.reflowing_template;
 
 		// make sure we have proper vendor prefixed props for when we need them
 		this.stashModernizrPrefixedProps();

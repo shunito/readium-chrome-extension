@@ -9,8 +9,6 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 	initialize: function() {
 
 		// call the super ctor
-		this.page_template = _.template( $('#fixed-page-template').html() );
-		this.empty_template = _.template( $('#empty-fixed-page-template').html() );
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
 
 		var spinePos = this.model.get("spine_position");
@@ -161,7 +159,7 @@ Readium.Views.FixedPageView = Backbone.View.extend({
 	className: "fixed-page-wrap",
 
 	initialize: function() {
-		this.template = _.template( $('#fixed-page-template').html() );
+		this.template = Handlebars.templates.fixed_page_template;
 		this.model.on("change", this.render, this);
 	},
 
