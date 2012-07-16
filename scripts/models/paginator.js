@@ -1,6 +1,5 @@
 
-// Description: Chooses a pagination strategy based on the ePub passed in
-// Inputs: This model references an epub
+// Description: Chooses a pagination strategy
 
 // REFACTORING CANDIDATE: There is an issue here that is a bit hidden. Having this pagination strategy model attached to the 
 //   epub makes sense in that each spine item within an epub can be either reflowable or fixed. As such, when navigating through
@@ -13,10 +12,10 @@
 Readium.Models.Paginator = Backbone.Model.extend({
 
 	renderToLastPage: false,
-	
-	/**************************************************************************************/
-	/* PUBLIC METHODS (THE API)                                                           */
-	/**************************************************************************************/
+
+	// ------------------------------------------------------------------------------------ //
+	//  "PUBLIC" METHODS (THE API)                                                          //
+	// ------------------------------------------------------------------------------------ //	
 
 	initialize: function() {
 
@@ -56,10 +55,10 @@ Readium.Models.Paginator = Backbone.Model.extend({
 		this.rendered_spine_positions = this.v.render(!!renderToLast);
 		return this.rendered_spine_positions;
 	},
-  
-	/**************************************************************************************/
-	/* "PRIVATE" HELPERS                                                                  */
-	/**************************************************************************************/
+
+	// ------------------------------------------------------------------------------------ //
+	//  "PRIVATE" HELPERS                                                                   //
+	// ------------------------------------------------------------------------------------ //  
 
 	shouldScroll: function() {
 		var optionString = localStorage["READIUM_OPTIONS"];

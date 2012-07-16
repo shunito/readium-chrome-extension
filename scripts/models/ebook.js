@@ -12,9 +12,9 @@
 
 Readium.Models.Ebook = Backbone.Model.extend({
 
-	/**************************************************************************************/
-	/* PUBLIC METHODS (THE API)                                                           */
-	/**************************************************************************************/
+	// ------------------------------------------------------------------------------------ //
+	//  "PUBLIC" METHODS (THE API)                                                          //
+	// ------------------------------------------------------------------------------------ //
 
 	initialize: function() {
 
@@ -187,6 +187,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		return this.packageDocument.getSpineItem(spine_pos);
 	},
 
+/*
 	// REFACTORING CANDIDATE: this should be refactored into its own model
 	playMo: function(forceFromStart) {
 		// there is way too much code in this method that does
@@ -222,7 +223,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			alert("Sorry, the current EPUB does not contain a media overlay for this content");
 		}
 	},
-
+*/
+/*
 	// REFACTORING CANDIDATE: this should be refactored into its own model
 	pauseMo: function() {
 		var mo = this.get("mo_playing");
@@ -234,18 +236,18 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			this.set("mo_playing", null);
 		}
 	},
+*/
 
-	// REFACTORING CANDIDATE: this should be renamed to indicate it applies to the entire epub
-	// is this book set to fixed layout at the meta-data level
-	// TODO: This is only passing through this data to avoid breaking code in viewer.js. Eventually
-	// this should probably be removed. 
+	// REFACTORING CANDIDATE: this should be renamed to indicate it applies to the entire epub.
+	//   This is only passing through this data to avoid breaking code in viewer.js. Eventually
+	//   this should probably be removed. 
 	isFixedLayout: function() {
 		return this.epub.isFixedLayout();
 	},
 
-	/**************************************************************************************/
-	/* "PRIVATE" HELPERS                                                                  */
-	/**************************************************************************************/
+	// ------------------------------------------------------------------------------------ //
+	//  "PRIVATE" HELPERS                                                                   //
+	// ------------------------------------------------------------------------------------ //
 
 	restorePosition: function() {
 		var pos = Readium.Utils.getCookie(this.epub.get("key"));
@@ -306,6 +308,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		//   how it accesses the new spine_position. This would be clearer if the spine_position to set were passed 
 		//   explicitly to the paginator. 
 		this.set("spine_position", pos);
+
+		// REFACTORING CANDIDATE: This event should only be triggered for fixed layout sections
 		this.trigger("FXL_goToPage");
 
 		// Render the new spine position if it is not already rendered. 
@@ -329,7 +333,8 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			});
 		}
 		this.meta_section.on("change:meta_height", this.setMetaSize, this);
-	},
+	}/*,
+
 
 	// REFACTORING CANDIDATE: This method may not be used for anything.
 	// when the spine position changes we need to update the
@@ -356,4 +361,5 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		// save the position
 		this.savePosition();
 	}
+*/
 });

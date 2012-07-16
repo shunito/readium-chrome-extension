@@ -2,9 +2,9 @@
 
 Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
-	/**************************************************************************************/
-	/* PUBLIC METHODS (THE API)                                                           */
-	/**************************************************************************************/
+	// ------------------------------------------------------------------------------------ //
+	//  "PUBLIC" METHODS (THE API)                                                          //
+	// ------------------------------------------------------------------------------------ //
 
 	initialize: function() {
 
@@ -58,9 +58,22 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		return rendered_spine_positions;
 	},
 
-	/**************************************************************************************/
-	/* "PRIVATE" HELPERS                                                                  */
-	/**************************************************************************************/
+	// ------------------------------------------------------------------------------------ //
+	//  "PRIVATE" HELPERS                                                                   //
+	// ------------------------------------------------------------------------------------ //
+
+	// sometimes these views hang around in memory before
+	// the GC's get them. we need to remove all of the handlers
+	// that were registered on the model
+	destruct: function() {
+
+		// call the super constructor
+		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
+
+		// remove any listeners registered on the model
+		this.model.off("change:two_up", this.setUpMode);
+		this.model.off("change:meta_size", this.setUpMode);
+	},
 
 	spinePositionChangeHandler: function () {
 
@@ -68,9 +81,9 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		this.pages.goToPage(pageNumber);
 	},
 
-	// Description: Creates/gets an iFrame, which contains a page view to represent a spine item, and appends it to an 
-	// element that contains the content of the current ePub. Each of these spine item views is not necessarily displayed
-	// immediately. 
+	// Description: Creates/gets an iFrame which contains a page view to represent a spine item and appends it to an 
+	//   element that contains the content of the current ePub. Each of these spine item iframes is not necessarily displayed
+	//   immediately. 
 	addPage: function(spineItem, pageNum) {
 
 		var that = this;
@@ -118,34 +131,21 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		return i + 1; // sloppy fix for an off by one error
 	},
 
-	// A spine item should pre-render if it is not undefined and should render as a fixed item
+	// Description: A spine item should pre-render if it is not undefined and should render as a fixed item
 	shouldPreRender: function(spineItem) {
 		return spineItem && spineItem.isFixedLayout(); 
 	},
 
 	// Description: For each fixed-page-wrap(per), if it is one of the current pages, toggle it as visible. If it is not
-	// Toggle it as invisible.
+	//   toggle it as invisible.
 	// Note: current_page is an array containing the page numbers (as of 25June2012, a maximum of two pages) of the 
-	// currently visible pages
+	//   currently visible pages
 	showCurrentPages: function() {
 		var that = this;
 
 		this.$(".fixed-page-wrap").each(function(index) {
 			$(this).toggle(that.pages.isPageVisible(index + 1));
 		});
-	},
-
-	// sometimes these views hang around in memory before
-	// the GC's get them. we need to remove all of the handlers
-	// that were registered on the model
-	destruct: function() {
-
-		// call the super constructor
-		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
-
-		// remove any listeners registered on the model
-		this.model.off("change:two_up", this.setUpMode);
-		this.model.off("change:meta_size", this.setUpMode);
 	},
 
 	setFontSize: function() {
@@ -183,5 +183,4 @@ Readium.Views.FixedPageView = Backbone.View.extend({
 	iframe: function() {
 		return this.$('.content-sandbox')[0];
 	}
-
 });

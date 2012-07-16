@@ -1,9 +1,9 @@
 
 Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend({
 
-	/**************************************************************************************/
-	/* PUBLIC METHODS (THE API)                                                           */
-	/**************************************************************************************/
+	// ------------------------------------------------------------------------------------ //
+	//  "PUBLIC" METHODS (THE API)                                                          //
+	// ------------------------------------------------------------------------------------ //
 
 	initialize: function() {
 		// call the super ctor
@@ -60,14 +60,13 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		return [this.model.get("spine_position")];
 	},
 
+	// ------------------------------------------------------------------------------------ //
+	//  "PRIVATE" HELPERS                                                                   //
+	// ------------------------------------------------------------------------------------ //
 
-	/**************************************************************************************/
-	/* "PRIVATE" HELPERS                                                                  */
-	/**************************************************************************************/
-
-	// sometimes these views hang around in memory before
-	// the GC's get them. we need to remove all of the handlers
-	// that were registered on the model
+	// Description: sometimes these views hang around in memory before
+	//   the GC's get them. we need to remove all of the handlers
+	//   that were registered on the model
 	destruct: function() {
 		
 		this.pages.off("change:current_page", this.pageChangeHandler);
@@ -84,8 +83,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
 	},
 
-	// REFACTORING CANDIDATE: This appears to be a private member, although there is a similarly named 
-	//   member in another class
 	goToPage: function(page) {
 		var offset = this.calcPageOffset(page).toString() + "px";
 		$(this.getBody()).css(this.offset_dir, "-" + offset);
@@ -93,9 +90,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Description: navigate to a url hash fragment by calculating the page of
-	// the corresponding elem and setting the page number on `this.model`
-	// as precondition the hash fragment should identify an element in the
-	// section rendered by this view
+	//   the corresponding elem and setting the page number on `this.model`
+	//   as precondition the hash fragment should identify an element in the
+	//   section rendered by this view
 	goToHashFragment: function() {
 
 		// this method is triggered in response to 
@@ -121,8 +118,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// else false alarm no work to do
 	},
 
-	// REFACTORING CANDIDATE: A private member, although a method with this name exists in the base class,
-	//   so it's not clear which is to be used.
 	setFontSize: function() {
 		var size = this.model.get("font_size") / 10;
 		$(this.getBody()).css("font-size", size + "em");
@@ -133,7 +128,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Description: we are using experimental styles so we need to 
-	// use modernizr to generate prefixes
+	//   use modernizr to generate prefixes
 	stashModernizrPrefixedProps: function() {
 		var cssIfy = function(str) {
 			return str.replace(/([A-Z])/g, function(str,m1){ 
@@ -248,7 +243,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Description: calculate the number of pages in the current section,
-	// based on section length : page size ratio
+	//   based on section length : page size ratio
 	calcNumPages: function() {
 
 		var body, offset, width, num;
@@ -279,7 +274,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		return num;
 	},
 
-	// REFACTORING CANDIDATE: this was that.model.goToPage
 	pageChangeHandler: function() {
 		var that = this;
 		this.hideContent();
@@ -378,7 +372,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	setNumPages: function() {
 		var num = this.calcNumPages();
 		this.pages.set("num_pages", num);
-	},
+	}/*,
+
 
 	// REFACTORING CANDIDATE: should be moved into an MO-specific another model
 	renderMoPlaying: function() {
@@ -413,4 +408,5 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 				css("color", this.themes[theme]["color"]);
 		}
 	}
+	*/
 });

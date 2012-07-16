@@ -20,9 +20,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 	},
 
-	/**************************************************************************************/
-	/* PUBLIC METHODS (THE API)                                                           */
-	/**************************************************************************************/
+	// ------------------------------------------------------------------------------------ //
+	//  "PUBLIC" METHODS (THE API)                                                          //
+	// ------------------------------------------------------------------------------------ //
 
 	initialize: function(options) {
 		
@@ -51,11 +51,8 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	//   just to prevent no method errors
 	goToHashFragment: function() {},
 
-	// TODO: This method is only called by the reflowable view and should be moved there
-	///
     // Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
-    // only the day-night alternate tags are available as an option. 
-    //
+    //   only the day-night alternate tags are available as an option. 
 	activateEPubStyle: function(bookDom) {
 
 	    var selector;
@@ -75,8 +72,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	    }
 	},
 
-	// REFACTORING CANDIDATE: This method could use a better name
-	// Description: Changes the display between having one or two pages displayed. 
+	// REFACTORING CANDIDATE: This method could use a better name. The purpose of this method is to make one or two 
+	//   pages of an epub visible. "setUpMode" seems non-specific. 
+	// Description: Changes the html to make either 1 or 2 pages visible in their iframes
 	setUpMode: function() {
 		var two_up = this.model.get("two_up");
 		this.$el.toggleClass("two-up", two_up);
@@ -96,9 +94,19 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		});
 	},
 
-	/**************************************************************************************/
-	/* "PRIVATE" HELPERS                                                                  */
-	/**************************************************************************************/
+	// ------------------------------------------------------------------------------------ //
+	//  "PRIVATE" HELPERS                                                                   //
+	// ------------------------------------------------------------------------------------ //
+
+	// Description: Sometimes views hang around in memory before
+	//   the GC gets them. we need to remove all of the handlers
+	//   that were registered on the model
+	destruct: function() {
+		this.pages.off("change:current_page", this.showCurrentPages);
+		this.model.off("change:font_size", this.setFontSize);
+		this.model.off("change:hash_fragment", this.goToHashFragment);
+		this.resetEl();
+	},
 
 	// Description: Handles clicks of anchor tags by navigating to
 	// the proper location in the epub spine, or opening
@@ -114,16 +122,6 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 	},
 
-	// Description: Sometimes views hang around in memory before
-	// the GC gets them. we need to remove all of the handlers
-	// that were registered on the model
-	destruct: function() {
-		this.pages.off("change:current_page", this.showCurrentPages);
-		this.model.off("change:font_size", this.setFontSize);
-		this.model.off("change:hash_fragment", this.goToHashFragment);
-		this.resetEl();
-	},
-	
 	getBindings: function() {
 		var packDoc = this.model.epub.getPackageDocument();
 		var bindings = packDoc.get('bindings');

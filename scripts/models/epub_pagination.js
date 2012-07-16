@@ -5,15 +5,16 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 		"num_pages" : 0
 	},
 
-	/**************************************************************************************/
-	/* PUBLIC METHODS (THE API)                                                           */
-	/**************************************************************************************/
+	// ------------------------------------------------------------------------------------ //
+	//  "PUBLIC" METHODS (THE API)                                                          //
+	// ------------------------------------------------------------------------------------ //
 
 	initialize: function () {
 
-		// TODO: This should be a temporary hack until the persistence for current_page/spine_position can be
-		//   worked out. 		
 		this.epubController = this.get("model");
+
+		// REFACTORING CANDIDATE: This is not ideal as it muddies the difference between the spine index position and 
+		//   the page numbers that result from pagination. 
 		this.set("current_page", [this.epubController.get("spine_position") + 1]);
 
 		// Instantiate an object to decide what to display
@@ -45,10 +46,11 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 
 	// REFACTORING CANDIDATE: This needs to be investigated, but I bet if the prevPage and nextPage methods were 
 	//   called directly (goRight and goLeft were removed), the new page number display logic would account for the 
-	//   page progression direction and that that logic could also be simplified.
-	// turn pages in the rightward direction
-	// ie progression direction is dependent on 
-	// page progression dir
+	//   page progression direction and that all this logic could be simplified.
+	// 
+	// Description: turn pages in the rightward direction
+	//   ie progression direction is dependent on 
+	//   page progression dir
 	goRight: function() {
 		if (this.epubController.epub.get("page_prog_dir") === "rtl") {
 			this.prevPage();
@@ -82,15 +84,15 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 	},
 
 	// Description: Return true if the pageNum argument is a currently visible 
-	// page. Return false if it is not; which will occur if it cannot be found in 
-	// the array.
+	//   page. Return false if it is not; which will occur if it cannot be found in 
+	//   the array.
 	isPageVisible: function(pageNum) {
 		return this.get("current_page").indexOf(pageNum) !== -1;
 	},
 
-	/**************************************************************************************/
-	/* "PRIVATE" HELPERS                                                                  */
-	/**************************************************************************************/
+	// ------------------------------------------------------------------------------------ //
+	//  "PRIVATE" HELPERS                                                                   //
+	// ------------------------------------------------------------------------------------ //
 
 	// REFACTORING CANDIDATE: This is public but not sure it should be; it's called from the navwidget and viewer.js
 	prevPage: function() {
@@ -98,9 +100,7 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 		var curr_pg = this.get("current_page");
 		var lastPage = curr_pg[0] - 1;
 
-		// For fixed layout pubs, check if the last page is displayed; if so, end navigation.
-		// TODO: This is a bit of a hack, but the this entire model underlying the part of the pub that 
-		// is displayed on the screen probably needs to change. 
+		// Description: For fixed layout pubs, check if the last page is displayed; if so, end navigation.
 		if (this.epubController.getCurrentSection().isFixedLayout()) {
 
 			if (this.epubController.get("two_up") && curr_pg[0] === 1) {
@@ -110,6 +110,13 @@ Readium.Models.EPUBPagination = Backbone.Model.extend({
 		}
 
 		if (curr_pg[0] <= 1) {
+
+			this.epubController.goToPrevSection();
+		}
+		// REFACTORING CANDIDATE: The pagination/spine position relationship is still a bit muddied. As a result, 
+		//   the assumption that a single content document (spine element) is rendered in every scrolling view must be
+		//   enforced here with this scrolling view specific check condition.  
+		else if (this.epubController.paginator.shouldScroll()) {
 
 			this.epubController.goToPrevSection();
 		}
