@@ -1,34 +1,114 @@
-/*
-	Base class from which all pagination strategy classes are derived. This
-	class should not bet intialized (if it could be it would be abstract). It
-	exists for the purpose of sharing behaviour between the different strategies.
-*/
+// Description: The base model for the set of different pagination view strategies: Reflowable, fixed layout and scrolling
+// Rationale: The intention behind this model is to provide implementations for behaviour common to all the pagination 
+//   strategies. 
+// Notes: This model has a reference to the model for the epub currently being rendered, as well as a "pages" object that
+//   contains data and behaviour related to the current set of rendered "pages."
+
 Readium.Views.PaginationViewBase = Backbone.View.extend({
 
-	// all strategies are linked to the same dom elem
+	// Description: All strategies are linked to the same dom element
 	el: "#readium-book-view-el",
 
+	// REFACTORING CANDIDATE: this doesn't seem to be working...
+	events: {
+		"click #page-margin": function(e) {
+			this.trigger("toggle_ui");
+		},
+
+		"click #readium-content-container a": function(e) {
+			this.linkClickHandler(e);
+		}
+	},
+
+	// ------------------------------------------------------------------------------------ //
+	//  "PUBLIC" METHODS (THE API)                                                          //
+	// ------------------------------------------------------------------------------------ //
+
 	initialize: function(options) {
-		this.model.on("change:current_page", this.changePage, this);
+		
+		this.pages = new Readium.Models.ReadiumPagination({model : this.model});
+		this.pages.on("change:current_page", this.showCurrentPages, this);
+
 		this.model.on("change:font_size", this.setFontSize, this);
 		this.model.on("change:hash_fragment", this.goToHashFragment, this);
+		this.model.on("change:two_up", this.pages.toggleTwoUp, this.pages);
 		this.bindingTemplate = Handlebars.templates.binding_template;
 	},
 
-	// sometimes these views hang around in memory before
-	// the GC gets them. we need to remove all of the handlers
-	// that were registered on the model
-	destruct: function() {
-		console.log("Pagination base destructor called");
+    iframeLoadCallback: function(e) {
+		
+		this.applyBindings( $(e.srcElement).contents() );
+		this.applySwitches( $(e.srcElement).contents() );
+		this.addSwipeHandlers( $(e.srcElement).contents() );
+        this.injectMathJax(e.srcElement);
+        this.injectLinkHandler(e.srcElement);
+        var trigs = this.parseTriggers(e.srcElement.contentDocument);
+		this.applyTriggers(e.srcElement.contentDocument, trigs);
+	},
 
-		// remove any listeners registered on the model
-		this.model.off("change:current_page", this.changePage);
+	// Rationale: Only the reflowable view has an implementation for this method. It is 
+	//   stubbed into the base model as a no-op for now
+	//   just to prevent no method errors
+	goToHashFragment: function() {},
+
+    // Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
+    //   only the day-night alternate tags are available as an option. 
+	activateEPubStyle: function(bookDom) {
+
+	    var selector;
+		
+		// Apply night theme for the book; nothing will be applied if the ePub's style sheets do not contain a style
+		// set with the 'night' tag
+	    if (this.model.get("current_theme") === "night-theme") {
+
+	    	selector = new Readium.Models.AlternateStyleTagSelector;
+	    	bookDom = selector.activateAlternateStyleSet(["night"], bookDom);
+
+	    }
+	    else {
+
+			selector = new Readium.Models.AlternateStyleTagSelector;
+	    	bookDom = selector.activateAlternateStyleSet([""], bookDom);
+	    }
+	},
+
+	// REFACTORING CANDIDATE: This method could use a better name. The purpose of this method is to make one or two 
+	//   pages of an epub visible. "setUpMode" seems non-specific. 
+	// Description: Changes the html to make either 1 or 2 pages visible in their iframes
+	setUpMode: function() {
+		var two_up = this.model.get("two_up");
+		this.$el.toggleClass("two-up", two_up);
+		this.$('#spine-divider').toggle(two_up);
+	},
+
+	// Description: Iterates through the list of rendered pages and displays those that 
+	//   should be visible in the viewer.
+	showCurrentPages: function() {
+		var that = this;
+		var two_up = this.model.get("two_up");
+		this.$(".page-wrap").each(function(index) {
+			if(!two_up) { 
+				index += 1;
+			}
+			$(this).toggleClass("hidden-page", !that.pages.isPageVisible(index));
+		});
+	},
+
+	// ------------------------------------------------------------------------------------ //
+	//  "PRIVATE" HELPERS                                                                   //
+	// ------------------------------------------------------------------------------------ //
+
+	// Description: Sometimes views hang around in memory before
+	//   the GC gets them. we need to remove all of the handlers
+	//   that were registered on the model
+	destruct: function() {
+		this.pages.off("change:current_page", this.showCurrentPages);
 		this.model.off("change:font_size", this.setFontSize);
 		this.model.off("change:hash_fragment", this.goToHashFragment);
 		this.resetEl();
 	},
 
-	// handle  clicks of anchor tags by navigating to
+	// Description: Handles clicks of anchor tags by navigating to
 	// the proper location in the epub spine, or opening
 	// a new window for external links
 	linkClickHandler: function(e) {
@@ -42,13 +122,8 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 	},
 
-	goToHashFragment: function() {
-		// stub this in to the super class as a no-op for now
-		// just to prevent "no method error"s
-	},
-
 	getBindings: function() {
-		var packDoc = this.model.packageDocument;
+		var packDoc = this.model.epub.getPackageDocument();
 		var bindings = packDoc.get('bindings');
 		return bindings.map(function(binding) {
 			binding.selector = 'object[type="' + binding.media_type + '"]';
@@ -85,8 +160,8 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 	},
 
-	// for reflowable content we only add what is in the body tag.
-	// lots of times the triggers are in the head of the dom
+	// Description: For reflowable content we only add what is in the body tag.
+	// Lots of times the triggers are in the head of the dom
 	parseTriggers: function(dom) {
 		var triggers = [];
 		$('trigger', dom).each(function() {
@@ -98,7 +173,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		return triggers;
 	},	
 
-	// parse the epub "switch" tags and hide
+	// Description: Parse the epub "switch" tags and hide
 	// cases that are not supported
 	applySwitches: function(dom) {
 
@@ -119,12 +194,10 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 			return _.include(supportedNamespaces, ns);
 		};
 
-
 		$('switch', dom).each(function(ind) {
 			
 			// keep track of whether or now we found one
 			var found = false;
-
 
 			$('case', this).each(function() {
 
@@ -143,97 +216,25 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		})
 	},
 
-    /*
-     * Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
-     * only the day-night alternate tags are available as an option. 
-     * TODO: Create a transition from day to night and vice-versa to prevent flickering.
-     * TODO: If Readium is initialized in night mode, the night style may not be applied on initialization
-    */
-	activateEPubStyle: function(bookDom) {
-
-	    var selector;
-		
-		// Apply night theme for the book; nothing will be applied if the ePub's style sheets do not contain a style
-		// set with the 'night' tag
-	    if (this.model.get("current_theme") === "night-theme") {
-
-	    	selector = new Readium.Models.AlternateStyleTagSelector;
-	    	bookDom = selector.activateAlternateStyleSet(["night"], bookDom);
-
-	    }
-	    else {
-
-			selector = new Readium.Models.AlternateStyleTagSelector;
-	    	bookDom = selector.activateAlternateStyleSet([""], bookDom);
-	    }
-	},
-
 	addSwipeHandlers: function(dom) {
 		var that = this;
 		$(dom).on("swipeleft", function(e) {
 			e.preventDefault();
-			that.model.goRight();
+			that.pages.goRight();
 			
 		});
 
 		$(dom).on("swiperight", function(e) {
 			e.preventDefault();
-			that.model.goLeft();
+			that.pages.goLeft();
 		});
 	},
 
-	// Description: Changes between having one or two pages displayed. 
-	setUpMode: function() {
-		var two_up = this.model.get("two_up");
-		this.$el.toggleClass("two-up", two_up);
-		this.$('#spine-divider').toggle(two_up);
-	},
-
-	// this doesn't seem to be working...
-	events: {
-		"click #page-margin": function(e) {
-			this.trigger("toggle_ui");
-		},
-
-		"click #readium-content-container a": function(e) {
-			this.linkClickHandler(e);
-		}
-	},
-
-	// Description: Return true if the pageNum argument is a currently visible 
-	// page. Return false if it is not; which will occur if it cannot be found in 
-	// the array.
-	isPageVisible: function(pageNum, currentPages) {
-		return currentPages.indexOf(pageNum) !== -1;
-	},
-
-	changePage: function() {
-		var that = this;
-		var currentPage = this.model.get("current_page");
-		var two_up = this.model.get("two_up");
-		this.$(".page-wrap").each(function(index) {
-			if(!two_up) { 
-				index += 1;
-			}
-			$(this).toggleClass("hidden-page", !that.isPageVisible(index, currentPage));
-		});
-	},
-	
 	replaceContent: function(content) {
 		// TODO: put this where it belongs
 		this.$('#readium-content-container').
 		css('visibility', 'hidden').
 		html(content).append("<div id='content-end'></div>");
-	},
-
-	toggleTwoUp: function() {
-		//this.render();
-	},
-
-	setFontSize: function() {
-		var size = this.model.get("font_size") / 10;
-		$('#readium-content-container').css("font-size", size + "em");
-		this.renderPages();
 	},
 
 	// inject mathML parsing code into an iframe
@@ -271,17 +272,5 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
     		"top": "0px",
     		"-webkit-transform": "scale(1.0) translate(0px, 0px)"
     	});
-    },
-
-    iframeLoadCallback: function(e) {
-		
-		this.applyBindings( $(e.srcElement).contents() );
-		this.applySwitches( $(e.srcElement).contents() );
-		this.addSwipeHandlers( $(e.srcElement).contents() );
-        this.injectMathJax(e.srcElement);
-        this.injectLinkHandler(e.srcElement);
-        var trigs = this.parseTriggers(e.srcElement.contentDocument);
-		this.applyTriggers(e.srcElement.contentDocument, trigs);
-	}
-	
+    }
 });

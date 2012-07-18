@@ -54,7 +54,7 @@
 // describe("parsing the ncx", function() {
 //     var toc;
 //     beforeEach(function() {
-//         var ebook = new Readium.Models.Ebook({"package_doc_path": "banana"});
+//         var ebook = new Readium.Models.EPUBController({"package_doc_path": "banana"});
 //         toc = new Readium.Models.NcxToc({book: ebook, file_path: "nowhere"});
 //     });
 

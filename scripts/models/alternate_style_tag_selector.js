@@ -1,17 +1,18 @@
-/* Description: This model is responsible for implementing the Alternate Style Tags specification
- * found at http://idpf.org/epub/altss-tags/. The model selects a "preferred" style sheet or style set 
- * with which to render an ePUB document. 
- * 
- * Notes: The convention in this model is to prepend the names of "private" methods with an underscore ('_')
- */
- // TODO: shorcut the processing if persistent style sheets exist? 
- // TODO: More validation for style sets with mixed rel="alternate ..." and rel="stylesheet"?
- // TODO: Handling <style> elements
- // TODO: Tagging of persistent sets
- // TODO: Ensure that the "default" style set (the default in the ePub) is activated if no tags are supplied
+// Description: This model is responsible for implementing the Alternate Style Tags specification
+// found at http://idpf.org/epub/altss-tags/. The model selects a "preferred" style sheet or style set 
+// with which to render an ePUB document. 
+// 
+// Notes: The convention in this model is to prepend the names of "private" methods with an underscore ('_')
+//
+// TODO: More validation for style sets with mixed rel="alternate ..." and rel="stylesheet"?
+// TODO: Ensure that the "default" style set (the default in the ePub) is activated if no tags are supplied
  
 
 Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
+
+	// ------------------------------------------------------------------------------------ //
+	//  "PUBLIC" METHODS (THE API)                                                          //
+	// ------------------------------------------------------------------------------------ //
 
 	initialize: function() {},
 
@@ -63,6 +64,10 @@ Readium.Models.AlternateStyleTagSelector = Backbone.Model.extend({
 
 		return bookDom;
 	},
+
+	// ------------------------------------------------------------------------------------ //
+	//  "PRIVATE" HELPERS                                                                   //
+	// ------------------------------------------------------------------------------------ //
 
 	/* Description: Activate the specified style set and de-activate all others
 	 * Design rationale: The disabled property is used to activate/de-activate the style sheets, as opposed to changing 

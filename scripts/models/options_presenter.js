@@ -17,10 +17,6 @@ Readium.Models.OptionsPresenter = Backbone.Model.extend({
 	applyOptions: function() {
 		var book = this.get("book");
 
-		// cannot set two_up directly, need to call toggle
-		// so determine if we should
-		var should_toggle = this.get("two_up") !== book.get("two_up");
-
 		// set everything but two_up
 		book.set({
 			"font_size": 		this.get("font_size"),
@@ -28,8 +24,13 @@ Readium.Models.OptionsPresenter = Backbone.Model.extend({
 	    	"current_margin": 	this.get("current_margin")
 		});
 
-		// toggle two up if we determined we should have
-		if(should_toggle) book.toggleTwoUp();
+		// cannot set two_up directly, need to call toggle
+		// so determine if we should
+		var shouldToggleTwoUp = this.get("two_up") !== book.get("two_up");
+		if (shouldToggleTwoUp) {
+
+			book.set("two_up", !book.get("two_up"));
+		}
 
 		// persist user settings for next time
 		book.save();
@@ -44,5 +45,4 @@ Readium.Models.OptionsPresenter = Backbone.Model.extend({
 	    	"current_margin": 	book.get("current_margin")
 		});
 	}
-
 });
