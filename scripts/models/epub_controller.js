@@ -10,7 +10,7 @@
 //   that Backbone attributes (getting/setting) and the backbone attribute event model (events fired on attribute changes) should 
 //   the primary ways of interacting with this model.
 
-Readium.Models.Ebook = Backbone.Model.extend({
+Readium.Models.EPUBController = Backbone.Model.extend({
 
 	// ------------------------------------------------------------------------------------ //
 	//  "PUBLIC" METHODS (THE API)                                                          //
@@ -25,7 +25,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 		// create a [`Paginator`](/docs/paginator.html) object used to initialize
 		// pagination strategies for the spine items of this book
-		this.paginator = new Readium.Models.Paginator({book: this});
+		this.paginator = new Readium.Models.PaginationStrategySelector({book: this});
 
 		// Get the epub package document
 		this.packageDocument = this.epub.getPackageDocument();
@@ -64,7 +64,7 @@ Readium.Models.Ebook = Backbone.Model.extend({
 
 	// Description: Persists the attributes of this model
 	// Arguments (
-	//   attrs: Probably not used
+	//   attrs: doesn't appear to be used
 	//   options: 
 	//	)
 	// Rationale: Each epub unpacked and saved to the filesystem in Readium has a unique
@@ -187,57 +187,6 @@ Readium.Models.Ebook = Backbone.Model.extend({
 		return this.packageDocument.getSpineItem(spine_pos);
 	},
 
-/*
-	// REFACTORING CANDIDATE: this should be refactored into its own model
-	playMo: function(forceFromStart) {
-		// there is way too much code in this method that does
-		// does not belong here. TODO: Clean up
-		var mo = this.getCurrentSection().getMediaOverlay();
-		if(mo) {
-			this.set("mo_playing", mo);
-			var that = this;
-			mo.on("change:current_text_document_url", function () {
-                that.goToHref(mo.get("current_text_document_url"));
-			});
-			mo.on("change:current_text_element_id", function () {
-				var frag = mo.get("current_text_element_id")
-				that.set("hash_fragment", frag);
-				that.set("current_mo_frag", frag);
-			});
-            mo.on("change:is_document_done", function() {
-                that.pauseMo();
-                // advance the spine position
-                if (that.hasNextSection()) {
-                    that.goToNextSection();
-                    that.playMo(true);
-                }
-            });
-            if (mo.get("has_started_playback") && forceFromStart == false) {
-                mo.resume();
-            }
-            else {
-                mo.startPlayback(null);
-            }
-		}
-		else {
-			alert("Sorry, the current EPUB does not contain a media overlay for this content");
-		}
-	},
-*/
-/*
-	// REFACTORING CANDIDATE: this should be refactored into its own model
-	pauseMo: function() {
-		var mo = this.get("mo_playing");
-		if(mo) {
-
-			// mo.off() and mo.pause() seem like they should be in the same call
-			mo.off();
-			mo.pause();
-			this.set("mo_playing", null);
-		}
-	},
-*/
-
 	// REFACTORING CANDIDATE: this should be renamed to indicate it applies to the entire epub.
 	//   This is only passing through this data to avoid breaking code in viewer.js. Eventually
 	//   this should probably be removed. 
@@ -333,33 +282,5 @@ Readium.Models.Ebook = Backbone.Model.extend({
 			});
 		}
 		this.meta_section.on("change:meta_height", this.setMetaSize, this);
-	}/*,
-
-
-	// REFACTORING CANDIDATE: This method may not be used for anything.
-	// when the spine position changes we need to update the
-	// state of this, this involes setting attributes that reflect
-	// the current section's url and content etc, and then we need
-	// to persist the position in a cookie
-	spinePositionChangedHandler: function() {
-		var that = this;
-		var sect = this.getCurrentSection();
-		var path = sect.get("href");
-		var url = this.packageDocument.resolveUri(path);;
-		path = this.resolvePath(path);
-		this.set("current_section_url", url);
-
-		Readium.FileSystemApi(function(api) {
-
-			api.readTextFile(path, function(result) {
-				that.set( {current_content: result} );
-			}, function() {
-				console.log("Failed to load file: " + path);
-			})
-		});
-		
-		// save the position
-		this.savePosition();
 	}
-*/
 });

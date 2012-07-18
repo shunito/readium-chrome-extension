@@ -16,7 +16,7 @@ Readium.Routers.ViewerRouter = Backbone.Router.extend({
 
 		if(book_data) {
 			// initialze the viewer for that book
-			window._book = new Readium.Models.Ebook(book_data);
+			window._book = new Readium.Models.EPUBController(book_data);
 			window._applicationView = new Readium.Views.ViewerApplicationView({
 				model: window._book
 			});

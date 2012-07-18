@@ -1,7 +1,6 @@
 // This class is used to navigate an EPub's package document
 Readium.Models.PackageDocument = Backbone.Model.extend({
 
-
 	initialize: function(attributes, options) {
 		var that = this;
 		

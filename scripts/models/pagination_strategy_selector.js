@@ -9,7 +9,7 @@
 //   pagination strategy is never called again when navigating to the other (possibly reflowable) spine items. This will have to be addressed
 //   at some point. 
 
-Readium.Models.Paginator = Backbone.Model.extend({
+Readium.Models.PaginationStrategySelector = Backbone.Model.extend({
 
 	renderToLastPage: false,
 
@@ -23,7 +23,7 @@ Readium.Models.Paginator = Backbone.Model.extend({
 	},
 
 	// Description: Determine what the current spine item is and render it
-	// Updates which spine items have been rendered in an array of rendered spine items
+	//   Updates which spine items have been rendered in an array of rendered spine items
 	renderSpineItems: function(renderToLast) {
 		var book = this.model;
 		var that = this;

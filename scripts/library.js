@@ -21,7 +21,18 @@ Readium.Models.LibraryItem = Backbone.Model.extend({
 						that.remove(key);
 					});
 				}
-			});		
+			});
+
+			// Remove the viewer preferences as well
+			propertiesKey = key + "_epubViewProperties";
+			this.get(propertiesKey, function(epubViewProperties) {
+				if(epubViewProperties) {
+					Readium.FileSystemApi(function(fs) {
+						fs.rmdir(epubViewProperties.key);
+						that.remove(propertiesKey);
+					});
+				}
+			});
 		});
 	}
 });
