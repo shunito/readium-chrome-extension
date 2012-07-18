@@ -2,45 +2,23 @@
 Readium.Models.ManifestItem = Backbone.Model.extend({
 	
 	parseMetaTags: function() {
-		 var pageSize;
 		// only need to go through this one time, so only parse it
 		// if it is not already known
 		if(typeof this.get("meta_width") !== "undefined") {
 			return;
 		}
-
-		if(this.isSvg()) {
-			pageSize = this.parseViewboxTag();
+		var parser = new window.DOMParser();
+		var dom = parser.parseFromString(this.get('content'), 'text/xml');
+		var tag = dom.getElementsByName("viewport")[0];
+		if(tag) {
+			var pageSize = this.parseViewportTag(tag);
+			this.set({"meta_width": pageSize.width, "meta_height": pageSize.height})
+			return {meta_width: pageSize.width, meta_height: pageSize.height};
 		}
-		else if(!this.isImage()) {
-			pageSize = this.parseViewportTag();
-		}
-
-		if(pageSize) {
-			this.set({"meta_width": pageSize.width, "meta_height": pageSize.height});
-		}
+		return null;
 	},
 
-	getContentDom: function() {
-		var content = this.get('content');
-		if(content) {
-			var parser = new window.DOMParser();
-			return parser.parseFromString(content, 'text/xml');
-		}
-	},
-
-	// for fixed layout xhtml we need to parse the meta viewport
-	// tag to determine the size of the pages. more info in the 
-	// [fixed layout spec](http://idpf.org/epub/fxl/#dimensions-xhtml-svg)
-	parseViewportTag: function() {
-		var dom = this.getContentDom();
-		if(!dom) {
-			return;
-		}
-		var viewportTag = dom.getElementsByName("viewport")[0];
-		if(!viewportTag) {
-			return null;
-		}
+	parseViewportTag: function(viewportTag) {
 		// this is going to be ugly
 		var str = viewportTag.getAttribute('content');
 		str = str.replace(/\s/g, '');
@@ -53,31 +31,9 @@ Readium.Models.ManifestItem = Backbone.Model.extend({
 				values[ pair[0] ] = pair[1];
 			}
 		}
-		values['width'] = parseFloat(values['width'], 10);
-		values['height'] = parseFloat(values['height'], 10);
+		values['width'] = parseFloat(values['width']);
+		values['height'] = parseFloat(values['height']);
 		return values;
-	},
-
-	// for fixed layout svg we need to parse the viewbox on the svg
-	// root tag to determine the size of the pages. more info in the 
-	// [fixed layout spec](http://idpf.org/epub/fxl/#dimensions-xhtml-svg)
-	parseViewboxTag: function() {
-
-		// The value of the ‘viewBox’ attribute is a list of four numbers 
-		// `<min-x>`, `<min-y>`, `<width>` and `<height>`, separated by 
-		// whitespace and/or a comma
-		var dom = this.getContentDom();
-		if(!dom) {
-			return;
-		}
-		var viewboxString = dom.documentElement.getAttribute("viewBox");
-		// split on whitespace and/or comma
-		var valuesArray = viewboxString.split(/,?\s+|,/);
-		var values = {};
-		values['width'] = parseFloat(valuesArray[2], 10);
-		values['height'] = parseFloat(valuesArray[3], 10);
-		return values;
-
 	},
 
 	resolvePath: function(path) {
@@ -88,22 +44,10 @@ Readium.Models.ManifestItem = Backbone.Model.extend({
 		return this.collection.packageDocument.resolveUri(path)	
 	},
 
-	isSvg: function() {
-		return this.get("media_type") === "image/svg+xml";
-	},
-
-	isImage: function() {
-		var media_type = this.get("media_type");
-
-		if(media_type && media_type.indexOf("image/") > -1) {
-			// we want to treat svg as a special case, so they
-			// are not images
-			return media_type !== "image/svg+xml";
-		}
-		return false;
-	},
-
-	// Load this content from the filesystem
+	// when the spine position changes we need to update the
+	// state of this, this involes setting attributes that reflect
+	// the current section's url and content etc, and then we need
+	// to persist the position in a cookie
 	loadContent: function() {
 		var that = this;
 		var path = this.resolvePath(this.get("href"));
@@ -124,9 +68,8 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 	initialize: function() {
 		if(this.isFixedLayout()) {
 			this.on("change:content", this.parseMetaTags, this);
-			this.loadContent();
 		}
-		
+		this.loadContent();
 	},
 
 	// this method creates the JSON representation of a manifest item
@@ -237,18 +180,9 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 	},
 
 	isFixedLayout: function() {
-
-		// if it an svg or image then it is fixed layout
-		if(this.isSvg() || this.isImage()) {
-			return true;
-		}
-
-		// if there is a fixed_flow property, then it takes precedence
 		if(typeof this.get("fixed_flow") !== 'undefined') {
 			return this.get('fixed_flow');
 		}
-
-		// nothing special about this spine item, fall back to the books settings
 		return this.collection.isBookFixedLayout();
 	},
 

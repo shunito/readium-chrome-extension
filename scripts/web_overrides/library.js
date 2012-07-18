@@ -4,11 +4,13 @@ Readium.Models.LibraryItem = Backbone.Model.extend({
 	idAttribute: "key",
 	
 	getViewBookUrl: function(book) {
+// Track3
 		return "/viewer.html?book=" + this.get('key');
 	},
 
 	openInReader: function() {
-		window.location = this.getViewBookUrl();
+// Track2
+		window.location.href = this.getViewBookUrl();
 	}
 
 });
@@ -56,6 +58,7 @@ Readium.Views.LibraryItemView = Backbone.View.extend({
 		},
 
 		"click .read": function(e) {
+// Track1
 			this.model.openInReader();
 		}
 		
