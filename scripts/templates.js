@@ -16,7 +16,7 @@ templates['extracting_item_template'] = template(function (Handlebars,depth0,hel
   stack1 = foundHelper || depth0.log_message;
   if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
   else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "log_message", { hash: {} }); }
-  buffer += escapeExpression(stack1) + "</h5>\n<div class=\"progress progress-striped progress-success active \">	\n		<div class=\"bar\" style=\"width: ";
+  buffer += escapeExpression(stack1) + "</h5>\n<div role=\"status\" aria-live=\"assertive\" aria-relevant=\"all\" class=\"progress progress-striped progress-success active \">	\n		<div class=\"bar\" style=\"width: ";
   foundHelper = helpers.progress;
   stack1 = foundHelper || depth0.progress;
   if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
