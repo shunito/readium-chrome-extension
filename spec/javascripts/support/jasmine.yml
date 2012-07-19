@@ -34,6 +34,11 @@ src_files:
   - scripts/models/mediaOverlay.js
   - scripts/models/audioClipPlayer.js
   - scripts/models/ibooks_options_parser.js
+  - scripts/models/epub_controller.js
+  - scripts/models/epub.js
+  - scripts/models/pagination_strategy_selector.js
+  - scripts/models/readium_pagination.js
+  - scripts/models/page_number_display_logic.js
 
 # stylesheets
 #
