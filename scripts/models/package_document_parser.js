@@ -25,7 +25,8 @@ Readium.Models.PackageDocumentParser.JathTemplate = {
 		spread: "//def:metadata/def:meta[@property='rendition:spread']",
 		orientation: "//def:metadata/def:meta[@property='rendition:orientation']",
 		ncx: "//def:spine/@toc",
-		page_prog_dir: "//def:spine/@page-progression-direction"
+		page_prog_dir: "//def:spine/@page-progression-direction",
+		
 	 },
 
 	manifest: [ "//def:item", { 
@@ -56,7 +57,7 @@ Readium.Models.PackageDocumentParser.prototype.parse = function(xml_content) {
 	else {
 		xmlDom = xml_content;
 	}
-	
+
 	Jath.resolver = function( prefix ) {
 		var mappings = { 
     		def: "http://www.idpf.org/2007/opf",
@@ -78,8 +79,13 @@ Readium.Models.PackageDocumentParser.prototype.parse = function(xml_content) {
 	if(json.metadata.layout === "pre-paginated") {
 		json.metadata.fixed_layout = true;
 	}
-	
-	// parse the manifest into a proper collection
+
+    // use a default value for media:active-class
+    if(json.metadata.active_class === "") {
+        json.metadata.active_class = "-epub-media-overlay-active";
+    }
+    
+    // parse the manifest into a proper collection
 	json.manifest = new Readium.Collections.ManifestItems(json.manifest, {packageDocument: this});
 
 	// create a map of all the media overlay objects
@@ -92,6 +98,7 @@ Readium.Models.PackageDocumentParser.prototype.parse = function(xml_content) {
 	return json;
 
 };
+
 	
 
 Readium.Models.PackageDocumentParser.prototype.getCoverHref = function(dom) {

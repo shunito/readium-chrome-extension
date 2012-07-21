@@ -15,6 +15,8 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		this.model.on("FXL_goToPage", this.spinePositionChangeHandler, this);
 		this.model.on("change:two_up", this.setUpMode, this);
 		this.model.on("change:meta_size", this.setContainerSize, this);
+
+		this.mediaOverlayController.on("change:current_mo_frag", this.currentMOFragChangeHandler, this);
 	},
 
 	render: function() {
@@ -32,8 +34,8 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		var rendered_spine_positions = [];
 		var spine_position = this.model.get("spine_position");
 
-		// (I think) Gets each page of the current pub and injects it into the page, then 
-		// keeps track of what has been pre-rendered
+		// Gets each page of the current pub and injects it into the page 
+		// keeping track of what has been pre-rendered
 		while ( this.shouldPreRender( this.model.getCurrentSection(offset) ) ) {
 
 			this.addPage(this.model.getCurrentSection(offset), pageNum);
@@ -56,6 +58,18 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		return rendered_spine_positions;
 	},
 
+	// get the body element for a page number
+    getPageBody: function(pageNum) {
+        var pageElm = $("#page-" + pageNum.toString() +" iframe");
+        if (pageElm.length > 0) {
+            pageElm = pageElm.contents()[0].documentElement;
+            return $(pageElm).find("body")
+        }
+        else {
+            return null;
+        }
+    },
+
 	// ------------------------------------------------------------------------------------ //
 	//  "PRIVATE" HELPERS                                                                   //
 	// ------------------------------------------------------------------------------------ //
@@ -71,6 +85,8 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		// remove any listeners registered on the model
 		this.model.off("change:two_up", this.setUpMode);
 		this.model.off("change:meta_size", this.setUpMode);
+
+		this.mediaOverlayController.off("change:current_mo_frag", this.currentMOFragChangeHandler, this);
 	},
 
 	spinePositionChangeHandler: function () {
@@ -78,6 +94,16 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		var pageNumber = this.model.get("spine_position") + 1;
 		this.pages.goToPage(pageNumber);
 	},
+
+	currentMOFragChangeHandler: function () {
+
+		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
+
+		moHelper.renderFixedLayoutMoFragHighlight(
+			this.pages.get("current_pages"),
+			this.mediaOverlayController.get("current_mo_frag"),
+			this);
+	}, 
 
 	// Description: Creates/gets an iFrame which contains a page view to represent a spine item and appends it to an 
 	//   element that contains the content of the current ePub. Each of these spine item iframes is not necessarily displayed
@@ -140,10 +166,16 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 	//   currently visible pages
 	showCurrentPages: function() {
 		var that = this;
+		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
 
 		this.$(".fixed-page-wrap").each(function(index) {
 			$(this).toggle(that.pages.isPageVisible(index + 1));
 		});
+
+		// remove any artifact of MO highlighting from the current page(s)
+        $.each(this.pages.get("current_page"), function(idx) {
+            moHelper.removeActiveClass(that.getPageBody(this.toString()));
+        });
 	},
 
 	setFontSize: function() {

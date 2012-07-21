@@ -81,7 +81,7 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 			this.model.pauseMo();
 		}
 		else {
-			this.model.playMo(false);
+			this.model.playMo();
 		}
 	}
 });

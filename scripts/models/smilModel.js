@@ -77,7 +77,6 @@ Readium.Models.SmilModel = function() {
                     "text": function() {}}
     var url = null;
     var notifySmilDone = null;
-    
     var root = null;
     
     // call this first with the media node renderers to add them to the master list
@@ -116,10 +115,53 @@ Readium.Models.SmilModel = function() {
         }
     };
     
+    // find the first node with the given attribute value
+    // e.g.
+    // findNodeByAttrValue("*", "id", "num1")
+    // findNodeByAttrValue("text", "", "")
+    // findNodeByAttrValue("*", "id", "")
+    // but NOT findNodeByAttrValue("text", "", "num1")
     this.findNodeByAttrValue = function(nodename, attr, val) {
         if (root == null) return null;
-        var res = $(root).find(nodename + "[" + attr + "='" + val + "']");
-        return res.length == 0 ? null : res[0];
+        var res = null;
+        
+        if (attr == "src" || attr == "epub:textref") {
+            // treat src and textref attrs differently
+            // TODO can get a better comparison with something like http://medialize.github.com/URI.js/
+            // for now, just look at the text file names
+            var doc_href = val.substr(val.lastIndexOf("/")+1); // TODO hack!
+            var selector = nodename + "[" + attr + "]";
+            var potentialMatches = $(root).find(selector);
+            if (val == "") {
+                res = potentialMatches[0];
+            }
+            else {
+                potentialMatches.each(function(idx) {
+                    var src = $(this).attr(attr);
+                    if (src != undefined) {
+                        // TODO fix this hack, same as above
+                        src = src.substr(src.lastIndexOf("/")+1);
+                        if (src === doc_href) {
+                            res = this;
+                            return false;
+                        }
+                    }
+                });
+            }
+        }
+        else {
+            var selector = nodename;
+            if (attr != "") {
+                selector += "[" + attr;
+                if (val != "") {
+                    selector += "='" + val + "'";
+                }
+                selector += "]";
+            }
+            res = $(root).find(selector);
+            res = res.length == 0 ? null : res[0]; // grab first result
+        }   
+        return res;
     };
     
     // see what the next audio node is going to be
@@ -164,10 +206,10 @@ Readium.Models.SmilModel = function() {
         // add a toString method for debugging
         node.toString = function() {
             var string = "<" + this.nodeName;
-        	for (var i = 0; i < this.attributes.length; i++) {
-        		string += " " + this.attributes.item(i).nodeName + "=" + this.attributes.item(i).nodeValue;
-        	}
-        	string += ">";
+            for (var i = 0; i < this.attributes.length; i++) {
+                string += " " + this.attributes.item(i).nodeName + "=" + this.attributes.item(i).nodeValue;
+            }
+            string += ">";
             return string;
         };
         
@@ -233,30 +275,29 @@ Readium.Models.SmilModel = function() {
         var mins = 0;
         var secs = 0;
         
-        // parse as hh:mm:ss.fraction
-        // this also works for seconds-only, e.g. 12.345
-        arr = value.split(":");
-        secs = parseFloat(arr.pop());
-        if (arr.length > 0) {
-            mins = parseFloat(arr.pop());
-            if (arr.length > 0) {
-                hours = parseFloat(arr.pop());
-            }
+        if (value.indexOf("min") != -1) {
+            mins = parseFloat(value.substr(0, value.indexOf("min")));
         }
-        // look for unit 's', 'h', 'min', 'ms'
+        else if (value.indexOf("ms") != -1) {
+            var ms = parseFloat(value.substr(0, value.indexOf("ms")));
+            secs = ms/1000;
+        }
+        else if (value.indexOf("s") != -1) {
+            secs = parseFloat(value.substr(0, value.indexOf("s")));                
+        }
+        else if (value.indexOf("h") != -1) {
+            hours = parseFloat(value.substr(0, value.indexOf("h")));                
+        }
         else {
-            if (value.indexOf("min") != -1) {
-                mins = parseFloat(value.substr(0, value.indexOf("min")));
-            }
-            else if (value.indexOf("ms") != -1) {
-                var ms = parseFloat(value.substr(0, value.indexOf("ms")));
-                secs = ms/1000;
-            }
-            else if (value.indexOf("s") != -1) {
-                secs = parseFloat(value.substr(0, value.indexOf("s")));                
-            }
-            else if (value.indexOf("h") != -1) {
-                hours = parseFloat(value.substr(0, value.indexOf("h")));                
+            // parse as hh:mm:ss.fraction
+            // this also works for seconds-only, e.g. 12.345
+            arr = value.split(":");
+            secs = parseFloat(arr.pop());
+            if (arr.length > 0) {
+                mins = parseFloat(arr.pop());
+                if (arr.length > 0) {
+                    hours = parseFloat(arr.pop());
+                }
             }
         }
         var total = hours * 3600 + mins * 60 + secs;
