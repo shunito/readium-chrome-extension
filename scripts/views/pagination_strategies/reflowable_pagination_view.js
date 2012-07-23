@@ -198,6 +198,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	adjustIframeColumns: function() {
 		var prop_dir = this.offset_dir;
 		var $frame = this.$('#readium-flowing-content');
+
 		this.setFrameSize();
 		this.frame_width = parseInt($frame.width(), 10);
 		this.frame_height = parseInt($frame.height(), 10);
