@@ -48,7 +48,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             var target = this.get("mo_target");
             this.set("mo_target", null);
             
-            if (this.currentSection.isFixedLayout()) {
+            if (currentSection.isFixedLayout()) {
                 if (mo.get("has_started_playback")) {
                     // restore the highlight
                     this.handleMoTextDocumentUrl();
@@ -93,7 +93,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 			// mo.off() and mo.pause() seem like they should be in the same call
 			mo.off();
 			mo.pause();
-			this.set("mo_playing", null);
+			this.set("mo_playing", null); // REFACTORING CANDIDATE: Should this be set to "false"???
             this.set("hash_fragment", "");
             this.set("current_mo_frag", "");
 		}
@@ -102,7 +102,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
     handleMoTextDocumentUrl: function() {
         var mo = this.get("mo_playing");
         this.set("mo_processing", true);
-        this.goToHref(mo.get("current_text_document_url"));
+        this.epubController.goToHref(mo.get("current_text_document_url"));
         this.set("mo_processing", false);
     },
     

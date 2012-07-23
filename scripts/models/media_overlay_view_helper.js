@@ -110,7 +110,7 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
 			$(body).css("color", reflowableView.themes[currentTheme]["color"]);	
 
             // remove style info from the last MO fragment
-            var lastFrag = this.removeActiveClass(this.getBody());
+            var lastFrag = this.removeActiveClass(reflowableView.getBody());
             if (lastFrag) {
                 $(lastFrag).css("color", "");
             }

@@ -310,14 +310,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		return num;
 	},
 
-	pageChangeHandler: function() {
-		var that = this;
-		this.hideContent();
-		setTimeout(function() {
-			that.goToPage(that.pages.get("current_page")[0]);
-		}, 150);
-	},
-
 	getElemPageNumber: function(elem) {
 
 		var rects, shift;
@@ -353,6 +345,14 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         }
     },
 
+	pageChangeHandler: function() {
+		var that = this;
+		this.hideContent();
+		setTimeout(function() {
+			that.goToPage(that.pages.get("current_page")[0]);
+		}, 150);
+	},
+
 	windowSizeChangeHandler: function() {
 		this.adjustIframeColumns();
 	},
@@ -362,7 +362,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
 
 		moHelper.renderReflowableMoPlaying(
-			this.epubController.get("current_theme"),
+			this.model.get("current_theme"),
 			this.mediaOverlayController.get("mo_playing"),
 			this
 			);
@@ -370,10 +370,10 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	currentMOFragChangeHandler: function () {
 
-		var moHelper = new Readium.Models.mediaOverlayViewHelper({epubController : this.model});
+		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
 
 		moHelper.renderReflowableMoFragHighlight(
-			this.epubController.get("current_theme"),
+			this.model.get("current_theme"),
 			this,
 			this.mediaOverlayController.get("current_mo_frag")
 			);
