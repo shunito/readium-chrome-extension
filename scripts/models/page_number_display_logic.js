@@ -38,8 +38,10 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 
 						return [gotoPageNumber, gotoPageNumber + 1];
 					}
+					else {
 
-					// TODO: Handle center pages
+						return [gotoPageNumber];
+					}
 				}
 				// Left-to-right page progression
 				else {
@@ -52,8 +54,10 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 
 						return [gotoPageNumber - 1, gotoPageNumber];
 					}
+					else {
 
-					// TODO: Handle center pages
+						return [gotoPageNumber];
+					}
 				}
 			}
 			// This is a reflowable page
