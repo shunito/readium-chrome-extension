@@ -26,7 +26,7 @@ Readium.Models.PackageDocumentParser.JathTemplate = {
 		orientation: "//def:metadata/def:meta[@property='rendition:orientation']",
 		ncx: "//def:spine/@toc",
 		page_prog_dir: "//def:spine/@page-progression-direction",
-		
+		active_class: "//def:metadata/def:meta[@property='media:active-class']"
 	 },
 
 	manifest: [ "//def:item", { 

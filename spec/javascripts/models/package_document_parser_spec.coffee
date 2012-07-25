@@ -62,7 +62,11 @@ describe "Readium.Models.PackageDocumentParser", ->
 			expect(res.manifest.at(4).media_overlay == "");
 
 		it 'creates a ManifestItems collection', ->
-			expect(Readium.Collections.ManifestItems).toBeDefined()
+			expect(Readium.Collections.ManifestItems).toBeDefined();
+
+		it "parses the media:active-class metadata", ->
+            res = @parser.parse(@xml)
+            expect(res.metadata.active_class).toEqual("-epub-media-overlay-active");
 
 
 	describe "parseSpineProperties", ->
