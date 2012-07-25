@@ -9,20 +9,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	// Description: All strategies are linked to the same dom element
 	el: "#readium-book-view-el",
 
-	// REFACTORING CANDIDATE: this doesn't seem to be working...
-	events: {
-		"click #page-margin": function(e) {
-			this.trigger("toggle_ui");
-		},
-
-		"click #readium-content-container a": function(e) {
-			this.linkClickHandler(e);
-		}
-	},
-
-	// ------------------------------------------------------------------------------------ //
+	/* ------------------------------------------------------------------------------------ */
 	//  "PUBLIC" METHODS (THE API)                                                          //
-	// ------------------------------------------------------------------------------------ //
+	/* ------------------------------------------------------------------------------------ */
 
 	initialize: function(options) {
 		

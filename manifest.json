@@ -33,7 +33,17 @@
   ],
    "options_page": "views/library.html#options",
    "web_accessible_resources": [
-    "lib/mathjax/MathJax.js"
+    "lib/mathjax/MathJax.js",
+    "lib/mathjax/config/readium-iframe.js",
+    "lib/mathjax/extensions/MathMenu.js",
+    "lib/mathjax/extensions/MathZoom.js",
+    "lib/mathjax/jax/input/TeX/config.js",
+    "lib/mathjax/jax/input/MathML/config.js",
+    "lib/mathjax/jax/output/SVG/config.js",
+    "lib/mathjax/extensions/tex2jax.js",
+    "lib/mathjax/extensions/mml2jax.js",
+    "lib/mathjax/extensions/MathEvents.js",
+    "lib/images/MenuArrow-15.png"
    ],
    "version": "0.4.2" // UPDATE VERSION NUMBER 
 }
