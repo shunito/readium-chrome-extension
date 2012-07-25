@@ -72,8 +72,13 @@
         expect(res.manifest.at(3).media_overlay === "Page_4_MO");
         return expect(res.manifest.at(4).media_overlay === "");
       });
-      return it('creates a ManifestItems collection', function() {
+      it('creates a ManifestItems collection', function() {
         return expect(Readium.Collections.ManifestItems).toBeDefined();
+      });
+      return it("parses the media:active-class metadata", function() {
+        var res;
+        res = this.parser.parse(this.xml);
+        return expect(res.metadata.active_class).toEqual("-epub-media-overlay-active");
       });
     });
     describe("parseSpineProperties", function() {
