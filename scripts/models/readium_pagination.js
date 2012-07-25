@@ -17,7 +17,7 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		//   the page numbers that result from pagination. 
 		this.set("current_page", [this.epubController.get("spine_position") + 1]);
 
-		// Instantiate an object to decide what to display
+		// Instantiate an object responsible for deciding which pages to display
 		this.pageNumberDisplayLogic = new Readium.Models.PageNumberDisplayLogic();
 		
 		// if content reflows and the number of pages in the section changes
@@ -39,14 +39,14 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 				this.epubController.getCurrentSection().isFixedLayout()
 				);
 
-			//this.epubController.set({two_up: !this.epubController.get("two_up")});
 			this.set({current_page: newPages});
 		}	
 	},
 
 	// REFACTORING CANDIDATE: This needs to be investigated, but I bet if the prevPage and nextPage methods were 
 	//   called directly (goRight and goLeft were removed), the new page number display logic would account for the 
-	//   page progression direction and that all this logic could be simplified.
+	//   page progression direction and that all this logic could be simplified in both this model and the 
+	//   PageNumberDisplayLogic model
 	// 
 	// Description: turn pages in the rightward direction
 	//   ie progression direction is dependent on 

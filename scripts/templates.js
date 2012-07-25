@@ -4,8 +4,8 @@ templates['binding_template'] = template(function (Handlebars,depth0,helpers,par
   helpers = helpers || Handlebars.helpers;
   var foundHelper, self=this;
 
-
   return "<iframe scrolling=\"no\" \n		frameborder=\"0\" \n		marginwidth=\"0\" \n		marginheight=\"0\" \n		width=\"100%\" \n		height=\"100%\" \n		class='binding-sandbox'>\n</iframe>";});
+
 templates['extracting_item_template'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
   var buffer = "", stack1, foundHelper, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
@@ -16,7 +16,7 @@ templates['extracting_item_template'] = template(function (Handlebars,depth0,hel
   stack1 = foundHelper || depth0.log_message;
   if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
   else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "log_message", { hash: {} }); }
-  buffer += escapeExpression(stack1) + "</h5>\n<div class=\"progress progress-striped progress-success active \">	\n		<div class=\"bar\" style=\"width: ";
+  buffer += escapeExpression(stack1) + "</h5>\n<div role=\"status\" aria-live=\"assertive\" aria-relevant=\"all\" class=\"progress progress-striped progress-success active \">	\n		<div class=\"bar\" style=\"width: ";
   foundHelper = helpers.progress;
   stack1 = foundHelper || depth0.progress;
   if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
@@ -50,13 +50,13 @@ templates['library_item_template'] = template(function (Handlebars,depth0,helper
   var buffer = "", stack1, stack2, foundHelper, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
 
 
-  buffer += "<div class='info-wrap clearfix'>\n	<div class='caption book-info'>\n		<h3 class='green info-item title'>";
+  buffer += "<div class='info-wrap clearfix'>\n	<div class='caption book-info'>\n		<h2 class='green info-item title'>";
   foundHelper = helpers.data;
   stack1 = foundHelper || depth0.data;
   stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.title);
   if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
   else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "data.title", { hash: {} }); }
-  buffer += escapeExpression(stack1) + "</h3>\n		<h3 class='info-item author'>";
+  buffer += escapeExpression(stack1) + "</h2>\n		<div class='info-item author'>";
   foundHelper = helpers.data;
   stack1 = foundHelper || depth0.data;
   stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.author);
@@ -65,7 +65,7 @@ templates['library_item_template'] = template(function (Handlebars,depth0,helper
   if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
   else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "orUnknown", stack1, { hash: {} }); }
   else { stack1 = stack2; }
-  buffer += escapeExpression(stack1) + "</h3>\n		<h3 class='info-item epub-version'>ePUB ";
+  buffer += escapeExpression(stack1) + "</div>\n		<div class='info-item epub-version'>ePUB ";
   foundHelper = helpers.data;
   stack1 = foundHelper || depth0.data;
   stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.epub_version);
@@ -74,7 +74,7 @@ templates['library_item_template'] = template(function (Handlebars,depth0,helper
   if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
   else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "orUnknown", stack1, { hash: {} }); }
   else { stack1 = stack2; }
-  buffer += escapeExpression(stack1) + "</h3>\n		\n	</div>\n	\n	<img class='cover-image read' src='";
+  buffer += escapeExpression(stack1) + "</div>\n		\n	</div>\n	\n	<img class='cover-image read' src='";
   foundHelper = helpers.data;
   stack1 = foundHelper || depth0.data;
   stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.cover_href);

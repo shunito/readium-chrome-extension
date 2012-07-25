@@ -27,11 +27,18 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	initialize: function(options) {
 		
 		this.pages = new Readium.Models.ReadiumPagination({model : this.model});
+		this.mediaOverlayController = new Readium.Models.MediaOverlayController({
+			epubController : this.model,
+			pages : this.pages,
+			view : this
+		});
+
 		this.pages.on("change:current_page", this.showCurrentPages, this);
 
 		this.model.on("change:font_size", this.setFontSize, this);
 		this.model.on("change:hash_fragment", this.goToHashFragment, this);
 		this.model.on("change:two_up", this.pages.toggleTwoUp, this.pages);
+
 		this.bindingTemplate = Handlebars.templates.binding_template;
 	},
 
@@ -272,5 +279,5 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
     		"top": "0px",
     		"-webkit-transform": "scale(1.0) translate(0px, 0px)"
     	});
-    }
+    },
 });

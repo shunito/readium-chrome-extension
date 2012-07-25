@@ -29,9 +29,11 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.on("change:two_up", this.setUpMode, this);
 		this.model.on("change:two_up", this.adjustIframeColumns, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
+
+		this.mediaOverlayController.on("change:mo_playing", this.MOPlayingChangeHandler, this);
+		this.mediaOverlayController.on("change:current_mo_frag", this.currentMOFragChangeHandler, this);
 	},
 
-	// REFACTORING CANDIDATE: Part of the public interface
 	render: function(goToLastPage) {
 		var that = this;
 		var json = this.model.getCurrentSection().toJSON();
@@ -58,11 +60,35 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		return [this.model.get("spine_position")];
 	},
 
+    findVisiblePageElements: function() {
+        var elmsWithId = $(this.getBody()).find("[id]");
+        var doc = $("#readium-flowing-content").contents()[0].documentElement;
+        var doc_top = 0;
+        var doc_left = 0;
+        var doc_right = doc_left + $(doc).width();
+        var doc_bottom = doc_top + $(doc).height();
+        
+        var visibleElms = elmsWithId.filter(function(idx) {
+            var elm_top = $(this).offset().top;
+            var elm_left = $(this).offset().left;
+            var elm_right = elm_left + $(this).width();
+            var elm_bottom = elm_top + $(this).height();
+            
+            var is_ok_x = elm_left >= doc_left && elm_right <= doc_right;
+            var is_ok_y = elm_top >= doc_top && elm_bottom <= doc_bottom;
+            
+            return is_ok_x && is_ok_y;
+        });
+
+        return visibleElms;
+        //this.model.set("visible_page_elements", visibleElms);
+    },
+
 	// ------------------------------------------------------------------------------------ //
 	//  "PRIVATE" HELPERS                                                                   //
 	// ------------------------------------------------------------------------------------ //
 
-	// Description: sometimes these views hang around in memory before
+	// Description: Sometimes these views hang around in memory before
 	//   the GC's get them. we need to remove all of the handlers
 	//   that were registered on the model
 	destruct: function() {
@@ -75,14 +101,27 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.off("change:two_up", this.adjustIframeColumns);
 		this.model.off("change:current_margin", this.marginCallback);
 
+		this.mediaOverlayController.off("change:mo_playing", this.renderReflowableMoPlaying, this);
+		this.mediaOverlayController.off("change:current_mo_frag", this.renderReflowableMoFragHighlight, this);
+
 		// call the super destructor
 		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
 	},
 
+	// REFACTORING CANDIDATE: I think this is actually part of the public interface
 	goToPage: function(page) {
 		var offset = this.calcPageOffset(page).toString() + "px";
 		$(this.getBody()).css(this.offset_dir, "-" + offset);
 		this.showContent();
+
+		// REFACTORING CANDIDATE: This can probably be removed as the implementation of findVisiblePageElements
+		//   has changed so that method no longer sets an attribute on another model but rather returns the 
+		//   visible elements. 
+		console.log("going to page " + page);
+        if (this.model.get("two_up") == false || 
+            (this.model.get("two_up") && page % 2 === 1)) {
+            this.findVisiblePageElements(); // find visible page elements after refreshing the display
+        }
 	},
 
 	// Description: navigate to a url hash fragment by calculating the page of
@@ -159,6 +198,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	adjustIframeColumns: function() {
 		var prop_dir = this.offset_dir;
 		var $frame = this.$('#readium-flowing-content');
+
 		this.setFrameSize();
 		this.frame_width = parseInt($frame.width(), 10);
 		this.frame_height = parseInt($frame.height(), 10);
@@ -180,6 +220,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.goToPage(page);
 	},
 
+	// This is now part of the public interface
 	// Description: helper method to get the a reference to the documentElement
 	// of the document in this strategy's iFrame.
 	// TODO: this is a bad name for this function
@@ -270,14 +311,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		return num;
 	},
 
-	pageChangeHandler: function() {
-		var that = this;
-		this.hideContent();
-		setTimeout(function() {
-			that.goToPage(that.pages.get("current_page")[0]);
-		}, 150);
-	},
-
 	getElemPageNumber: function(elem) {
 
 		var rects, shift;
@@ -301,8 +334,50 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		return Math.ceil( shift / (this.page_width + this.gap_width) );
 	},
 
+	// REFACTORING CANDIDATE: This might be part of the public interface
+	getElemPageNumberById: function(elemId) {
+        var doc = $("#readium-flowing-content").contents()[0].documentElement;
+        var elem = $(doc).find("#" + elemId);
+        if (elem.length == 0) {
+            return -1;
+        }
+        else {
+            return this.getElemPageNumber(elem[0]);
+        }
+    },
+
+	pageChangeHandler: function() {
+		var that = this;
+		this.hideContent();
+		setTimeout(function() {
+			that.goToPage(that.pages.get("current_page")[0]);
+		}, 150);
+	},
+
 	windowSizeChangeHandler: function() {
 		this.adjustIframeColumns();
+	},
+
+	MOPlayingChangeHandler: function () {
+
+		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
+
+		moHelper.renderReflowableMoPlaying(
+			this.model.get("current_theme"),
+			this.mediaOverlayController.get("mo_playing"),
+			this
+			);
+	},
+
+	currentMOFragChangeHandler: function () {
+
+		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
+
+		moHelper.renderReflowableMoFragHighlight(
+			this.model.get("current_theme"),
+			this,
+			this.mediaOverlayController.get("current_mo_frag")
+			);
 	},
 
 	marginCallback: function() {

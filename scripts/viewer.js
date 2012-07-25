@@ -1,3 +1,6 @@
+// REFACTORING CANDIDATE: Parts of this model are making calls to the current view through the epubController->paginator->view->etc., 
+//   that is a lot of indirection. Perhaps epubController shouldn't be at the centre of this model anymore.
+
 Readium.Views.ViewerApplicationView = Backbone.View.extend({
 	el: 'body',
 

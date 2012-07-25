@@ -18,7 +18,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     initialize: function() {
         var self = this;
         this.audioplayer = new Readium.Models.AudioClipPlayer();
-        this.audioplayer.setConsoleTrace(true);
+        this.audioplayer.setConsoleTrace(false);
 
         this.url = this.get("smil_url");
         
@@ -111,7 +111,11 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     },
     findNodeByTextSrc: function(src) {
         if (this.get("is_ready") == false) {
-            return;
+            return null;
+        }
+        
+        if (src == null || src == undefined || src == "") {
+            return null;
         }
         
         var elm = this.smilModel.findNodeByAttrValue("text", "src", src);

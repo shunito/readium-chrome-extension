@@ -76,12 +76,13 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 		this.model.save();
 	},
 
+	// REFACTORING CANDIDATE: A lot of indirection here! 
 	play_mo: function() {
-		if(this.model.get("mo_playing")) {
-			this.model.pauseMo();
+		if (this.model.paginator.v.mediaOverlayController.get("mo_playing")) {
+			this.model.paginator.v.mediaOverlayController.pauseMo();
 		}
 		else {
-			this.model.playMo(false);
+			this.model.paginator.v.mediaOverlayController.playMo();
 		}
 	}
 });

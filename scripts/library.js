@@ -276,4 +276,3 @@ Readium.Views.FilePickerView = Backbone.View.extend({
 	}
 
 });
-
