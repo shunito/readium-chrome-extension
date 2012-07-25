@@ -90,11 +90,7 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		return this.get("current_page").indexOf(pageNum) !== -1;
 	},
 
-	// ------------------------------------------------------------------------------------ //
-	//  "PRIVATE" HELPERS                                                                   //
-	// ------------------------------------------------------------------------------------ //
-
-	// REFACTORING CANDIDATE: This is public but not sure it should be; it's called from the navwidget and viewer.js
+	// REFACTORING CANDIDATE: prevPage and nextPage are public but not sure it should be; it's called from the navwidget and viewer.js
 	prevPage: function() {
 
 		var curr_pg = this.get("current_page");
@@ -201,6 +197,10 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 			}
 		}
 	},
+
+	// ------------------------------------------------------------------------------------ //
+	//  "PRIVATE" HELPERS                                                                   //
+	// ------------------------------------------------------------------------------------ //
 
 	adjustCurrentPage: function() {
 		var cp = this.get("current_page");
