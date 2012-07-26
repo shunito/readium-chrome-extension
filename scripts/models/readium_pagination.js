@@ -90,30 +90,19 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		return this.get("current_page").indexOf(pageNum) !== -1;
 	},
 
-	// ------------------------------------------------------------------------------------ //
-	//  "PRIVATE" HELPERS                                                                   //
-	// ------------------------------------------------------------------------------------ //
-
-	// REFACTORING CANDIDATE: This is public but not sure it should be; it's called from the navwidget and viewer.js
+	// REFACTORING CANDIDATE: prevPage and nextPage are public but not sure it should be; it's called from the navwidget and viewer.js.
+	//   Additionally the logic in this method, as well as that in nextPage(), could be refactored to more clearly represent that 
+	//   multiple different cases involved in switching pages.
 	prevPage: function() {
 
 		var curr_pg = this.get("current_page");
 		var lastPage = curr_pg[0] - 1;
 
-		// Description: For fixed layout pubs, check if the last page is displayed; if so, end navigation.
-		if (this.epubController.getCurrentSection().isFixedLayout()) {
-
-			if (this.epubController.get("two_up") && curr_pg[0] === 1) {
-
-				return;
-			}
-		}
-
 		if (curr_pg[0] <= 1) {
 
 			this.epubController.goToPrevSection();
 		}
-		// REFACTORING CANDIDATE: The pagination/spine position relationship is still a bit muddied. As a result, 
+		// REFACTORING CANDIDATE: The pagination/spine position relationship is still muddied. As a result, 
 		//   the assumption that a single content document (spine element) is rendered in every scrolling view must be
 		//   enforced here with this scrolling view specific check condition. 
 		else if (this.epubController.paginator.shouldScroll() &&
@@ -156,18 +145,6 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		var curr_pg = this.get("current_page");
 		var firstPage = curr_pg[curr_pg.length - 1] + 1;
 
-		// For fixed layout pubs, check if the last page is displayed; if so, end navigation
-		if (this.epubController.getCurrentSection().isFixedLayout()) {
-
-			if (this.epubController.get("two_up") && 
-				(curr_pg[0] === this.epubController.get("rendered_spine_items").length || 
-				 curr_pg[1] === this.epubController.get("rendered_spine_items").length)
-				) {
-
-				return;
-			}
-		}
-
 		if (curr_pg[curr_pg.length - 1] >= this.get("num_pages")) {
 
 			this.epubController.goToNextSection();
@@ -201,6 +178,10 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 			}
 		}
 	},
+
+	// ------------------------------------------------------------------------------------ //
+	//  "PRIVATE" HELPERS                                                                   //
+	// ------------------------------------------------------------------------------------ //
 
 	adjustCurrentPage: function() {
 		var cp = this.get("current_page");
