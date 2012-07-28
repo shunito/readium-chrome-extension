@@ -2335,7 +2335,11 @@ a.label:hover, a.badge:hover {
 
 #show-toolbar-button {
   padding: 8px;
-  margin-right: 7px; }
+  margin-right: 7px;
+  display: none; }
+
+#add-book-li {
+  margin-right: 22px; }
 
 /* A css clearfix for holding floated elements in a container */
 .clearfix:after {
@@ -2388,7 +2392,7 @@ body {
   overflow-y: scroll; }
 
 .library-container {
-  padding-top: 45px; }
+  padding-top: 52px; }
 
 .green {
   color: #6FA64D; }
