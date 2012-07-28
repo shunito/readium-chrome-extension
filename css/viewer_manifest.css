@@ -1228,6 +1228,9 @@ html {
 * {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
 
+.offscreenText {
+  display: none; }
+
 #toolbar-el {
   height: 52px; }
 
@@ -1334,9 +1337,8 @@ span.setting-button:hover {
 
 body {
   margin: 0;
-  padding: 0;
-  position: relative;
-  padding-top: 45; }
+  padding: 52px 0 0 0;
+  position: relative; }
 
 #next-page-button {
   right: 0;
