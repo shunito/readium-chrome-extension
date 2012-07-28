@@ -110,7 +110,6 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 	//   immediately. 
 	addPage: function(spineItem, pageNum) {
 
-
 		var that = this;
 		var view = spineItem.getPageView();
 
