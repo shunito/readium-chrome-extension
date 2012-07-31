@@ -68,9 +68,12 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
                 }
                 
                 // if media overlays is on our current page, then resume playback
-                if ((this.epubController.get("two_up") == false && currMoPage == this.pages.get("current_page")) ||
+                var currMoPageIsVisible = this.pages.get("current_page").indexOf(currMoPage) != -1;
+                
+                /*if ((this.epubController.get("two_up") == false && currMoPage == this.pages.get("current_page")) ||
                     (this.epubController.get("two_up") == true && this.pages.get("current_page").indexOf(currMoPage) != -1)) {
-                    
+                */
+                if (currMoPageIsVisible) {    
                     // restore the highlight
                     this.handleMoTextDocumentUrl();
                     this.handleMoTextElementId();
@@ -179,9 +182,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             return;
         }
         
-        // REFACTORING CANDIDATE: Find visible only exists for reflowable view
-        if (currentSection.isFixedLayout()) {
-        	
+        if (!currentSection.isFixedLayout()) {
         	pageElms = this.currentView.findVisiblePageElements();
         	var doc_href = currentSection.get("href");
             
@@ -196,7 +197,8 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 	        }
         }
         else {
-        	node = null
+            // fixed layout doesn't need a target node: the top of the page is always the start of the document
+        	node = null;
         }
         
         if (node) {
