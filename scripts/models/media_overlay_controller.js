@@ -35,8 +35,6 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 	},
 
 	playMo: function() {
-		// there is way too much code in this method that does
-		// does not belong here. TODO: Clean up
 		var currentSection = this.epubController.getCurrentSection();
 		var mo = currentSection.getMediaOverlay();
 		if(mo) {
@@ -101,6 +99,14 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             this.set("current_mo_frag", "");
 		}
 	},
+    
+    pageChanged: function() {
+        this.updateMoPosition();
+    },
+    
+	// ------------------------------------------------------------------------------------ //
+	//  "PRIVATE" METHODS                                                                   //
+	// ------------------------------------------------------------------------------------ //
     
     handleMoTextDocumentUrl: function() {
         var mo = this.get("mo_playing");
