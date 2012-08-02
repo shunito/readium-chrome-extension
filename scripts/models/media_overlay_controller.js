@@ -1,7 +1,7 @@
 // Description: This model is responsible for coordinating actions for processing of media overlays 
 
 // Properties of this model: 
-//   mo_playing
+//   active_mo
 //   
 
 // REFACTORING CANDIDATE: As the media overlay progresses through the epub, the page numbers have to get updated, as well. There
@@ -10,9 +10,9 @@
 Readium.Models.MediaOverlayController = Backbone.Model.extend({
 
 	defaults: {
-		"mo_playing" : false,
+		"active_mo" : null, // the currently-playing media overlay; null if nothing is being played
 		"mo_processing": false, // flag that we are currently processing an MO event
-		"mo_target": null  // target MO node
+		"mo_target": null  // target MO node: gets set when the page changes; MO can update its playback accordingly by restarting at the new target
 	},
 
 	// ------------------------------------------------------------------------------------ //
@@ -38,7 +38,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 		var currentSection = this.epubController.getCurrentSection();
 		var mo = currentSection.getMediaOverlay();
 		if(mo) {
-			this.set("mo_playing", mo);
+			this.set("active_mo", mo);
 			mo.on("change:current_text_src", this.handleMoTextSrc, this);
 			mo.on("change:is_document_done", this.handleMoDocumentDone, this);
             
@@ -78,12 +78,11 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 	},
 
 	pauseMo: function() {
-		var mo = this.get("mo_playing");
+		var mo = this.get("active_mo");
 		if(mo) {
-			// mo.off() and mo.pause() seem like they should be in the same call
 			mo.off();
 			mo.pause();
-			this.set("mo_playing", null); // REFACTORING CANDIDATE: Should this be set to "false"???
+			this.set("active_mo", null); 
             this.set("mo_text_id", "");
 		}
 	},
@@ -103,7 +102,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
     },
     
     handleMoTextSrc: function() {
-        var mo = this.get("mo_playing");
+        var mo = this.get("active_mo");
         var textSrc = mo.get("current_text_src");
         this.set("mo_processing", true);
         this.epubController.goToHref(textSrc);
@@ -115,7 +114,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         this.set("mo_processing", false);        
     },
     handleMoDocumentDone: function() {
-        var mo = this.get("mo_playing");
+        var mo = this.get("active_mo");
         if (mo != null && mo != undefined) {
             if (mo.get("is_document_done") == false) {
                 return;
@@ -140,11 +139,11 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
     	var mo;
         // if we are processing an MO event, then don't update MO position:
         // chances are, it's a page change event that came from MO playback advancing
-        if (this.get("mo_playing") != null && this.get("mo_processing") == true) {
+        if (this.get("active_mo") != null && this.get("mo_processing") == true) {
             console.log("Ignoring internal page change");
             return;
         }
-        mo_is_playing = this.get("mo_playing");
+        mo_is_playing = this.get("active_mo");
         
         this.pauseMo();
         console.log("updating MO position");
@@ -171,7 +170,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 
     	var pageElms;
     	var node;
-        // using this instead of "mo_playing" because this function could be called when MO is not playing
+        // using this instead of "active_mo" because this function could be called when MO is not playing
         var currentSection = this.epubController.getCurrentSection();
         var mo = currentSection.getMediaOverlay();
         if (mo == null) {

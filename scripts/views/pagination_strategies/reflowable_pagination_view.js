@@ -87,7 +87,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
 		moHelper.renderReflowableMoPlaying(
 			this.model.get("current_theme"),
-			this.mediaOverlayController.get("mo_playing"),
+			this.mediaOverlayController.get("active_mo"),
 			this
 		);
 	},
@@ -119,10 +119,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.off("change:two_up", this.setUpMode);
 		this.model.off("change:two_up", this.adjustIframeColumns);
 		this.model.off("change:current_margin", this.marginCallback);
-
-		this.mediaOverlayController.off("change:mo_playing", this.renderReflowableMoPlaying, this);
-		this.mediaOverlayController.off("change:current_mo_frag", this.renderReflowableMoFragHighlight, this);
-
 		// call the super destructor
 		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
 	},

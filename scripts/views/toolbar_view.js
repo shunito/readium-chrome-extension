@@ -78,7 +78,7 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 
 	// REFACTORING CANDIDATE: A lot of indirection here! 
 	play_mo: function() {
-		if (this.model.paginator.v.mediaOverlayController.get("mo_playing")) {
+		if (this.model.paginator.v.mediaOverlayController.get("active_mo")) {
 			this.model.paginator.v.mediaOverlayController.pauseMo();
 		}
 		else {

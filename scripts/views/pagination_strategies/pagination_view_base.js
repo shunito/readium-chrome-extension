@@ -28,7 +28,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.model.on("change:hash_fragment", this.goToHashFragment, this);
 		this.model.on("change:two_up", this.pages.toggleTwoUp, this.pages);
         this.mediaOverlayController.on("change:mo_text_id", this.highlightText, this);
-        this.mediaOverlayController.on("change:mo_playing", this.indicateMoIsPlaying, this);
+        this.mediaOverlayController.on("change:active_mo", this.indicateMoIsPlaying, this);
         
 		this.bindingTemplate = Handlebars.templates.binding_template;
 	},
@@ -105,7 +105,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.model.off("change:font_size", this.setFontSize);
 		this.model.off("change:hash_fragment", this.goToHashFragment);
         this.mediaOverlayController.off("change:mo_text_id", this.highlightText);
-        this.mediaOverlayController.off("change:mo_playing", this.indicateMoIsPlaying);
+        this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying);
 		this.resetEl();
 	},
 
