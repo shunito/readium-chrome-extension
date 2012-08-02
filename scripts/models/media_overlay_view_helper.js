@@ -41,8 +41,8 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
         }
         return null;
     },
-
-	// we're not using themes for fixed layout, so just apply the active class name to the
+    
+    // we're not using themes for fixed layout, so just apply the active class name to the
     // current MO fragment, so that any authored styles will be applied.
     renderFixedLayoutMoFragHighlight: function(currentPages, currentMOFrag, fixedLayoutView) {
         var that = this;
@@ -65,6 +65,8 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
 
     // apply the active class to the current MO fragment and also
     // apply the default theme colors to it
+    // TODO: do we want to do both these things? we could also say that if no active class is specified, then use the defaults from the theme.
+    // otherwise, use the active class.
 	renderReflowableMoFragHighlight: function(currentTheme, reflowableView, currentMOFrag) {
 
 		if (currentTheme === "default") {

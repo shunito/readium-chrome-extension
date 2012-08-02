@@ -29,9 +29,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.on("change:two_up", this.setUpMode, this);
 		this.model.on("change:two_up", this.adjustIframeColumns, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
-
-		this.mediaOverlayController.on("change:mo_playing", this.MOPlayingChangeHandler, this);
-		this.mediaOverlayController.on("change:current_mo_frag", this.currentMOFragChangeHandler, this);
+        
 	},
 
 	render: function(goToLastPage) {
@@ -83,6 +81,27 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         return visibleElms;
         //this.model.set("visible_page_elements", visibleElms);
     },
+    
+    // override
+	indicateMoIsPlaying: function () {
+		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
+		moHelper.renderReflowableMoPlaying(
+			this.model.get("current_theme"),
+			this.mediaOverlayController.get("mo_playing"),
+			this
+		);
+	},
+
+    // override
+	highlightText: function () {
+		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
+		moHelper.renderReflowableMoFragHighlight(
+			this.model.get("current_theme"),
+			this,
+			this.mediaOverlayController.get("mo_text_id")
+		);
+	},
+    
 
 	// ------------------------------------------------------------------------------------ //
 	//  "PRIVATE" HELPERS                                                                   //
@@ -355,29 +374,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	windowSizeChangeHandler: function() {
 		this.adjustIframeColumns();
 	},
-
-	MOPlayingChangeHandler: function () {
-
-		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
-
-		moHelper.renderReflowableMoPlaying(
-			this.model.get("current_theme"),
-			this.mediaOverlayController.get("mo_playing"),
-			this
-			);
-	},
-
-	currentMOFragChangeHandler: function () {
-
-		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
-
-		moHelper.renderReflowableMoFragHighlight(
-			this.model.get("current_theme"),
-			this,
-			this.mediaOverlayController.get("current_mo_frag")
-			);
-	},
-
+    
 	marginCallback: function() {
 		this.adjustIframeColumns();
 	},

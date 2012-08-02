@@ -9,9 +9,8 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         is_document_done: false,
         is_playing: false,
         should_highlight: true,
-        current_text_document_url: null,
-        current_text_element_id: null,
-        has_started_playback: false        
+        has_started_playback: false,
+        current_text_src: null        
     },
     
     // initialize with a "smil_url" option
@@ -66,12 +65,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
                 self.audioplayer.play($(this).attr("src"), parseFloat($(this).attr("clipBegin")), parseFloat($(this).attr("clipEnd")), isJumpTarget);
             }, 
             "text": function(){
-                var src = $(this).attr("src");
-                // broadcast the text properties so that any listeners can do the right thing wrt loading/highlighting text
-                self.set({
-                    current_text_document_url: self.stripFragment(src), 
-                    current_text_element_id: self.getFragment(src)
-                });
+                self.set("current_text_src", $(this).attr("src"));
             }
         });
         
@@ -130,20 +124,5 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         }
         
         this.audioplayer.setVolume(volume);
-    },
-    
-    getFragment: function(url) {
-        if (url.indexOf("#") != -1 && url.indexOf("#") < url.length -1) {
-            return url.substr(url.indexOf("#")+1);
-        }
-        return "";
-    },
-    stripFragment: function(url) {
-        if (url.indexOf("#") == -1) {
-            return url;
-        }
-        else {
-            return url.substr(0, url.indexOf("#"));
-        }
     }
 });

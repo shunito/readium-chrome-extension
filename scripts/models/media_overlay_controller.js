@@ -39,8 +39,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 		var mo = currentSection.getMediaOverlay();
 		if(mo) {
 			this.set("mo_playing", mo);
-			mo.on("change:current_text_document_url", this.handleMoTextDocumentUrl, this);
-			mo.on("change:current_text_element_id", this.handleMoTextElementId, this);
+			mo.on("change:current_text_src", this.handleMoTextSrc, this);
 			mo.on("change:is_document_done", this.handleMoDocumentDone, this);
             
             var target = this.get("mo_target");
@@ -48,10 +47,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             
             if (currentSection.isFixedLayout()) {
                 if (mo.get("has_started_playback")) {
-                    // restore the highlight
-                    this.handleMoTextDocumentUrl();
-                    this.handleMoTextElementId();
-                    mo.resume();
+                    this.resumeMo();
                 }
                 else {
                     mo.startPlayback(null);
@@ -60,7 +56,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             // Is a reflowable section
             else {
                 var currMoPage = -1;
-                var currMoId = mo.get("current_text_element_id");
+                var currMoId = this.get("mo_text_id");
                 if (currMoId != null && currMoId != undefined && currMoId != "") {
                     currMoPage = this.currentView.getElemPageNumberById(currMoId);
                 }
@@ -68,14 +64,8 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
                 // if media overlays is on our current page, then resume playback
                 var currMoPageIsVisible = this.pages.get("current_page").indexOf(currMoPage) != -1;
                 
-                /*if ((this.epubController.get("two_up") == false && currMoPage == this.pages.get("current_page")) ||
-                    (this.epubController.get("two_up") == true && this.pages.get("current_page").indexOf(currMoPage) != -1)) {
-                */
                 if (currMoPageIsVisible) {    
-                    // restore the highlight
-                    this.handleMoTextDocumentUrl();
-                    this.handleMoTextElementId();
-                    mo.resume();
+                    this.resumeMo();
                 }
                 else {
                     mo.startPlayback(target);
@@ -90,13 +80,11 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 	pauseMo: function() {
 		var mo = this.get("mo_playing");
 		if(mo) {
-
 			// mo.off() and mo.pause() seem like they should be in the same call
 			mo.off();
 			mo.pause();
 			this.set("mo_playing", null); // REFACTORING CANDIDATE: Should this be set to "false"???
-            this.set("hash_fragment", "");
-            this.set("current_mo_frag", "");
+            this.set("mo_text_id", "");
 		}
 	},
     
@@ -107,23 +95,25 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 	// ------------------------------------------------------------------------------------ //
 	//  "PRIVATE" METHODS                                                                   //
 	// ------------------------------------------------------------------------------------ //
-    
-    handleMoTextDocumentUrl: function() {
-        var mo = this.get("mo_playing");
-        this.set("mo_processing", true);
-        this.epubController.goToHref(mo.get("current_text_document_url"));
-        this.set("mo_processing", false);
+    resumeMo: function() {
+        var currentSection = this.epubController.getCurrentSection();
+        var mo = currentSection.getMediaOverlay();
+        this.handleMoTextSrc();
+        mo.resume();
     },
     
-    handleMoTextElementId: function() {
+    handleMoTextSrc: function() {
         var mo = this.get("mo_playing");
+        var textSrc = mo.get("current_text_src");
         this.set("mo_processing", true);
-        var frag = mo.get("current_text_element_id")
-        this.set("hash_fragment", frag); // This attribute has another purpose in epub_controller. Not sure what to do with it atm
-        this.set("current_mo_frag", frag);
-        this.set("mo_processing", false);
+        this.epubController.goToHref(textSrc);
+        var frag = "";
+        if (textSrc.indexOf("#") != -1 && textSrc.indexOf("#") < textSrc.length -1) {
+            frag = textSrc.substr(textSrc.indexOf("#")+1);
+        }
+        this.set("mo_text_id", frag);
+        this.set("mo_processing", false);        
     },
-    
     handleMoDocumentDone: function() {
         var mo = this.get("mo_playing");
         if (mo != null && mo != undefined) {
