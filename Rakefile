@@ -49,6 +49,16 @@ task :docs do
 	puts "the docs have been docco-ed"
 end
 
+namespace :handlebars do
+
+	desc "precompile all the handlebars templates"
+	task :compile do
+		puts "precompiling all .handlebars files in scripts/templates"
+		`handlebars scripts/templates/*.handlebars -f scripts/templates.js`
+	end
+
+end
+
 namespace :site do
 
 	desc "pushes out the website using the contents of :publish dir via push to :gh-pages branch"

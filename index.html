@@ -35,7 +35,7 @@
 							</a>
 						</li>
 						<li class="divider-vertical stubby"></li>
-						<li style="margin-right: 15px" >
+						<li id="add-book-li">
 							<a href="#readium-options-modal" id="options-btn" data-toggle="modal" role="button">
 								<img src="/images/top_bar/options.png" class="small" alt="Options"/>
 							</a>
@@ -89,7 +89,7 @@
 			<div id="add-book-modal" class="modal fade" ><!-- add le book Modal -->
 		
 				<div class="modal-header">
-					<a class="close" data-dismiss="modal">&times;</a>
+					<a class="close" data-dismiss="modal" role="button" aria-label="Close">&times;</a>
 					<h3>Add Book To Readium Library:</h3>
 				</div>
 
@@ -152,7 +152,7 @@
 
 		<div class="modal fade" id="readium-options-modal"  style="display: none"><!-- le settings modal -->
 			<div class="modal-header">
-				<a class="close" data-dismiss="modal">&times;</a>
+				<a class="close" data-dismiss="modal" role="button" aria-label="Close">&times;</a>
 				<h2>Readium Options:</h2>
 			</div>
 			
@@ -203,7 +203,7 @@
 		</div><!-- end le settings modal -->
 
 
-			<div id='progress-container' class='span5' style="display: none">
+			<div id='progress-container' class='span5' style="display: none" role="status" aria-live="assertive">
 			</div>
 
 		</div>
@@ -213,10 +213,9 @@
 		<script type="text/template" id='library-item-template'>
 			<div class='info-wrap clearfix'>
 				<div class='caption book-info'>
-					<h3 class='green info-item title'><%= data.title %></h3>
-					<h3 class='info-item author'><%= data.author || "Unknown" %></h3>
-					<h3 class='info-item epub-version'>ePUB <%= data.epub_version || "?" %></h3>
-					
+					<h2 role="heading" aria-level="2" class='green info-item title'><%= data.title %></h2>
+					<div class='info-item author'><%= data.author || "Unknown" %></div>
+					<div class='info-item epub-version'>ePUB <%= data.epub_version || "?" %></div>
 				</div>
 				
 				<img class='cover-image read' src='<%= data.cover_href %>' width='150' height='220' alt='Open ePUB <%= data.title %>'>
@@ -289,8 +288,10 @@
 		<script src="/scripts/web_overrides/httpFileApi.js" type="text/javascript" ></script>
 		<script src="/scripts/utils/local_storage_sync.js" type="text/javascript"></script>
 		<script src="/scripts/utils/cookie_utils.js" type="text/javascript"></script>
+		<script src="/scripts/utils/handlebars_helpers.js" type="text/javascript"></script>
 		<script src="/scripts/models/readium_options.js" type="text/javascript" ></script>
 		<script src="/scripts/web_overrides/library.js" type="text/javascript"></script>
+		<script src="/scripts/templates.js" type="text/javascript"></script>
 		<!-- end scripts -->
 
 

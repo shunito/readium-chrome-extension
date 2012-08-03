@@ -8,6 +8,7 @@
     <dc:rights>copyright something or other</dc:rights>
     <dc:identifier id='ean'>9782035862464</dc:identifier>
     <dc:language>fr</dc:language>
+    <meta property="media:active-class">-epub-media-overlay-active</meta>
   </metadata>
   <manifest>
     <item id='Page_1'  href='Page_1.html'  media-type='application/xhtml+xml'/>

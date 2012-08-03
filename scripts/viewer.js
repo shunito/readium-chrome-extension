@@ -1,3 +1,6 @@
+// REFACTORING CANDIDATE: Parts of this model are making calls to the current view through the epubController->paginator->view->etc., 
+//   that is a lot of indirection. Perhaps epubController shouldn't be at the centre of this model anymore.
+
 Readium.Views.ViewerApplicationView = Backbone.View.extend({
 	el: 'body',
 
@@ -17,14 +20,13 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		this.optionsView.render();
 
 		// the top bar
-		this.toolbar = new Readium.Views.ToolbarView({model: _book});
+		this.toolbar = new Readium.Views.ToolbarView({model: _epubController});
 		this.toolbar.render();
 
 		// the table of contents
 		this.model.on("change:has_toc", this.init_toc, this);
 
 		this.addGlobalEventHandlers();
-
 	},
 
 	toggleFullscreen: function() {
@@ -45,23 +47,23 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 
 		$(document).keydown(function(e) {
 			if(e.which == 39) {
-				that.model.goRight();
+				that.model.paginator.v.pages.goRight();
 			}
 							
 			if(e.which == 37) {
-				that.model.goLeft();
+				that.model.paginator.v.pages.goLeft();
 			}
 		});
 
 		$("#readium-book-view-el").on("swipeleft", function(e) {
 			e.preventDefault();
-			that.model.goRight();
+			that.model.paginator.v.pages.goRight();
 			
 		});
 
 		$("#readium-book-view-el").on("swiperight", function(e) {
 			e.preventDefault();
-			that.model.goLeft();
+			that.model.paginator.v.pages.goLeft();
 		});
 	},
 
@@ -112,10 +114,10 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 	
 	events: {
 		"click #prev-page-button": 	function() { 
-			this.model.goLeft();
+			this.model.paginator.v.pages.goLeft();
 		},
 		"click #next-page-button": 	function() { 
-			this.model.goRight();
+			this.model.paginator.v.pages.goRight();
 		}
   	}
 });
