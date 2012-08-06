@@ -17,31 +17,31 @@
 			<div class="navbar-inner" id="inner-top-bar">
 				<div class="container" style="width: 100%">
 
-					<a class="brand" data-toggle="modal" href="#readium-info" id='bar-logo' role="button">
-						<img src="/images/top_bar/readium_logo.png" alt="Readium logo"/>
+					<a accesskey="i" class="brand" data-toggle="modal" href="#readium-info" id='bar-logo' role="button">
+						<img src="/images/top_bar/readium_logo.png" alt="Readium Info"/>
 					</a>
 
 					<ul class="nav pull-right">
 						<li class="divider-vertical stubby"></li>
 						<li>
-							<a href="#" id="row-view-btn" role="button">
+							<a accesskey="l" href="#" id="row-view-btn" role="button">
 								<img src="/images/top_bar/list_view.png" class="small"/ alt="List view of ePUB library">
 							</a>
 						</li>
 						<li>
-							<a href="#" id='block-view-btn' role="button">
+							<a accesskey="t" href="#" id='block-view-btn' role="button">
 								<img src="/images/top_bar/thumb_view.png" class="small" alt="Thumbnail view of ePUB library"/>
 							</a>
 						</li>
 						<li class="divider-vertical stubby"></li>
 						<li>
-							<a href="#readium-options-modal" id="options-btn" data-toggle="modal" role="button">
+							<a accesskey="o" href="#readium-options-modal" id="options-btn" data-toggle="modal" role="button">
 								<img src="/images/top_bar/options.png" class="small" alt="Options"/>
 							</a>
 						</li>
 						<li class="divider-vertical"></li>
 						<li id="add-book-li">
-							<a href="#add-book-modal" data-toggle="modal" role="button">
+							<a accesskey="a" href="#add-book-modal" data-toggle="modal" role="button">
 								<img src="/images/top_bar/add_book.png" class="small" alt="Add a new ePUB"/>
 							</a>
 						</li>
@@ -130,16 +130,17 @@
 
 			<!-- le settings modal -->
 			<div class="modal fade" id="readium-options-modal"  style="display: none">
+<div class="offscreenText"> Options Start </div>
 				<div class="modal-header">
 					<a class="close" data-dismiss="modal" role="button" aria-label="Close">&times;</a>
-					<h2>Readium Options:</h2>
+				<h1 tabindex="-1" id="options-heading">Readium Options:</h1>
 				</div>
 				
 				<div class="modal-body">
 					<form class="form">
 				        <fieldset>
 				          <div class="control-group">
-				            <label class="control-label" for="optionsCheckbox"></label>
+				            <label class="control-label" for=""></label>
 				            <div class="controls">
 				              <label class="checkbox" for="paginate_everything">
 				                <input type="checkbox" id="paginate_everything" value="paginate_everything">
@@ -149,7 +150,7 @@
 				          </div>
 				           
 				          <div class="control-group">
-				            <label class="control-label" for="optionsCheckbox"></label>
+				            <label class="control-label" for=""></label>
 				            <div class="controls">
 				              <label class="checkbox" for="hijack_epub_urls">
 				                <input type="checkbox" id="hijack_epub_urls" value="hijack_epub_urls">
@@ -159,7 +160,7 @@
 				          </div>
 
 				          <div class="control-group">
-				            <label class="control-label" for="optionsCheckbox"></label>
+				            <label class="control-label" for=""></label>
 				            <div class="controls">
 				              <label class="checkbox" for="verbose_unpacking">
 				                <input type="checkbox" id="verbose_unpacking" value="verbose_unpacking">
@@ -173,9 +174,10 @@
 	  			</div>
 				
 				<div class="modal-footer">
-	                <a href="#" class="btn btn-primary" id="save-settings-btn" role="button">Save changes</a>
-	                <a href="#" class="btn" data-dismiss="modal" role="button">Close</a>
+	                <a accesskey="s" href="#" class="btn btn-primary" id="save-settings-btn" role="button">Save changes</a>
+	                <a accesskey="c" href="#" class="btn" data-dismiss="modal" role="button">Cancel</a>
 	            </div>
+<div class="offscreenText"> Options End </div>
 			</div><!-- end le settings modal -->
 
 			<div id='progress-container' class='span5' style="display: none" role="status" aria-live="assertive">

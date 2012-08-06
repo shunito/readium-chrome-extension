@@ -98,8 +98,8 @@ e.stopPropagation();
 	},
 
   	selectTheme: function(e) {
-  		var id = e.srcElement.id;
-if (e.srcElement && Acc.rg && Acc.rg.theme && e.srcElement != Acc.rg.theme.selected) Acc.rg.theme.set(id);
+  		var id = e.srcElement ? e.srcElement.id : '';
+if (id && e.srcElement && Acc.rg && Acc.rg.theme && e.srcElement != Acc.rg.theme.selected) Acc.rg.theme.set(id);
   		if(id === "default-theme-option" ) this.model.set("current_theme", "default-theme");
 		if(id === "night-theme-option" ) this.model.set("current_theme", "night-theme");
 		if(id === "parchment-theme-option" ) this.model.set("current_theme", "parchment-theme");

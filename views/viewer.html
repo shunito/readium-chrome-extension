@@ -20,48 +20,48 @@
 			<div class="navbar-inner" id="top-bar">
 				<div class="container" style="width: 100%">
 
-					<a class="brand" data-toggle="modal" href="#readium-info" id='bar-logo' role="button">
-						<img src="/images/top_bar/readium_logo.png" id="bar-logo-img" alt="Readium logo"/>
+					<a accesskey="i" class="brand" data-toggle="modal" href="#readium-info" id='bar-logo' role="button">
+						<img src="/images/top_bar/readium_logo.png" id="bar-logo-img" alt="Readium Info"/>
 					</a>
 
 					<ul class="nav pull-right">
 						<li class="divider-vertical stubby"></li>
 						<li>
-							<a href="/views/library.html" id="back-to-lib-button" role="button">
+							<a accesskey="b" href="/views/library.html" id="back-to-lib-button" role="button">
 								<img src="/images/top_bar/ico_library.png" class="nav-icon" alt="Library"/>
 							</a>
 						</li>
 						<li>
-							<a href="#" id='toggle-toc-btn' role="button">
+							<a accesskey="t" href="#" id='toggle-toc-btn' role="button">
 								<img src="/images/top_bar/ico_toc.png" class="nav-icon" alt="Table of contents"/>
 							</a>
 						</li>
 						<li>
-							<a href="#" id='play-mo-btn' role="button">
+							<a accesskey="m" href="#" id='play-mo-btn' role="button">
 								<img src="/images/top_bar/ico_tts.png" class="nav-icon" alt="Media overlays"/>
 							</a>
 						</li>
 						<li class="divider-vertical stubby"></li>
 						<li>
-							<a href="#viewer-settings-modal" id="options-btn" data-toggle="modal" role="button">
+							<a accesskey="o" href="#viewer-settings-modal" id="options-btn" data-toggle="modal" role="button">
 								<img src="/images/top_bar/options.png" class="nav-icon" alt="Options"/>
 							</a>
 						</li>
 						<li>
-							<a href="#" id="nightmode-btn" role="button">
+							<a accesskey="n" href="#" id="nightmode-btn" role="button">
 								<img src="/images/top_bar/ico_nightmode_toggle_off.png" class="nav-icon" id="day-to-night-ico" alt="Nightmode off"/>
 								<img src="/images/top_bar/ico_nightmode_toggle_on.png" class="nav-icon" id="night-to-day-ico" alt="Nightmode on"/>
 							</a>
 						</li>
 						<li>
-							<a href="#" id="fs-toggle-btn" role="button">
+							<a accesskey="f" href="#" id="fs-toggle-btn" role="button">
 								<img src="/images/top_bar/ico_fs_toggle_on.png" class="nav-icon" id="go-to-fs-ico" alt="Fullscreen on"/>
 								<img src="/images/top_bar/ico_fs_toggle_off.png" class="nav-icon" id="leave-fs-ico" alt="Fullscreen off"/>
 							</a>
 						</li>
 						<li class="divider-vertical"></li>
 						<li style="margin-right: 15px">
-							<a id="hide-toolbar-button" class="toggle-bar-btn" role="button">
+							<a accesskey="x" id="hide-toolbar-button" class="toggle-bar-btn" role="button">
 		 						<img src="/images/top_bar/ico_closeUI.png" class="nav-icon" alt="Hide Readium user interface"/>
 							</a>
 						</li>
@@ -71,7 +71,7 @@
 
 				</div>
 			</div>
-			<span id="show-toolbar-button" class="pull-right" role="button" >
+			<span accesskey="v" tabindex="0" id="show-toolbar-button" class="pull-right" role="button" >
  				<img src="/images/top_bar/ico_openUI.png" class="nav-icon" alt="Show Readium user interface"/>
 			</span>
     	</div><!-- end le top bar -->
@@ -79,7 +79,7 @@
     	<div id='readium-toc' style="display: none">
 
     		<div id="toc-header">
-    			<span id="close-toc-button"></span>
+    			<span id="close-toc-button" tabindex="0" role="button" aria-label="Close Table of Contents"></span>
     		</div>
     		<div id="toc-body">
 
@@ -102,6 +102,8 @@
 		</div> <!-- end readium-right-content -->
 
 		<div class="modal fade" id="viewer-settings-modal"  style="display: none"><!-- le settings modal -->
+<div class="offscreenText"> Options Start </div>
+				<h1 tabindex="-1" id="options-heading">Viewer Options:</h1>
 			<div id='settings-margin'>
 				<div id="preview-text">
 					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus neque dui, congue a suscipit non, feugiat eu urna. Donec tempus, nunc vel rutrum posuere, quam magna imperdiet elit, eget facilisis mauris tellus non eros. Cras in felis sed orci aliquam sagittis. Cras adipiscing rhoncus justo commodo sodales. Phasellus vel mauris vel ipsum semper feugiat at ut sapien. Mauris consectetur aliquam aliquam. Nunc viverra dictum enim sit amet cursus.
@@ -109,14 +111,14 @@
 					Proin adipiscing rutrum ante. Vivamus tristique nisl quis neque viverra facilisis. Maecenas quis quam risus, at lacinia quam. Maecenas imperdiet, eros quis vulputate rutrum, metus neque sollicitudin libero, vel lobortis elit nisl sit amet lectus. Proin metus elit, mollis in fringilla sit amet, fermentum et odio. Sed sapien metus, consequat a bibendum et, eleifend eu mi. Praesent interdum lorem non risus sollicitudin vitae viverra nisi accumsan. Donec felis odio, tempus quis venenatis ac, auctor vitae sapien. Aenean quis nisl risus. Nulla sed pellentesque mauris.
 				</div>
 				<div>
-					<h3 class="setting-header">FONT SIZE</h3>
+					<h2 class="setting-header">FONT SIZE</h2>
 					<div class="clearfix">
 						<span id="font-size-icon"></span>
 						<input type="range" id="font-size-input" min="1" max="20" title="Font size"/>
 					</div>
 				</div>
 				<div>
-					<h3 id="setting-header-margins-legend" class="setting-header">MARGINS</h3>
+					<h2 id="setting-header-margins-legend" class="setting-header">MARGINS</h2>
 					<div role="radiogroup" aria-labelledby="setting-header-margins-legend" class="clearfix" id="margin-radio-wrapper">
 						<span aria-labelledby="margin-option-1-lbl" role="radio" id="margin-option-1" class="margin-radio clickable">
 <span id="margin-option-1-lbl" class="offscreenText">Verry Narrow</span>
@@ -136,7 +138,7 @@
 					</div>
 				</div>
 				<div>
-					<h3 id="setting-header-color-legend" class="setting-header">TEXT AND BACKGROUND COLOR</h3>
+					<h2 id="setting-header-color-legend" class="setting-header">TEXT AND BACKGROUND COLOR</h2>
 					<div role="radiogroup" aria-labelledby="setting-header-color-legend" id="theme-radio-group" class="clearfix">
 						<span role="radio" id="default-theme-option" class="theme-option default-theme clickable">Black and White</span>
 						<span role="radio" id="night-theme-option" class="theme-option night-theme clickable">Arabian Nights</span>
@@ -146,7 +148,7 @@
 					</div>
 				</div>
 				<div>
-					<h3 id="setting-header-display-legend" class="setting-header">DISPLAY FORMAT</h3>
+					<h2 id="setting-header-display-legend" class="setting-header">DISPLAY FORMAT</h2>
 					<div role="radiogroup" aria-labelledby="setting-header-display-legend" class="clearfix" id="two-up-options">
 						<span role="radio" id="one-up-option" class="simple-radio clickable">Single Pages</span>
 						<span role="radio" id="two-up-option" class="simple-radio clickable">Double Pages</span>
@@ -154,20 +156,22 @@
 				</div>
 			</div>
 			<div id="settings-form-footer" class="clearfix">
-				<button class='btn btn-inverse' id="cancel-settings-but">Cancel</button>
-				<button class='btn btn-inverse' id="save-settings-but">Save Settings</button>
+				<button accesskey="c" class='btn btn-inverse' id="cancel-settings-but">Cancel</button>
+				<button accesskey="s" class='btn btn-inverse' id="save-settings-but">Save Settings</button>
 			</div>
 			
+<div class="offscreenText"> Options End </div>
 		</div><!-- end le info modal -->
 
 
 		<div class="modal fade" id="readium-info"  style="display: none"><!-- le info modal -->
+<div class="offscreenText"> Info Start </div>
 			<div>
 				<img src="/images/info_modal/about_readium_logo.png" alt="About Readium logo">
 			</div>
 			<div>
 				<!-- UPDATE VERSION NUMBER -->
-				<h3 id="version-info">Version 0.4.2 Release Date 7.2.12</h3>
+				<h1 tabindex="-1" id="version-info">Version 0.4.2 Release Date 7.2.12</h1>
 			</div>
 			<p>
 				Readium<sup>TM</sup>, a project of the International Digital Publishing Forum (IDPF) and supporters, is an open source reference system and rendering engine for EPUB&reg; publications.  To learn more, visit the <a href="http://readium.org/">project homepage</a>. To date, the project development has been lead by <a href="http://evidentpoint.com/">Evident Point</a> and <a href="http://www.bluefirereader.com/">Bluefire Productions</a>. To contribute visit the <a href="https://github.com/readium/readium">github repository</a>
@@ -175,6 +179,7 @@
 			<div>
 				<img src="/images/info_modal/partner_logos.png" alt="Readium partner logos">
 			</div>
+<div class="offscreenText"> Info End </div>
 		</div><!-- end le info modal -->
 
 		
