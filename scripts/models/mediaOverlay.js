@@ -2,6 +2,7 @@
 Readium.Models.MediaOverlay = Backbone.Model.extend({
     audioplayer: null,
     smilModel: null,
+    consoleTrace: false,
     
     // observable properties
     defaults: {
@@ -10,7 +11,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         is_playing: false,
         should_highlight: true,
         has_started_playback: false,
-        current_text_src: null        
+        current_text_src: null,    
     },
     
     // initialize with a "smil_url" option
@@ -43,6 +44,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         this.smilModel = new Readium.Models.SmilModel();
         this.smilModel.setUrl(this.get("smil_url"));
         this.smilModel.setNotifySmilDone(function() {
+            self.debugPrint("document done");
             self.set({is_document_done: true});
         });
         
@@ -65,7 +67,9 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
                 self.audioplayer.play($(this).attr("src"), parseFloat($(this).attr("clipBegin")), parseFloat($(this).attr("clipEnd")), isJumpTarget);
             }, 
             "text": function(){
-                self.set("current_text_src", $(this).attr("src"));
+                var src = $(this).attr("src");
+                self.debugPrint("Text: " + src)
+                self.set("current_text_src", src);
             }
         });
         
@@ -79,6 +83,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     // if node is null, playback starts at the beginning
     startPlayback: function(node) {
         if (this.get("is_ready") == false) {
+            this.debugPrint("document not ready");
             return;
         }
         this.set({is_document_done: false});
@@ -87,24 +92,29 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     },
     pause: function() {
         if (this.get("is_ready") == false) {
+            this.debugPrint("document not ready");
             return;
         }
         if (this.get("has_started_playback") == false) {
+            this.debugPrint("can't pause: playback not yet started");
             return;
         }
         this.audioplayer.pause();
     },
     resume: function() {
         if (this.get("is_ready") == false) {
+            this.debugPrint("document not ready");
             return;
         }
         if (this.get("has_started_playback") == false) {
+            this.debugPrint("can't resume: playback not yet started");
             return;
         }
         this.audioplayer.resume();        
     },
     findNodeByTextSrc: function(src) {
         if (this.get("is_ready") == false) {
+            this.debugPrint("document not ready");
             return null;
         }
         
@@ -120,9 +130,19 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     },
     setVolume: function(volume) {
         if (this.get("is_ready") == false) {
+            this.debugPrint("document not ready");
             return;
         }
         
         this.audioplayer.setVolume(volume);
+    },
+    setConsoleTrace: function(onOff) {
+        this.consoleTrace = onOff;
+    },
+    debugPrint: function(str) {
+        if (this.consoleTrace) {
+            console.log("MediaOverlay: " + str);
+        }
+        
     }
 });

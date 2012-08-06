@@ -136,7 +136,7 @@ Readium.Models.AudioClipPlayer = function() {
         }
         else {
             elm.addEventListener("seeked", seeked);
-            console.log("setting currentTime from " + elm.currentTime + "to " + clipBegin);
+            debugPrint("setting currentTime from " + elm.currentTime + "to " + clipBegin);
             elm.currentTime = clipBegin;
             function seeked() {
                 elm.removeEventListener("seeked", seeked);
@@ -168,7 +168,7 @@ Readium.Models.AudioClipPlayer = function() {
     
     function debugPrint(str) {
         if (consoleTrace) {
-            console.log(str);
+            console.log("AudioClipPlayer: " + str);
         }
     }
 };

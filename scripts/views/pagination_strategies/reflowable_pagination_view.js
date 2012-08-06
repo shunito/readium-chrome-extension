@@ -125,11 +125,14 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	// REFACTORING CANDIDATE: I think this is actually part of the public interface
 	goToPage: function(page) {
+        // check to make sure we're not already on that page
+        if (this.model.get("current_page") != undefined && this.model.get("current_page").indexOf(page) != -1) {
+            return;
+        }
 		var offset = this.calcPageOffset(page).toString() + "px";
 		$(this.getBody()).css(this.offset_dir, "-" + offset);
 		this.showContent();
-
-		console.log("going to page " + page);
+        
         if (this.model.get("two_up") == false || 
             (this.model.get("two_up") && page % 2 === 1)) {
                 // when we change the page, we should tell MO to update its position
@@ -150,7 +153,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 			if(!el) {
 				// couldn't find the el. just give up
-				return;
+                return;
 			}
 
 			// we get more precise results if we look at the first children
@@ -159,8 +162,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			}
 
 			var page = this.getElemPageNumber(el);
-			if (page > 0) {
-				this.pages.goToPage(page);	
+            if (page > 0) {
+                this.pages.goToPage(page);	
 			}
 		}
 		// else false alarm no work to do
@@ -334,7 +337,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		}
 		shift = rects[0][this.offset_dir];
 
-		// `clientRects` are relative to the top left corner of the frame, but
+        // `clientRects` are relative to the top left corner of the frame, but
 		// for right to left we actually need to measure relative to right edge
 		// of the frame
 		if(this.offset_dir === "right") {
@@ -344,7 +347,10 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		}
 		// less the amount we already shifted to get to cp
 		shift -= parseInt(this.getBody().style[this.offset_dir], 10); 
-		return Math.ceil( shift / (this.page_width + this.gap_width) );
+        
+        // added 1 to shift value because page 2 elements starting at the border of the first page were still getting calculated as being on pg 1
+        // TODO test with RTL
+		return Math.ceil( (shift + 1) / (this.page_width + this.gap_width) );
 	},
 
 	// REFACTORING CANDIDATE: This might be part of the public interface
@@ -360,7 +366,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
     },
 
 	pageChangeHandler: function() {
-		var that = this;
+        var that = this;
 		this.hideContent();
 		setTimeout(function() {
 			that.goToPage(that.pages.get("current_page")[0]);

@@ -111,8 +111,9 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             frag = textSrc.substr(textSrc.indexOf("#")+1);
         }
         this.set("mo_text_id", frag);
-        this.set("mo_processing", false);        
+        this.set("mo_processing", false);    
     },
+    
     handleMoDocumentDone: function() {
         var mo = this.get("active_mo");
         if (mo != null && mo != undefined) {
@@ -120,7 +121,6 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
                 return;
             }
         }
-        console.log("MO document done");
         this.set("mo_processing", true);
         this.set("mo_target", null);
         this.pauseMo();
@@ -140,14 +140,13 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         // if we are processing an MO event, then don't update MO position:
         // chances are, it's a page change event that came from MO playback advancing
         if (this.get("active_mo") != null && this.get("mo_processing") == true) {
-            console.log("Ignoring internal page change");
             return;
         }
-        mo_is_playing = this.get("active_mo");
+        
+        var mo_is_playing = this.get("active_mo") != null;
         
         this.pauseMo();
-        console.log("updating MO position");
-
+        
         currentSection = this.epubController.getCurrentSection();
 
         if (currentSection.isFixedLayout()) {
@@ -196,11 +195,12 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         	node = null;
         }
         
+        // TODO remove debug output
         if (node) {
             console.log("Found MO target for " + src);
         }
         else {
-            console.log("MO target not found");
+            console.log("MO target not found for " + src);
         }
         this.set("mo_target", node);
     }
