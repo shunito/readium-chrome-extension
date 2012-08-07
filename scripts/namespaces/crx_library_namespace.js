@@ -34,12 +34,20 @@ window.Readium = {
 
 		// TODO: this is not how we should do this, we should use a proper backbone view.
 
+var hc = $('#library-items-container').hasClass("row-view");
+$("#block-view-btn").attr('aria-pressed', hc ? 'false' : 'true');
+$("#row-view-btn").attr('aria-pressed', hc ? 'true' : 'false');
+
 		$("#block-view-btn").click(function(e) {
+$("#block-view-btn").attr('aria-pressed', 'true');
+$("#row-view-btn").attr('aria-pressed', 'false');
 			$('#library-items-container').addClass("block-view").removeClass("row-view");
 			Readium.Utils.setCookie("lib_view", "block", 1000);
 		});
 
 		$("#row-view-btn").click(function(e) {
+$("#block-view-btn").attr('aria-pressed', 'false');
+$("#row-view-btn").attr('aria-pressed', 'true');
 			$('#library-items-container').addClass("row-view").removeClass("block-view");
 			Readium.Utils.setCookie("lib_view", "row", 1000);
 		});

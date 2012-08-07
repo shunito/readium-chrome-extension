@@ -229,3 +229,13 @@ padding-top: 20px;
 #progress-container h5 {
   color: #999;
 }
+
+/* Necessary for screen reader users. Must not include display:none or visibility:hidden */
+.offscreenText {
+  font-size: 0;
+  height: 0;
+  width: 0;
+  position: absolute;
+  overflow: hidden;
+  z-index: -1000;
+}

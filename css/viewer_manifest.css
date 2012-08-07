@@ -315,7 +315,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#e6e6e6));
   background-image: -webkit-linear-gradient(top, white, #e6e6e6);
   background-image: -o-linear-gradient(top, white, #e6e6e6);
-  background-image: linear, top, white, #e6e6e6;
+  background-image: linear, compact(top, white, #e6e6e6, false, false, false, false, false, false, false, false);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(white)', endColorstr='ie-hex-str(#e6e6e6)', GradientType=0);
   border-color: #e6e6e6 #e6e6e6 #bfbfbf;
@@ -418,7 +418,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0055cc));
   background-image: -webkit-linear-gradient(top, #0088cc, #0055cc);
   background-image: -o-linear-gradient(top, #0088cc, #0055cc);
-  background-image: linear, top, #0088cc, #0055cc;
+  background-image: linear, compact(top, #0088cc, #0055cc, false, false, false, false, false, false, false, false);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#0088cc)', endColorstr='ie-hex-str(#0055cc)', GradientType=0);
   border-color: #0055cc #0055cc #003580;
@@ -438,7 +438,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fbb450), to(#f89406));
   background-image: -webkit-linear-gradient(top, #fbb450, #f89406);
   background-image: -o-linear-gradient(top, #fbb450, #f89406);
-  background-image: linear, top, #fbb450, #f89406;
+  background-image: linear, compact(top, #fbb450, #f89406, false, false, false, false, false, false, false, false);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#fbb450)', endColorstr='ie-hex-str(#f89406)', GradientType=0);
   border-color: #f89406 #f89406 #ad6704;
@@ -458,7 +458,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ee5f5b), to(#bd362f));
   background-image: -webkit-linear-gradient(top, #ee5f5b, #bd362f);
   background-image: -o-linear-gradient(top, #ee5f5b, #bd362f);
-  background-image: linear, top, #ee5f5b, #bd362f;
+  background-image: linear, compact(top, #ee5f5b, #bd362f, false, false, false, false, false, false, false, false);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#ee5f5b)', endColorstr='ie-hex-str(#bd362f)', GradientType=0);
   border-color: #bd362f #bd362f #802420;
@@ -478,7 +478,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#62c462), to(#51a351));
   background-image: -webkit-linear-gradient(top, #62c462, #51a351);
   background-image: -o-linear-gradient(top, #62c462, #51a351);
-  background-image: linear, top, #62c462, #51a351;
+  background-image: linear, compact(top, #62c462, #51a351, false, false, false, false, false, false, false, false);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#62c462)', endColorstr='ie-hex-str(#51a351)', GradientType=0);
   border-color: #51a351 #51a351 #387038;
@@ -498,7 +498,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#5bc0de), to(#2f96b4));
   background-image: -webkit-linear-gradient(top, #5bc0de, #2f96b4);
   background-image: -o-linear-gradient(top, #5bc0de, #2f96b4);
-  background-image: linear, top, #5bc0de, #2f96b4;
+  background-image: linear, compact(top, #5bc0de, #2f96b4, false, false, false, false, false, false, false, false);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#5bc0de)', endColorstr='ie-hex-str(#2f96b4)', GradientType=0);
   border-color: #2f96b4 #2f96b4 #1f6377;
@@ -518,7 +518,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#555555), to(#222222));
   background-image: -webkit-linear-gradient(top, #555555, #222222);
   background-image: -o-linear-gradient(top, #555555, #222222);
-  background-image: linear, top, #555555, #222222;
+  background-image: linear, compact(top, #555555, #222222, false, false, false, false, false, false, false, false);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#555555)', endColorstr='ie-hex-str(#222222)', GradientType=0);
   border-color: #222222 #222222 black;
@@ -833,7 +833,7 @@ button.btn, input[type="submit"].btn {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#333333), to(#222222));
   background-image: -webkit-linear-gradient(top, #333333, #222222);
   background-image: -o-linear-gradient(top, #333333, #222222);
-  background-image: linear, top, #333333, #222222;
+  background-image: linear, compact(top, #333333, #222222, false, false, false, false, false, false, false, false);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#333333)', endColorstr='ie-hex-str(#222222)', GradientType=0);
   -webkit-border-radius: 4px;
@@ -1021,7 +1021,7 @@ button.btn, input[type="submit"].btn {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#333333), to(#222222));
   background-image: -webkit-linear-gradient(top, #333333, #222222);
   background-image: -o-linear-gradient(top, #333333, #222222);
-  background-image: linear, top, #333333, #222222;
+  background-image: linear, compact(top, #333333, #222222, false, false, false, false, false, false, false, false);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#333333)', endColorstr='ie-hex-str(#222222)', GradientType=0);
   border-color: #222222 #222222 black;
@@ -1311,12 +1311,12 @@ span.setting-button:hover {
 
 #settings {
   background-color: #353f5e;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #353f5e), color-stop(100%, #000011));
-  background-image: -webkit-linear-gradient(top, #353f5e, #000011);
-  background-image: -moz-linear-gradient(top, #353f5e, #000011);
-  background-image: -ms-linear-gradient(top, #353f5e, #000011);
-  background-image: -o-linear-gradient(top, #353f5e, #000011);
-  background-image: linear-gradient(top, #353f5e, #000011); }
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, compact(#353f5e, #000011, false, false, false, false, false, false, false, false)));
+  background-image: -webkit-linear-gradient(top, compact(#353f5e, #000011, false, false, false, false, false, false, false, false));
+  background-image: -moz-linear-gradient(top, compact(#353f5e, #000011, false, false, false, false, false, false, false, false));
+  background-image: -ms-linear-gradient(top, compact(#353f5e, #000011, false, false, false, false, false, false, false, false));
+  background-image: -o-linear-gradient(top, compact(#353f5e, #000011, false, false, false, false, false, false, false, false));
+  background-image: linear-gradient(top, compact(#353f5e, #000011, false, false, false, false, false, false, false, false)); }
 
 #settings {
   opacity: 0.9;
@@ -1472,12 +1472,12 @@ body.apple-fixed-layout {
   text-align: center;
   padding: 30px;
   background-color: #cccccc;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #cccccc), color-stop(100%, white));
-  background-image: -webkit-linear-gradient(top, #cccccc, white);
-  background-image: -moz-linear-gradient(top, #cccccc, white);
-  background-image: -ms-linear-gradient(top, #cccccc, white);
-  background-image: -o-linear-gradient(top, #cccccc, white);
-  background-image: linear-gradient(top, #cccccc, white); }
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, compact(#cccccc, white, false, false, false, false, false, false, false, false)));
+  background-image: -webkit-linear-gradient(top, compact(#cccccc, white, false, false, false, false, false, false, false, false));
+  background-image: -moz-linear-gradient(top, compact(#cccccc, white, false, false, false, false, false, false, false, false));
+  background-image: -ms-linear-gradient(top, compact(#cccccc, white, false, false, false, false, false, false, false, false));
+  background-image: -o-linear-gradient(top, compact(#cccccc, white, false, false, false, false, false, false, false, false));
+  background-image: linear-gradient(top, compact(#cccccc, white, false, false, false, false, false, false, false, false)); }
   #readium-info #version-info, #readium-info .green, #readium-info .modal-detail.green {
     color: #6FA64D; }
   #readium-info p {
@@ -1512,12 +1512,12 @@ body.apple-fixed-layout {
   width: 352px;
   margin: -326px 0 0 -176px;
   background-color: white;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #cccccc));
-  background-image: -webkit-linear-gradient(top, white, #cccccc);
-  background-image: -moz-linear-gradient(top, white, #cccccc);
-  background-image: -ms-linear-gradient(top, white, #cccccc);
-  background-image: -o-linear-gradient(top, white, #cccccc);
-  background-image: linear-gradient(top, white, #cccccc);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, compact(white, #cccccc, false, false, false, false, false, false, false, false)));
+  background-image: -webkit-linear-gradient(top, compact(white, #cccccc, false, false, false, false, false, false, false, false));
+  background-image: -moz-linear-gradient(top, compact(white, #cccccc, false, false, false, false, false, false, false, false));
+  background-image: -ms-linear-gradient(top, compact(white, #cccccc, false, false, false, false, false, false, false, false));
+  background-image: -o-linear-gradient(top, compact(white, #cccccc, false, false, false, false, false, false, false, false));
+  background-image: linear-gradient(top, compact(white, #cccccc, false, false, false, false, false, false, false, false));
   line-height: 1em; }
   #viewer-settings-modal .clickable {
     -webkit-user-select: none;
@@ -1627,12 +1627,12 @@ body.apple-fixed-layout {
     background-color: #000;
     padding: 5px 10px;
     background-color: #444444;
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #444444), color-stop(100%, #222222));
-    background-image: -webkit-linear-gradient(top, #444444, #222222);
-    background-image: -moz-linear-gradient(top, #444444, #222222);
-    background-image: -ms-linear-gradient(top, #444444, #222222);
-    background-image: -o-linear-gradient(top, #444444, #222222);
-    background-image: linear-gradient(top, #444444, #222222); }
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, compact(#444444, #222222, false, false, false, false, false, false, false, false)));
+    background-image: -webkit-linear-gradient(top, compact(#444444, #222222, false, false, false, false, false, false, false, false));
+    background-image: -moz-linear-gradient(top, compact(#444444, #222222, false, false, false, false, false, false, false, false));
+    background-image: -ms-linear-gradient(top, compact(#444444, #222222, false, false, false, false, false, false, false, false));
+    background-image: -o-linear-gradient(top, compact(#444444, #222222, false, false, false, false, false, false, false, false));
+    background-image: linear-gradient(top, compact(#444444, #222222, false, false, false, false, false, false, false, false)); }
     #viewer-settings-modal #settings-form-footer button {
       width: 135px;
       margin: 5px;
@@ -1643,12 +1643,12 @@ body.apple-fixed-layout {
   position: absolute;
   width: 30%;
   background-color: #eeeeee;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeeeee), color-stop(100%, #dddddd));
-  background-image: -webkit-linear-gradient(top, #eeeeee, #dddddd);
-  background-image: -moz-linear-gradient(top, #eeeeee, #dddddd);
-  background-image: -ms-linear-gradient(top, #eeeeee, #dddddd);
-  background-image: -o-linear-gradient(top, #eeeeee, #dddddd);
-  background-image: linear-gradient(top, #eeeeee, #dddddd);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, compact(#eeeeee, #dddddd, false, false, false, false, false, false, false, false)));
+  background-image: -webkit-linear-gradient(top, compact(#eeeeee, #dddddd, false, false, false, false, false, false, false, false));
+  background-image: -moz-linear-gradient(top, compact(#eeeeee, #dddddd, false, false, false, false, false, false, false, false));
+  background-image: -ms-linear-gradient(top, compact(#eeeeee, #dddddd, false, false, false, false, false, false, false, false));
+  background-image: -o-linear-gradient(top, compact(#eeeeee, #dddddd, false, false, false, false, false, false, false, false));
+  background-image: linear-gradient(top, compact(#eeeeee, #dddddd, false, false, false, false, false, false, false, false));
   top: 0;
   z-index: 999;
   bottom: 0;
@@ -1745,3 +1745,12 @@ body.apple-fixed-layout {
     color: #666; }
     .night-theme #readium-content-container.mo-playing .current-mo-content {
       color: white; }
+
+/* Necessary for screen reader users. Must not include display:none or visibility:hidden */
+.offscreenText {
+  font-size: 0;
+  height: 0;
+  width: 0;
+  position: absolute;
+  overflow: hidden;
+  z-index: -1000; }

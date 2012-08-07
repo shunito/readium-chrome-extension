@@ -70,12 +70,13 @@
 			
 				
 			<div class="modal fade" id="readium-info" style="display: none" ><!-- le info modal -->
+<div class="offscreenText"> Info Start </div>
 				<div>
 					<img src="/images/info_modal/about_readium_logo.png" alt="About Readium logo">
 				</div>
 				<div>
 					<!-- UPDATE VERSION NUMBER -->
-					<h3 id="version-info">Version 0.4.2 Release Date 7.2.12</h3>
+					<h1 tabindex="-1" id="version-info">Version 0.4.2 Release Date 7.2.12</h1>
 				</div>
 				<p>
 				Readium<sup>TM</sup>, a project of the International Digital Publishing Forum (IDPF) and supporters, is an open source reference system and rendering engine for EPUB&reg; publications.  To learn more, visit the <a href="http://readium.org/">project homepage</a>. To date, the project development has been lead by <a href="http://evidentpoint.com/">Evident Point</a> and <a href="http://www.bluefirereader.com/">Bluefire Productions</a>. To contribute visit the <a href="https://github.com/readium/readium">github repository</a>
@@ -83,14 +84,16 @@
 				<div>
 					<img src="/images/info_modal/partner_logos.png" alt="Readium partner logos">
 				</div>
+<div class="offscreenText"> Info End </div>
 			</div><!-- end le info modal -->
 
 				
 			<div id="add-book-modal" class="modal fade" ><!-- add le book Modal -->
 		
+<div class="offscreenText"> Add Start </div>
 				<div class="modal-header">
 					<a class="close" data-dismiss="modal" role="button" aria-label="Close">&times;</a>
-					<h3>Add Book To Readium Library:</h3>
+					<h1>Add Book To Readium Library:</h1>
 				</div>
 
 				<div class="modal-body">
@@ -117,7 +120,7 @@
 				</div>
 
 				<div class="control-group" id='unpacked-input'>
-					<label for="files">Unpacked Directory:</label>
+					<label for="dir_input">Unpacked Directory:</label>
 					<div class="controls">
 					<input type="file" id="dir_input" webkitdirectory="" directory="">
 					</div>
@@ -125,9 +128,9 @@
 					
 				</div>
 				<div class="control-group">
-            		<label class="control-label" for="optionsCheckbox">Validate:</label>
+            		<label class="control-label" for="">Validate:</label>
             		<div class="controls">
-              		<label class="checkbox">
+              		<label class="checkbox" for="optionsCheckbox">
                 		<input type="checkbox" id="optionsCheckbox" value="option1">
                 		Confirm that this book complies with ePUB standards
               			</label>
@@ -147,6 +150,7 @@
 					<a href="#" class="btn" data-dismiss="modal" role="button">Cancel</a>
 				</div>
 
+<div class="offscreenText"> Add End </div>
 			</div><!-- end add le book -->
 
 
