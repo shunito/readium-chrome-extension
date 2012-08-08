@@ -27,6 +27,22 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 		this.model.on("change:has_toc", this.init_toc, this);
 
 		this.addGlobalEventHandlers();
+
+$('#bar-logo').attr('aria-pressed', 'false');
+$('#readium-info').on('shown', function(){
+$('#version-info').focus();
+setTimeout(function(){
+$('#bar-logo').attr('aria-pressed', 'true');
+}, 1);
+})
+.on('hidden', function(){
+setTimeout(function(){
+$('#bar-logo').attr('aria-pressed', 'false').focus();
+}, 1);
+});
+
+Acc.title = this.model.get('title') + ', by ' + this.model.get('author');
+
 	},
 
 	toggleFullscreen: function() {
@@ -102,7 +118,9 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 var vis = this.model.get("toc_visible");
 $('#toggle-toc-btn').attr('aria-pressed', vis ? 'true' : 'false');
 		this.$el.toggleClass("show-readium-toc", vis);
-if (vis) $('#close-toc-button').focus();
+if (vis) setTimeout(function(){
+$('#toc-heading-ref').focus();
+}, 500);
 else $('#toggle-toc-btn').focus();
 		return this;
 	},

@@ -43,6 +43,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.$('#container').html( this.page_template(json) );
 		
 		this.$('#readium-flowing-content').on("load", function(e) {
+// Important: Firefox doesn't recognize e.srcElement, so this needs to be checked for whenever it's required.
+if (!e.srcElement) e.srcElement = this;
+
 			that.adjustIframeColumns();
 			that.iframeLoadCallback(e);
 			that.setFontSize();

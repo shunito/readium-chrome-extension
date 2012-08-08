@@ -1,4 +1,7 @@
+(function(window){
+
 window.Acc = {
+title: '',
 RadioGroup: function(radioGroupObjId, defaultRadioValSelector, callback) {
 var rgo = $('#' + radioGroupObjId).get(0),
 track = {}, that = this,
@@ -56,3 +59,5 @@ select(track[id]);
 select(track[$('#' + radioGroupObjId + defaultRadioValSelector).get(0).id]);
 }
 };
+
+})(window);

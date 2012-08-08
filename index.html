@@ -87,6 +87,60 @@
 <div class="offscreenText"> Info End </div>
 			</div><!-- end le info modal -->
 
+		<div class="modal fade" id="readium-options-modal"  style="display: none"><!-- le settings modal -->
+<div class="offscreenText"> Options Start </div>
+			<div class="modal-header">
+				<a class="close" data-dismiss="modal" role="button" aria-label="Close">&times;</a>
+				<h1 tabindex="-1" id="options-heading">Readium Options:</h1>
+			</div>
+			
+			<div class="modal-body">
+		
+				<form class="form">
+        <fieldset>
+          
+			
+          <div class="control-group">
+            <label class="control-label" for=""></label>
+            <div class="controls">
+              <label class="checkbox" for="paginate_everything">
+                <input type="checkbox" id="paginate_everything" value="paginate_everything">
+                Paginate all reflowable ePUB content
+              </label>
+            </div>
+          </div>
+           
+          <div class="control-group">
+            <label class="control-label" for=""></label>
+            <div class="controls">
+              <label class="checkbox" for="hijack_epub_urls">
+                <input type="checkbox" id="hijack_epub_urls" value="hijack_epub_urls">
+                Automatically open *.epub urls in readium
+              </label>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for=""></label>
+            <div class="controls">
+              <label class="checkbox" for="verbose_unpacking">
+                <input type="checkbox" id="verbose_unpacking" value="verbose_unpacking">
+                Show warning messages when unpacking EPUB files
+              </label>
+            </div>
+          </div>
+          
+        </fieldset>
+      </form>
+      </div>
+			
+			<div class="modal-footer">
+                <a accesskey="s" href="#" class="btn btn-primary" id="save-settings-btn" role="button">Save changes</a>
+                <a accesskey="c" href="#" class="btn" data-dismiss="modal" role="button">Cancel</a>
+            </div>
+<div class="offscreenText"> Options End </div>
+		</div><!-- end le settings modal -->
+
 				
 			<div id="add-book-modal" class="modal fade" ><!-- add le book Modal -->
 		
@@ -152,61 +206,6 @@
 
 <div class="offscreenText"> Add End </div>
 			</div><!-- end add le book -->
-
-
-		<div class="modal fade" id="readium-options-modal"  style="display: none"><!-- le settings modal -->
-<div class="offscreenText"> Options Start </div>
-			<div class="modal-header">
-				<a class="close" data-dismiss="modal" role="button" aria-label="Close">&times;</a>
-				<h1 tabindex="-1" id="options-heading">Readium Options:</h1>
-			</div>
-			
-			<div class="modal-body">
-		
-				<form class="form">
-        <fieldset>
-          
-			
-          <div class="control-group">
-            <label class="control-label" for=""></label>
-            <div class="controls">
-              <label class="checkbox" for="paginate_everything">
-                <input type="checkbox" id="paginate_everything" value="paginate_everything">
-                Paginate all reflowable ePUB content
-              </label>
-            </div>
-          </div>
-           
-          <div class="control-group">
-            <label class="control-label" for=""></label>
-            <div class="controls">
-              <label class="checkbox" for="hijack_epub_urls">
-                <input type="checkbox" id="hijack_epub_urls" value="hijack_epub_urls">
-                Automatically open *.epub urls in readium
-              </label>
-            </div>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label" for=""></label>
-            <div class="controls">
-              <label class="checkbox" for="verbose_unpacking">
-                <input type="checkbox" id="verbose_unpacking" value="verbose_unpacking">
-                Show warning messages when unpacking EPUB files
-              </label>
-            </div>
-          </div>
-          
-        </fieldset>
-      </form>
-      </div>
-			
-			<div class="modal-footer">
-                <a accesskey="s" href="#" class="btn btn-primary" id="save-settings-btn" role="button">Save changes</a>
-                <a accesskey="c" href="#" class="btn" data-dismiss="modal" role="button">Cancel</a>
-            </div>
-<div class="offscreenText"> Options End </div>
-		</div><!-- end le settings modal -->
 
 
 			<div id='progress-container' class='span5' style="display: none" role="status" aria-live="assertive">

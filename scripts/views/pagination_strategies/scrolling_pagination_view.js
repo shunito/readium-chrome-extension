@@ -16,6 +16,9 @@ Readium.Views.ScrollingPaginationView = Readium.Views.PaginationViewBase.extend(
 		this.$('#container').html( this.page_template(json) );
 		
 		this.$('.content-sandbox').on("load", function(e) {
+// Important: Firefox doesn't recognize e.srcElement, so this needs to be checked for whenever it's required.
+if (!e.srcElement) e.srcElement = this;
+
 			that.iframeLoadCallback(e);
 		});
 
