@@ -100,7 +100,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
 
 		moHelper.renderFixedLayoutMoFragHighlight(
-			this.pages.get("current_pages"),
+			this.pages.get("current_page"),
 			this.mediaOverlayController.get("current_mo_frag"),
 			this);
 	}, 
