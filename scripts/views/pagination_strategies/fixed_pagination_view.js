@@ -138,9 +138,9 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 			if (!this.zoomed) {
 
 				this.zoomed = true;
-				setTimeout(function() {
-					$('#page-wrap').zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
-				}, 1)	
+				// setTimeout(function() {
+				// 	$('#page-wrap').zoomAndScale(); //<= this was a little buggy last I checked but it is a super cool feature
+				// }, 1)	
 			}
 		}
 	},	
@@ -226,15 +226,22 @@ Readium.Views.ImagePageView = Backbone.View.extend({
 	},
 
 	render: function() {
-		
-		debugger;
-
+		var that = this;
 		var json = this.model.toJSON();
 		this.$el.html( this.template( json ) );
 		this.$el.addClass( this.model.getPageSpreadClass() );
+
+		this.$('img').on("load", function() { that.setSize(); });
 		
 
 		return this;
+	},
+
+	setSize: function() {
+		var $img = this.$('img');
+		var width = $img.width();
+		var height = $img.width();
+		debugger;
 	}
 
 });
