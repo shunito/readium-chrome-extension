@@ -1353,8 +1353,7 @@ body {
   background-image: url("/images/paginator/previous_page.png"); }
 
 #page-wrap {
-  position: relative;
-  border: 1px solid red; }
+  position: relative; }
 
 #next-page-button, #prev-page-button {
   position: absolute;

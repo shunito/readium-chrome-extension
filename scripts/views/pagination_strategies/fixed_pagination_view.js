@@ -6,10 +6,10 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 	//  "PUBLIC" METHODS (THE API)                                                          //
 	/* ------------------------------------------------------------------------------------ */
 
-	initialize: function() {
+	initialize: function(options) {
 
 		// call the super ctor
-		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
+		Readium.Views.PaginationViewBase.prototype.initialize.call(this, options);
 
 		var spinePos = this.model.get("spine_position");
 		this.model.on("FXL_goToPage", this.spinePositionChangeHandler, this);
@@ -51,7 +51,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
 		setTimeout(function() {
 			that.setContainerSize();
-		}, 5);
+		}, 15);
 
 		this.showCurrentPages();
 
@@ -134,6 +134,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
 			this.$el.width(meta.width * 2);
 			this.$el.height(meta.height);
+			this.zoomer.fitToBest();
 
 			if (!this.zoomed) {
 
@@ -240,8 +241,12 @@ Readium.Views.ImagePageView = Backbone.View.extend({
 	setSize: function() {
 		var $img = this.$('img');
 		var width = $img.width();
-		var height = $img.width();
-		debugger;
+		var height = $img.height();
+		// temp this is a mess but it will do for now...
+		if( width > 0) {
+			this.model.set({meta_width: width, meta_height: height})
+		}
+		
 	}
 
 });
