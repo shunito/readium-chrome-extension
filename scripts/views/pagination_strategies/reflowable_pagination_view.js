@@ -66,20 +66,25 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         var doc_right = doc_left + $(doc).width();
         var doc_bottom = doc_top + $(doc).height();
         
-        var visibleElms = elmsWithId.filter(function(idx) {
+        var visibleElms = this.filterElementsByPosition(elmsWithId, doc_top, doc_bottom, doc_left, doc_right);
+        return visibleElms;
+    },
+    
+    // returns all the elements in the set that are inside the box
+    // separated this function from the one above in order to debug it
+    filterElementsByPosition: function(elements, documentTop, documentBottom, documentLeft, documentRight) {
+        var visibleElms = elements.filter(function(idx) {
             var elm_top = $(this).offset().top;
             var elm_left = $(this).offset().left;
             var elm_right = elm_left + $(this).width();
             var elm_bottom = elm_top + $(this).height();
             
-            var is_ok_x = elm_left >= doc_left && elm_right <= doc_right;
-            var is_ok_y = elm_top >= doc_top && elm_bottom <= doc_bottom;
+            var is_ok_x = elm_left >= documentLeft && elm_right <= documentRight;
+            var is_ok_y = elm_top >= documentTop && elm_bottom <= documentBottom;
             
             return is_ok_x && is_ok_y;
-        });
-
+        });  
         return visibleElms;
-        //this.model.set("visible_page_elements", visibleElms);
     },
     
     // override
@@ -348,7 +353,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// less the amount we already shifted to get to cp
 		shift -= parseInt(this.getBody().style[this.offset_dir], 10); 
         
-        // added 1 to shift value because page 2 elements starting at the border of the first page were still getting calculated as being on pg 1
+        // added 1 to shift value because elements starting at the 
+        // border between 2 pages were still getting calculated as being
+        // on the preceeding page
         // TODO test with RTL
 		return Math.ceil( (shift + 1) / (this.page_width + this.gap_width) );
 	},

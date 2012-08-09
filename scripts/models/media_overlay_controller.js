@@ -35,7 +35,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 	},
 
 	playMo: function() {
-		var currentSection = this.epubController.getCurrentSection();
+        var currentSection = this.epubController.getCurrentSection();
 		var mo = currentSection.getMediaOverlay();
 		if(mo) {
 			this.set("active_mo", mo);
@@ -78,16 +78,22 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 	},
 
 	pauseMo: function() {
-		var mo = this.get("active_mo");
+        var mo = this.get("active_mo");
 		if(mo) {
 			mo.off();
 			mo.pause();
 			this.set("active_mo", null); 
             this.set("mo_text_id", "");
 		}
+        // TODO remove debug statement
+        if (mo == null) {
+            console.log("MO Controller: MO is null!");
+        }
 	},
     
     pageChanged: function() {
+        // TODO remove debug statement
+        console.log("MO controller: page changed");
         this.updateMoPosition();
     },
     
@@ -145,6 +151,9 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         
         var mo_is_playing = this.get("active_mo") != null;
         
+        // TODO remove debug statement
+        console.log("updateMoPosition: mo_is_playing? " + mo_is_playing);
+        
         this.pauseMo();
         
         currentSection = this.epubController.getCurrentSection();
@@ -152,7 +161,8 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         if (currentSection.isFixedLayout()) {
             mo = currentSection.getMediaOverlay();
             if (mo) {
-                mo.set("has_started_playback", false);
+                // reset so it starts at the beginning of the page 
+                mo.reset(); 
             }
         }
         else {
@@ -178,6 +188,9 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         
         if (!currentSection.isFixedLayout()) {
         	pageElms = this.currentView.findVisiblePageElements();
+            // TODO remove debug statement
+            console.log("\nVisible page elements:")
+            console.log(pageElms);
         	var doc_href = currentSection.get("href");
             
 	        node = null;

@@ -3,46 +3,49 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     audioplayer: null,
     smilModel: null,
     consoleTrace: false,
+    url: null,
     
     // observable properties
     defaults: {
-        is_ready: false,
+        current_text_src: null,    
+        has_started_playback: false,
         is_document_done: false,
         is_playing: false,
-        should_highlight: true,
-        has_started_playback: false,
-        current_text_src: null,    
+        is_ready: false
     },
     
-    // initialize with a "smil_url" option
     initialize: function() {
         var self = this;
         this.audioplayer = new Readium.Models.AudioClipPlayer();
         this.audioplayer.setConsoleTrace(false);
 
-        this.url = this.get("smil_url");
-        
         // always know whether we're playing or paused
         this.audioplayer.setNotifyOnPause(function() {
             self.set({is_playing: self.audioplayer.isPlaying()});
         });
         this.audioplayer.setNotifyOnPlay(function(){
            self.set({is_playing: self.audioplayer.isPlaying()});
-        });
-        
+        });    
     },
     
+    // set the URL before calling fetch()
+    setUrl: function(smilUrl) {
+        this.url = smilUrl;
+    },
+    
+    // start retrieving the data
     fetch: function(options) {
         this.set({is_ready: false});
-        options || (options = {});
+        options = options || {};
         options.dataType="xml";
         Backbone.Model.prototype.fetch.call(this, options);
     },
-    // backbone fetch() callback
+    
+    // backbone fetch() callback; passes in an xml data object
     parse: function(xml) {
         var self = this;
         this.smilModel = new Readium.Models.SmilModel();
-        this.smilModel.setUrl(this.get("smil_url"));
+        this.smilModel.setUrl(this.url);
         this.smilModel.setNotifySmilDone(function() {
             self.debugPrint("document done");
             self.set({is_document_done: true});
@@ -135,6 +138,9 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         }
         
         this.audioplayer.setVolume(volume);
+    },
+    reset: function() {
+        this.set("has_started_playback", false);
     },
     setConsoleTrace: function(onOff) {
         this.consoleTrace = onOff;
