@@ -63,6 +63,19 @@ $('#options-btn').attr('aria-pressed', 'false').focus();
 }, 1);
 });
 
+$(Acc.detailed).each(function(i, o){
+$(o).on('shown', function(){
+setTimeout(function(){
+$(o).parent().find('a.info-icon, a.btn.details').attr('aria-pressed', 'true');
+}, 1);
+})
+.on('hidden', function(){
+setTimeout(function(){
+$(o).parent().find('a.info-icon, a.btn.details').attr('aria-pressed', 'false');
+}, 1);
+}).modal('show');
+});
+
 		}
 	};
 };

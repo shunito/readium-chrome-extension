@@ -1,6 +1,7 @@
 (function(window){
 
 window.Acc = {
+detailed: [],
 title: '',
 RadioGroup: function(radioGroupObjId, defaultRadioValSelector, callback) {
 var rgo = $('#' + radioGroupObjId).get(0),

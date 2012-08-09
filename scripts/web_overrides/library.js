@@ -30,6 +30,7 @@ Readium.Views.LibraryItemView = Backbone.View.extend({
 	initialize: function() {
 		_.bindAll(this, "render");	
 		this.template = Handlebars.templates.library_item_template;
+Acc.detailed.push('#details-modal-' + this.model.get('key'));
 	},
 
 	render: function() {

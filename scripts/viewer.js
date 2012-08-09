@@ -119,7 +119,8 @@ var vis = this.model.get("toc_visible");
 $('#toggle-toc-btn').attr('aria-pressed', vis ? 'true' : 'false');
 		this.$el.toggleClass("show-readium-toc", vis);
 if (vis) setTimeout(function(){
-$('#toc-heading-ref').focus();
+$('#readium-toc').find('h1, h2').first()
+.attr('tabindex', '-1').focus();
 }, 500);
 else $('#toggle-toc-btn').focus();
 		return this;

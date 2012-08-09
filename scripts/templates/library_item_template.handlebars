@@ -2,25 +2,25 @@
 	<div class='caption book-info'>
 		<h2 class='green info-item title'>{{ data.title }}</h2>
 		<div class='info-item author'>{{orUnknown data.author}}</div>
-		<div class='info-item epub-version'>ePUB {{orUnknown data.epub_version}}</div>
-		
+		<div class='info-item epub-version'>ePUB {{orUnknown data.epub_version}}</div>		
 	</div>
 	
 	<img class='cover-image read' src='{{ data.cover_href }}' width='150' height='220' alt='Open ePUB {{ data.title }}'>
 	
-	<a href="#details-modal-{{ data.key }}" class="info-icon" data-toggle="modal" role="button">
+	<a href="#details-modal-{{ data.key }}" class="info-icon" aria-pressed="true" data-toggle="modal" role="button">
 		<img class='info-icon pull-right' src='/images/library/info-icon.png' height="39px" width="39px" alt='{{ data.title }} information'>
 	</a>
 </div>
 
 <div class="caption clearfix buttons">
 	<a href="#todo" class="btn read" data-book='{{ data.key }}' role='button'>Read</a>
-	<a href="#details-modal-{{ data.key }}" class="btn details" data-toggle="modal" role="button">
+	<a href="#details-modal-{{ data.key }}" aria-pressed="true" class="btn details" data-toggle="modal" role="button">
 		Details
 	</a>
 </div>
 
 <div id='details-modal-{{ data.key }}' class='modal fade details-modal'>
+<div class="offscreenText"> Details Start </div>
 	<div class="pull-left modal-cover-wrap">
 		<img class='details-cover-image' src='{{ data.cover_href }}' width='150' height='220' alt='ePUB cover'>
 		<div class="caption clearfix modal-buttons">
@@ -40,4 +40,5 @@
 	<span class='green' style="padding-right: 10px">Source:</span>
 		{{orUnknown data.src_url}}
 	</div>
+<div class="offscreenText"> Details End </div>
 </div>			
