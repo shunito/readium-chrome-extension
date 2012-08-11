@@ -82,8 +82,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 		if(mo) {
 			mo.off();
 			mo.pause();
-			this.set("active_mo", null); 
-            this.set("mo_text_id", "");
+			this.set("active_mo", null);             
 		}
         // TODO remove debug statement
         if (mo == null) {
@@ -129,6 +128,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         }
         this.set("mo_processing", true);
         this.set("mo_target", null);
+        this.set("mo_text_id", null);
         this.pauseMo();
         // advance the spine position
         if (this.epubController.hasNextSection()) {
@@ -209,12 +209,13 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         }
         
         // TODO remove debug output
-        if (node) {
+        /*if (node) {
             console.log("Found MO target for " + src);
         }
         else {
             console.log("MO target not found for " + src);
         }
+        */
         this.set("mo_target", node);
     }
 });

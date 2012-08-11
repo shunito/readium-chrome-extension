@@ -30,6 +30,8 @@ Readium.Models.AudioClipPlayer = function() {
     // clipBeginTime and clipEndTime are in seconds
     // filesrc is an absolute path, local or remote
     this.play = function(filesrc, clipBeginTime, clipEndTime, shouldForceReset) {
+        // TODO remove. just useful for testing.
+        elm.playbackRate = 3.0;
         src = filesrc;
         clipBegin = clipBeginTime;
         clipEnd = clipEndTime;

@@ -30,6 +30,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.on("change:two_up", this.adjustIframeColumns, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
         
+		this.model.on("change:hash_fragment", this.goToHashFragment, this);
+        this.mediaOverlayController.on("change:active_mo", this.indicateMoIsPlaying, this);        
 	},
 
 	render: function(goToLastPage) {

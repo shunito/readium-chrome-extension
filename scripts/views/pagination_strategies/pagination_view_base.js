@@ -25,10 +25,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.pages.on("change:current_page", this.showCurrentPages, this);
 
 		this.model.on("change:font_size", this.setFontSize, this);
-		this.model.on("change:hash_fragment", this.goToHashFragment, this);
 		this.model.on("change:two_up", this.pages.toggleTwoUp, this.pages);
+        
         this.mediaOverlayController.on("change:mo_text_id", this.highlightText, this);
-        this.mediaOverlayController.on("change:active_mo", this.indicateMoIsPlaying, this);
         
 		this.bindingTemplate = Handlebars.templates.binding_template;
 	},
@@ -43,13 +42,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
         var trigs = this.parseTriggers(e.srcElement.contentDocument);
 		this.applyTriggers(e.srcElement.contentDocument, trigs);
 	},
-
-	// Rationale: Only the reflowable view has an implementation for these methods. They are
-	//   stubbed into the base model as no-op's for now
-	//   just to prevent no method errors
-	goToHashFragment: function() {},
-    indicateMoIsPlaying: function() {},
-    
+	
     // Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
     //   only the day-night alternate tags are available as an option. 
 	activateEPubStyle: function(bookDom) {

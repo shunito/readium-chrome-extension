@@ -79,11 +79,6 @@ Readium.Models.PackageDocumentParser.prototype.parse = function(xml_content) {
 	if(json.metadata.layout === "pre-paginated") {
 		json.metadata.fixed_layout = true;
 	}
-
-    // use a default value for media:active-class
-    if(json.metadata.active_class === "") {
-        json.metadata.active_class = "-epub-media-overlay-active";
-    }
     
     // parse the manifest into a proper collection
 	json.manifest = new Readium.Collections.ManifestItems(json.manifest, {packageDocument: this});

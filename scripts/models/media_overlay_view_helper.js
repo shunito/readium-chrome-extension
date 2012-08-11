@@ -63,10 +63,7 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
 		}
 	},
 
-    // apply the active class to the current MO fragment and also
-    // apply the default theme colors to it
-    // TODO: do we want to do both these things? we could also say that if no active class is specified, then use the defaults from the theme.
-    // otherwise, use the active class.
+    // highlight the text
 	renderReflowableMoFragHighlight: function(currentTheme, reflowableView, currentMOFrag) {
 
 		if (currentTheme === "default") {
@@ -76,16 +73,22 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
 		// get rid of the last highlight
 		var body = reflowableView.getBody();
         var lastFrag = this.removeActiveClass(body);
-        if (lastFrag) {
-            $(lastFrag).css("color", "");
-        }
         
+        // if the author did not define an active class themselves
+        if (this.authorActiveClassExists() == false) {
+            if (lastFrag) {
+                $(lastFrag).css("color", "");
+            }
+        }
+                
 		if (currentMOFrag) {
             // add active class to the new MO fragment
             var newFrag = $(body).find("#" + currentMOFrag);
             if (newFrag) {
                 this.addActiveClass(newFrag);
-                $(newFrag).css("color", reflowableView.themes[currentTheme]["color"]);   
+                if (this.authorActiveClassExists() == false) {
+                    $(newFrag).css("color", reflowableView.themes[currentTheme]["color"]);   
+                }
             }
 		}
 	},	
@@ -93,6 +96,11 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
 	// reflowable pagination uses default readium themes, which include a 'fade' effect on the inactive MO text
 	renderReflowableMoPlaying: function(currentTheme, MOIsPlaying, reflowableView) {
 		
+        // if we are using the author's default style for highlighting, then don't use readium's too
+        if (this.authorActiveClassExists()) {
+            return;
+        }
+        
 		if (currentTheme === "default") { 
 			currentTheme = "default-theme";
 		}
@@ -119,7 +127,17 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
 	// ------------------------------------------------------------------------------------ //
 
     getActiveClass: function() {
-
-    	return this.epubController.packageDocument.get("metadata").active_class;
+        var activeClass = this.epubController.packageDocument.get("metadata").active_class;
+        if (activeClass == "") {
+            // we need an active class value to use, whether the author specified it or not
+            activeClass = "-readium-epub-media-overlay-active";
+        }
+        return activeClass;
+    },
+    
+    // did the author supply an active-class metdata value
+    authorActiveClassExists: function() {
+        var activeClass = this.epubController.packageDocument.get("metadata").active_class;
+        return activeClass == "" ? false : true;
     }
 });
