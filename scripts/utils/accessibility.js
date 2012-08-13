@@ -3,6 +3,7 @@
 window.Acc = {
 detailed: [],
 title: '',
+page: '',
 RadioGroup: function(radioGroupObjId, defaultRadioValSelector, callback) {
 var rgo = $('#' + radioGroupObjId).get(0),
 track = {}, that = this,

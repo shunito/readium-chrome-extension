@@ -23,6 +23,7 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		// if content reflows and the number of pages in the section changes
 		// we need to adjust the the current page
 		this.on("change:num_pages", this.adjustCurrentPage, this);
+
 	},
 
 	// Description: This method determines which page numbers to display when switching
@@ -190,6 +191,9 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		if(cp[cp.length - 1] > num) {
 			this.goToLastPage();
 		}
+
+Acc.page = 'Page ' + cp;
+
 	},	
 
 	// REFACTORING CANDIDATE: this is strange in that it does not seem to account for 

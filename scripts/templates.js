@@ -112,11 +112,11 @@ templates['library_item_template'] = template(function (Handlebars,depth0,helper
   stack1 = depth0.data;
   stack1 = stack1 == null || stack1 === false ? stack1 : stack1.cover_href;
   stack1 = typeof stack1 === functionType ? stack1() : stack1;
-  buffer += escapeExpression(stack1) + "' width='150' height='220' alt='ePUB cover'>\r\n		<div class=\"caption clearfix modal-buttons\">\r\n</div>\r\n	</div>\r\n	<div class='caption modal-book-info'>\r\n		<h3 class='green modal-title'>";
+  buffer += escapeExpression(stack1) + "' width='150' height='220' alt='ePUB cover'>\r\n		<div class=\"caption clearfix modal-buttons\">\r\n</div>\r\n	</div>\r\n	<div class='caption modal-book-info'>\r\n		<div class='green modal-title'>";
   stack1 = depth0.data;
   stack1 = stack1 == null || stack1 === false ? stack1 : stack1.title;
   stack1 = typeof stack1 === functionType ? stack1() : stack1;
-  buffer += escapeExpression(stack1) + "</h3>\r\n		<div class='modal-detail gap'>Author: ";
+  buffer += escapeExpression(stack1) + "</div>\r\n		<div class='modal-detail gap'>Author: ";
   stack1 = depth0.data;
   stack1 = stack1 == null || stack1 === false ? stack1 : stack1.author;
   foundHelper = helpers.orUnknown;

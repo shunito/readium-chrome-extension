@@ -14,7 +14,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	/* ------------------------------------------------------------------------------------ */
 
 	initialize: function(options) {
-		
+
 		this.pages = new Readium.Models.ReadiumPagination({model : this.model});
 		this.mediaOverlayController = new Readium.Models.MediaOverlayController({
 			epubController : this.model,
@@ -41,7 +41,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
         var trigs = this.parseTriggers(e.srcElement.contentDocument);
 		this.applyTriggers(e.srcElement.contentDocument, trigs);
 
-$(e.srcElement).attr('title', Acc.title);
+$(e.srcElement).attr('title', Acc.page + ' - ' + Acc.title);
 
 	},
 
