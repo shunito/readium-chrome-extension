@@ -192,7 +192,7 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 			this.goToLastPage();
 		}
 
-Acc.page = 'Page ' + cp;
+Acc.page = '#' + cp;
 
 	},	
 
