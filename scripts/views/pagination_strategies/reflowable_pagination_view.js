@@ -334,17 +334,21 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		return num;
 	},
 
-	getElemPageNumber: function(elem) {
-
+    getElemPageNumber: function(elem) {
+		
 		var rects, shift;
 		rects = elem.getClientRects();
 		if(!rects || rects.length < 1) {
 			// if there were no rects the elem had display none
 			return -1;
 		}
-		shift = rects[0][this.offset_dir];
 
-        // `clientRects` are relative to the top left corner of the frame, but
+		shift = rects[0][this.offset_dir];
+		
+		// calculate to the center of the elem (the edge will cause off by one errors)
+		shift += Math.abs(rects[0].left - rects[0].right);
+		
+		// `clientRects` are relative to the top left corner of the frame, but
 		// for right to left we actually need to measure relative to right edge
 		// of the frame
 		if(this.offset_dir === "right") {
@@ -354,12 +358,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		}
 		// less the amount we already shifted to get to cp
 		shift -= parseInt(this.getBody().style[this.offset_dir], 10); 
-        
-        // added 1 to shift value because elements starting at the 
-        // border between 2 pages were still getting calculated as being
-        // on the preceeding page
-        // TODO test with RTL
-		return Math.ceil( (shift + 1) / (this.page_width + this.gap_width) );
+		return Math.ceil( shift / (this.page_width + this.gap_width) );
 	},
 
 	// REFACTORING CANDIDATE: This might be part of the public interface
