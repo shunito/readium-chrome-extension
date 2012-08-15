@@ -36,6 +36,7 @@ Acc.detailed.push('#details-modal-' + this.model.get('key'));
 	render: function() {
 		var renderedContent = this.template({data: this.model.toJSON()});
 		$(this.el).html(renderedContent);
+		this.$(".delete").toggle(false);
 		return this;
 	},
 

@@ -5,9 +5,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	//  "PUBLIC" METHODS (THE API)                                                          //
 	// ------------------------------------------------------------------------------------ //
 
-	initialize: function() {
+	initialize: function(options) {
 		// call the super ctor
-		Readium.Views.PaginationViewBase.prototype.initialize.call(this);
+		Readium.Views.PaginationViewBase.prototype.initialize.call(this, options);
 		this.page_template = Handlebars.templates.reflowing_template;
 
 		// make sure we have proper vendor prefixed props for when we need them
@@ -313,15 +313,19 @@ if (!e.srcElement) e.srcElement = this;
 	},
 
 	getElemPageNumber: function(elem) {
-
+		
 		var rects, shift;
 		rects = elem.getClientRects();
 		if(!rects || rects.length < 1) {
 			// if there were no rects the elem had display none
 			return -1;
 		}
-		shift = rects[0][this.offset_dir];
 
+		shift = rects[0][this.offset_dir];
+		
+		// calculate to the center of the elem (the edge will cause off by one errors)
+		shift += Math.abs(rects[0].left - rects[0].right);
+		
 		// `clientRects` are relative to the top left corner of the frame, but
 		// for right to left we actually need to measure relative to right edge
 		// of the frame
