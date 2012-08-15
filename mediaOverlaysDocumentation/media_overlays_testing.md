@@ -12,10 +12,12 @@ This reflowable book has media overlays for the first two chapters.
  * Go to chapter 1. Press 'play'. The text should be highlighted in gray/blue as the audio clips play.
  * Let playback continue. The pages should turn to match it.
  * During playback, turn the page. Playback should jump to the new page.
- * Pause playback and turn the page. Restart playback. It should start at the right place.
- * Switch between single-page and two-page display (in Readium's settings dialog). Try these page-related tests again.
- 
-Known behavior: if an element starts on one page and ends on another, it is treated as though it is on the first of those two pages. There is no reliable way of synchronizing audio at a sub-element level.
+ * During playback, select a section from the table of contents. Playback should jump to the new section.
+ * Pause playback and turn the page. Restart playback. It should resume at the top of the current page.
+ * Pause playback in the middle of a paragraph. The highlighting should go away. 
+ * Restart playback. The highlight should reappear and the audio should start where it left off.
+ * Go to chapter 2. Then go back 1 page, to the end of chapter 1. Start playback. When that page is done playing, it should continue automatically to chapter 2.
+ * Switch between single-page and two-page display (in Readium's settings dialog). Try these page-related tests again. 
 
 ## Valentin Haüy
 
@@ -23,8 +25,67 @@ TBD: Download link
 
 This short reflowable book has media overlays throughout.
 
-Use the same tests as above, except the highlight color should come from Readium's own default themes, as there is no authored active-class style.
+ * Go to the beginning of the book. Press 'play'. The text should be highlighted using Readium's default black/fade-out as the audio clips play.
+ * Let playback continue. The pages should turn to match it.
+ * During playback, turn the page. Playback should jump to the new page.
+ * During playback, select a section from the table of contents. Playback should jump to the new section.
+ * Pause playback and turn the page. Restart playback. It should resume at the top of the current page.
+ * Switch between single-page and two-page display (in Readium's settings dialog). Try these page-related tests again.
+ 
+## Little Match Girl   
 
-## TBD
+TBD: Download link?
 
-Include some fixed-layout books that feature Media Overlays.
+This fixed layout book has a yellow background text highlight.
+
+ * Go to the beginning of the book and press 'play'. The text should be highlighted in yellow.
+ * Let playback continue. The pages should turn to match it.
+ * During playback, turn the page. Playback should jump to the new page.
+ * During playback, select a section from the table of contents. Playback should jump to the new section.
+ * Pause playback and turn the page. Restart playback. It should resume at the top of the current page.
+ * Pause playback in the middle of a paragraph. The highlight should disappear.
+ * Restart playback. The highlight should reappear and the audio should start where it left off.
+ * Play halfway into the first full page of the book. Then, without stopping playback, go to the next page. Then, go back to the previous page. Playback should start at the beginning of that page, not the halfway point.
+
+## Manga 
+
+TBD: Download link?
+
+This fixed layout book has no highlight style. It has a right-to-left page progression direction.
+
+TBD: check above description against final version of book
+
+ * Go to the beginning of the book ("こんにちは" or "Konichiwa") and press 'play'. The text should not be highlighted.
+ * Let playback continue. The pages should turn from right to left to match it.
+ * During playback, turn the page. Playback should jump to the new page.
+ * During playback, select a section from the table of contents. Playback should jump to the new section.
+ * Pause playback and turn the page. Restart playback. It should resume at the top of the current page.
+ * Pause playback in the middle of a paragraph. The display should not change as there is no highlighting.
+ * Restart playback. The display should not change but the audio should start where it left off.
+ * Play halfway into the first full page of the book. Then, without stopping playback, go to the next page. Then, go back to the previous page. Playback should start at the beginning of that page, not the halfway point.
+
+## Wishlist
+
+This list is a work in progress.
+
+ * FXL with only some pages containing media overlays
+
+## Known behavior
+
+ * If an element starts on one page and ends on another, it is treated as though it is on the first of those two pages. There is no reliable way of synchronizing audio at a sub-element level.
+ * If the pages reflow during playback, for example when switching between single- and two-page display or toggling the table of contents, playback might reposition itself to the first element on the new page.
+
+
+## results
+
+bug
+moby dick, two-up mode
+go to ch 2
+go back a page
+press play 
+no highlight for first para
+then, highlight works on second
+chapter advances to ch 2
+no highlight for title of chap 2
+then, highlight works again
+

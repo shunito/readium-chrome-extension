@@ -142,6 +142,8 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
     },
     
     handleMoDocumentDone: function() {
+        // TODO
+        console.log("document done");
         var mo = this.get("active_mo");
         if (mo != null && mo != undefined) {
             if (mo.get("is_document_done") == false) {
@@ -159,12 +161,20 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
     },
     
     spineChanged: function() {
+        // TODO
+        console.log("spine changed");
+        
         // we only care about spine changes for FXL books because the page load handler takes care of reflowable books
-        if (this.epubController.getCurrentSection().isFixedLayout()) {
+        var currentSection = this.epubController.getCurrentSection();
+        var mo = currentSection.getMediaOverlay();
+        if (currentSection.isFixedLayout()) {
             // if we were waiting for the next spine item before continuing playback
             if (this.waitForPagesToLoadThenPlay) {
                 this.waitForPagesToLoadThenPlay = false;
-                this.playMo();
+                if (mo) {
+                    mo.reset();
+                    this.playMo();
+                }
             }
             // else just update our position so when playback starts, we'll be at the right point
             else {

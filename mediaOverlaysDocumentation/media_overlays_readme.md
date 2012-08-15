@@ -73,6 +73,9 @@ Starting from the point where media overlays integrate into the publication (see
 
 Note: Each content document is referenced by no more than one media overlay file. This means that given a point in a content document, there is only one possible media overlay document that could contain its corresponding synchronization point. This is a lot easier than, say, searching all the media overlay files to find a content document reference. 
  
+ 
+#### Page synchronization
+
 The primary area of consideration when integrating media overlays with Readium was to ensure that audio playback matched the page display. This involved two things:
 
  1. During continuous playback, Readium must turn its own pages to match whatever audio is playing. To do this, Readium observes change events on the media overlay object's `current_text_src` and ensures that the correct page is being shown.
@@ -80,6 +83,8 @@ The primary area of consideration when integrating media overlays with Readium w
  
  
 The code in `media_overlay_controller.js` acts as a bridge between the media overlay object and the rest of Readium.
+
+#### Highlighting
 
 The other area of consideration was highlighting. According to [Associating Style Information](http://idpf.org/epub/30/spec/epub30-mediaoverlays.html#sec-docs-assoc-style):
 >The Reading System would apply the author-defined -epub-media-overlay-active class to each text element in the EPUB Content Document as it became active during playback. Conversely, the class name is removed when the element is no longer active. 
