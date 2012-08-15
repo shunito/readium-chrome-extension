@@ -13,6 +13,7 @@
 // REFACTORING CANDIDATE: hash_fragment now has two responsibilities with media overlays included in the source: To act as a broadcast
 //   attribute that triggers the view to go to a particular hash_fragment, as well as to do something for media overlays. It would
 //   probably make sense for the first reason to have a function make a direct call through the pagination strategy selector. 
+// Update (Marisa 20120814): right now it looks like hash_fragment is only monitored by the view, not MO.
 
 Readium.Models.EPUBController = Backbone.Model.extend({
 
@@ -26,6 +27,9 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		var that = this;
 
 		this.epub = this.get("epub");
+        
+        this.set("media_overlay_controller", 
+            new Readium.Models.MediaOverlayController({epubController : this}));
 
 		// create a [`Paginator`](/docs/paginator.html) object used to initialize
 		// pagination strategies for the spine items of this book
@@ -55,8 +59,8 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 				that.set("has_toc", ( !!that.packageDocument.getTocItem() ) );
 			}
 		});
-
-		// `change:spine_position` is triggered whenver the reader turns pages
+        
+        // `change:spine_position` is triggered whenver the reader turns pages
 		// accross a `spine_item` boundary. We need to cache thier new position
 		// and 
 		this.on("change:spine_position", this.savePosition, this);
@@ -100,9 +104,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
     	"toc_visible": false,
     	"rendered_spine_items": [],
     	"current_theme": "default-theme",
-    	"current_margin": 3,
-    	"mo_processing": false,
-    	"mo_target": null
+    	"current_margin": 3
   	},
 
   	// Description: serialize this models state to `JSON` so that it can

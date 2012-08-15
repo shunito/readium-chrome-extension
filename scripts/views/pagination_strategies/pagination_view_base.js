@@ -16,11 +16,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	initialize: function(options) {
 		this.zoomer = options.zoomer;
 		this.pages = new Readium.Models.ReadiumPagination({model : this.model});
-		this.mediaOverlayController = new Readium.Models.MediaOverlayController({
-			epubController : this.model,
-			pages : this.pages,
-			view : this
-		});
+		this.mediaOverlayController = this.model.get("media_overlay_controller");
+        this.mediaOverlayController.setPages(this.pages);
+        this.mediaOverlayController.setView(this);
 
 		this.pages.on("change:current_page", this.showCurrentPages, this);
 
@@ -41,6 +39,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
         this.injectLinkHandler(e.srcElement);
         var trigs = this.parseTriggers(e.srcElement.contentDocument);
 		this.applyTriggers(e.srcElement.contentDocument, trigs);
+        this.mediaOverlayController.pagesLoaded();
 	},
 	
     // Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
