@@ -73,7 +73,7 @@ $(o).parent().find('a.info-icon, a.btn.details').attr('aria-pressed', 'true');
 setTimeout(function(){
 $(o).parent().find('a.info-icon, a.btn.details').attr('aria-pressed', 'false');
 }, 1);
-}).modal('show');
+}).modal('hide');
 });
 
 		}
