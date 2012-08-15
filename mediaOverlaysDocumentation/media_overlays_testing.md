@@ -76,16 +76,10 @@ This list is a work in progress.
  * If the pages reflow during playback, for example when switching between single- and two-page display or toggling the table of contents, playback might reposition itself to the first element on the new page.
 
 
-## results
+## Bugs
 
-bug
-moby dick, two-up mode
-go to ch 2
-go back a page
-press play 
-no highlight for first para
-then, highlight works on second
-chapter advances to ch 2
-no highlight for title of chap 2
-then, highlight works again
+### MO position is off
+ 
+ * Incorrect return value of visiblePageElements causes MO position to be off. Observed sometimes when turning pages manually. Is there a way to tell when the page elements for a page are ready?
+ * This can be seen in Moby Dick, 2-page mode. Start at chapter 1, press play. Then advance the pages. The pages won't turn. 
 

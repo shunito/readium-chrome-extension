@@ -63,6 +63,21 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
 		}
 	},
 
+	renderFixedMoPlaying: function(currentPages, MOIsPlaying, fixedLayoutView) {
+        var that = this;
+        // if we are using the author's style for highlighting, then just clear it if we are not playing
+        if (this.authorActiveClassExists()) {
+            if (!MOIsPlaying) {
+        		// get rid of the last highlight
+                $.each(currentPages, function(idx) {
+                   var body = fixedLayoutView.getPageBody(this);
+                   that.removeActiveClass(body);
+                }); 
+            }
+        }
+	},
+    
+
     // highlight the text
 	renderReflowableMoFragHighlight: function(currentTheme, reflowableView, currentMOFrag) {
 
@@ -96,30 +111,36 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
 	// reflowable pagination uses default readium themes, which include a 'fade' effect on the inactive MO text
 	renderReflowableMoPlaying: function(currentTheme, MOIsPlaying, reflowableView) {
 		
-        // if we are using the author's default style for highlighting, then don't use readium's too
+        // if we are using the author's default style for highlighting, then just clear it if we are not playing
         if (this.authorActiveClassExists()) {
-            return;
-        }
-        
-		if (currentTheme === "default") { 
-			currentTheme = "default-theme";
-		}
-
-		var body = reflowableView.getBody();
-        if (MOIsPlaying) {
-            // change the color of the body text so it looks inactive compared to the MO fragment that is playing
-			$(body).css("color", reflowableView.themes[currentTheme]["mo-color"]);
-		}
-		else {
-            // reset the color of the text to the theme default
-			$(body).css("color", reflowableView.themes[currentTheme]["color"]);	
-
-            // remove style info from the last MO fragment
-            var lastFrag = this.removeActiveClass(reflowableView.getBody());
-            if (lastFrag) {
-                $(lastFrag).css("color", "");
+            if (!MOIsPlaying) {
+        		// get rid of the last highlight
+        		var body = reflowableView.getBody();
+                var lastFrag = this.removeActiveClass(body);
             }
-		}
+        }
+        else {
+    		if (currentTheme === "default") { 
+    			currentTheme = "default-theme";
+    		}
+        
+    		var body = reflowableView.getBody();
+            if (MOIsPlaying) {
+                // change the color of the body text so it looks inactive compared to the MO fragment that is playing
+    			$(body).css("color", reflowableView.themes[currentTheme]["mo-color"]);
+    		}
+    		else {
+                // reset the color of the text to the theme default
+    			$(body).css("color", reflowableView.themes[currentTheme]["color"]);	
+
+                // remove style info from the last MO fragment
+                var lastFrag = this.removeActiveClass(reflowableView.getBody());
+                if (lastFrag) {
+                    $(lastFrag).css("color", "");
+                }
+    		}
+        }
+		
 	},
 
 	// ------------------------------------------------------------------------------------ //

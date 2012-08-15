@@ -140,6 +140,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         this.audioplayer.setVolume(volume);
     },
     reset: function() {
+        this.set("current_text_src", null);
         this.set("has_started_playback", false);
     },
     setConsoleTrace: function(onOff) {

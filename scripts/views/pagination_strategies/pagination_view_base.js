@@ -26,6 +26,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.model.on("change:two_up", this.pages.toggleTwoUp, this.pages);
         
         this.mediaOverlayController.on("change:mo_text_id", this.highlightText, this);
+        this.mediaOverlayController.on("change:active_mo", this.indicateMoIsPlaying, this);
         
 		this.bindingTemplate = Handlebars.templates.binding_template;
 	},

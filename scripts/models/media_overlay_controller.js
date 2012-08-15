@@ -51,7 +51,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         
 		if(mo) {
 			this.set("active_mo", mo);
-			mo.on("change:current_text_src", this.handleMoTextSrc, this);
+            mo.on("change:current_text_src", this.handleMoTextSrc, this);
 			mo.on("change:is_document_done", this.handleMoDocumentDone, this);
             
             var target = this.mo_target;
@@ -100,8 +100,6 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
     
     pageChanged: function() {
         if (this.mo_processing || this.waitForPagesToLoadThenPlay ) {
-            // TODO debug
-            console.log("ignoring page change.\n");
             return;
         }
             
@@ -130,7 +128,9 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
     handleMoTextSrc: function() {
         var mo = this.get("active_mo");
         var textSrc = mo.get("current_text_src");
-        
+        if (textSrc == null) {
+            return;
+        }
         this.mo_processing = true;
         this.epubController.goToHref(textSrc);
         var frag = "";
@@ -142,8 +142,6 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
     },
     
     handleMoDocumentDone: function() {
-        // TODO
-        console.log("document done");
         var mo = this.get("active_mo");
         if (mo != null && mo != undefined) {
             if (mo.get("is_document_done") == false) {
@@ -161,35 +159,35 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
     },
     
     spineChanged: function() {
-        // TODO
-        console.log("spine changed");
-        
-        // we only care about spine changes for FXL books because the page load handler takes care of reflowable books
+        this.set("mo_text_id", null);
         var currentSection = this.epubController.getCurrentSection();
         var mo = currentSection.getMediaOverlay();
+        if (mo == null) {
+            return;
+        }
         if (currentSection.isFixedLayout()) {
             // if we were waiting for the next spine item before continuing playback
             if (this.waitForPagesToLoadThenPlay) {
                 this.waitForPagesToLoadThenPlay = false;
-                if (mo) {
-                    mo.reset();
-                    this.playMo();
-                }
+                mo.reset();
+                this.playMo();
             }
             // else just update our position so when playback starts, we'll be at the right point
             else {
                 this.updateMoPosition();
             }
         }
+        
+        // reflowable books
+        else {
+            mo.reset();
+        }
     },
     
     updateMoPosition: function() {
-        
         // if we are processing an MO event, then don't update MO position:
         // chances are, it's a page change event that came from MO playback advancing
         if (this.mo_processing) {
-            // TODO debug
-            console.log("ignoring updateMoPosition");
             return;
         }
         

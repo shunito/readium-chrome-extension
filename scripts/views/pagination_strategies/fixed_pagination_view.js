@@ -69,6 +69,16 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
     },
     
     // override
+	indicateMoIsPlaying: function () {
+		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
+		moHelper.renderFixedMoPlaying(
+			this.pages.get("current_page"),
+			this.mediaOverlayController.get("active_mo"),
+			this
+        );
+	},
+    
+    // override
 	highlightText: function () {
 		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
 		moHelper.renderFixedLayoutMoFragHighlight(
