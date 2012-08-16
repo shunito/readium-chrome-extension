@@ -205,7 +205,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 	restorePosition: function() {
 		var pos = Readium.Utils.getCookie(this.epub.get("key"));
-		return parseInt(pos, 10) || 0;
+		return parseInt(pos, 10) || this.packageDocument.getNextLinearSpinePostition();
 	},
 
 	savePosition: function() {
@@ -217,26 +217,34 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 	},
 
 	hasNextSection: function() {
-		return this.get("spine_position") < (this.packageDocument.spineLength() - 1);
+		var start = this.get("spine_position");
+		return this.packageDocument.getPrevLinearSpinePostition(start) > -1;
 	},
 
 	hasPrevSection: function() {
-		return this.get("spine_position") > 0;
+		var start = this.get("spine_position");
+		return this.packageDocument.getNextLinearSpinePostition(start) > -1;
 	},
 	
+	// goes the next linear section in the spine. Non-linear sections should be
+	// skipped as per [the spec](http://idpf.org/epub/30/spec/epub30-publications.html#sec-itemref-elem)
 	goToNextSection: function() {
 
-		if (this.hasNextSection() ) {
-			var pos = this.get("spine_position");
-			this.setSpinePos(pos + 1, false);
+		var cp = this.get("spine_position");
+		var pos = this.packageDocument.getNextLinearSpinePostition(cp);
+		if(pos > -1) {
+			this.setSpinePos(pos, false);	
 		}
+		
 	},
 	
+	// goes the previous linear section in the spine. Non-linear sections should be
+	// skipped as per [the spec](http://idpf.org/epub/30/spec/epub30-publications.html#sec-itemref-elem)
 	goToPrevSection: function() {
-
-		if (this.hasPrevSection() ) {
-			var pos = this.get("spine_position");
-			this.setSpinePos(pos - 1, true);	
+		var cp = this.get("spine_position");
+		var pos = this.packageDocument.getPrevLinearSpinePostition(cp);
+		if(pos > -1) {
+			this.setSpinePos(pos, false);	
 		}
 	},
 
