@@ -22,6 +22,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 
 	initialize: function () {
 
+        this.currentSection = null;
         this.waitForPagesToLoadThenPlay = false;
         this.mo_processing = false;
         this.mo_target = null;
@@ -161,6 +162,11 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
     spineChanged: function() {
         this.set("mo_text_id", null);
         var currentSection = this.epubController.getCurrentSection();
+        if (currentSection == this.currentSection) {
+            // if the spine changed event didn't actually change the section, just return
+            return;
+        }
+        this.currentSection = currentSection;
         var mo = currentSection.getMediaOverlay();
         if (mo == null) {
             return;

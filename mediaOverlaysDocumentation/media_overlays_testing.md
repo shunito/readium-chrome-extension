@@ -34,7 +34,7 @@ This short reflowable book has media overlays throughout.
  
 ## Little Match Girl   
 
-TBD: Download link?
+TBD: Download link
 
 This fixed layout book has a yellow background text highlight.
 
@@ -49,7 +49,7 @@ This fixed layout book has a yellow background text highlight.
 
 ## Manga 
 
-TBD: Download link?
+TBD: Download link
 
 This fixed layout book has no highlight style. It has a right-to-left page progression direction.
 
@@ -64,7 +64,7 @@ TBD: check above description against final version of book
  * Restart playback. The display should not change but the audio should start where it left off.
  * Play halfway into the first full page of the book. Then, without stopping playback, go to the next page. Then, go back to the previous page. Playback should start at the beginning of that page, not the halfway point.
 
-## Wishlist
+## Test content wishlist
 
 This list is a work in progress.
 
@@ -76,10 +76,13 @@ This list is a work in progress.
  * If the pages reflow during playback, for example when switching between single- and two-page display or toggling the table of contents, playback might reposition itself to the first element on the new page.
 
 
-## Bugs
+## Problems
 
 ### MO position is off
  
- * Incorrect return value of visiblePageElements causes MO position to be off. Observed sometimes when turning pages manually. Is there a way to tell when the page elements for a page are ready?
- * This can be seen in Moby Dick, 2-page mode. Start at chapter 1, press play. Then advance the pages. The pages won't turn. 
+ * Moby Dick, 2-page mode. 
+ * Start at chapter 1, press play. 
+ * Then advance the pages. The pages won't turn. 
 
+This is caused by an incorrect return value of visiblePageElements. Is there a way to tell when the page elements for a page are ready?
+ 
