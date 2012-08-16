@@ -22,18 +22,31 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 
 	initialize: function () {
 
-        this.currentSection = null;
-        this.waitForPagesToLoadThenPlay = false;
-        this.mo_processing = false;
-        this.mo_target = null;
+        // the current media overlay
+        this.mo = null;
+        
+        // we track the current section to see when it changes
+        this.currentSection = null; 
+        
+        // flags
+        this.autoplayNextSpineItem = false;
+        this.processingMoTextSrc = false;
+        
+        // media overlay playback starts here, if not null
+        this.moTargetNode = null;
+        
+        // readium pages object
         this.pages = null;
+        // readium view
         this.currentView = null;
+        // readium epub controller, set as a constructor option
 		this.epubController = this.get("epubController");
-		// trigger media overlay position updates
-        this.epubController.on("change:spine_position", this.spineChanged, this);        
+		
+        // trigger media overlay position updates
+        this.epubController.on("change:spine_position", this.handleSpineChanged, this);        
 	},
     
-    // each time there is a new pagination view, it must call setPages
+    // each time there is a new pagination view created, it must call setPages
     setPages: function(pages) {
         if (this.pages != null) {
             this.pages.off();
@@ -41,76 +54,95 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         this.pages = pages;
     },
     
-    // each time there is a new pagination view, it must call setView
+    // each time there is a new pagination view created, it must call setView
     setView: function(view) {
         this.currentView = view;
     },
     
+    // main playback function
 	playMo: function() {
-        var currentSection = this.epubController.getCurrentSection();
-		var mo = currentSection.getMediaOverlay();
+        if (this.mo == null) {
+            alert("Sorry, there is no audio for this section.");
+            return;
+        }
         
-		if(mo) {
-			this.set("active_mo", mo);
-            mo.on("change:current_text_src", this.handleMoTextSrc, this);
-			mo.on("change:is_document_done", this.handleMoDocumentDone, this);
+        this.set("active_mo", this.mo);
+        this.mo.on("change:current_text_src", this.handleMoTextSrc, this);
+		this.mo.on("change:is_document_done", this.handleMoDocumentDone, this);
             
-            var target = this.mo_target;
-            this.mo_target = null;
+        var target = this.moTargetNode;
+        this.moTargetNode = null;
             
-            if (currentSection.isFixedLayout()) {
-                if (mo.get("has_started_playback")) {
-                    this.resumeMo();
-                }
-                else {
-                    mo.startPlayback(null);
-                }
+        // FXL
+        if (this.currentSection.isFixedLayout()) {
+            if (this.mo.get("has_started_playback")) {
+                this.resumeMo();
             }
-            // Is a reflowable section
             else {
-                var currMoPage = -1;
-                var currMoId = this.get("mo_text_id");
-                if (currMoId != null && currMoId != undefined && currMoId != "") {
-                    currMoPage = this.currentView.getElemPageNumberById(currMoId);
-                }
-                
-                // if media overlays is on our current page, then resume playback
-                var currMoPageIsVisible = this.pages.get("current_page").indexOf(currMoPage) != -1;
-                
-                if (currMoPageIsVisible) {    
-                    this.resumeMo();
-                }
-                else {
-                    mo.startPlayback(target);
-                }
+                this.mo.startPlayback(null);
             }
-		}
-		else {
-			alert("Sorry, the current EPUB does not contain a media overlay for this content");
-		}
+        }
+            
+        // Reflowable
+        else {
+            var currMoPage = -1;
+            var currMoId = this.get("mo_text_id");
+            if (currMoId != null && currMoId != undefined && currMoId != "") {
+                currMoPage = this.currentView.getElemPageNumberById(currMoId);
+            }
+                
+            // if media overlays is on our current page, then resume playback
+            var currMoPageIsVisible = this.pages.get("current_page").indexOf(currMoPage) != -1;
+                
+            if (currMoPageIsVisible) {   
+                this.resumeMo();
+            }
+            else {
+                this.mo.startPlayback(target);
+            }
+        }
 	},
 
+    // pause the media overlay playback
 	pauseMo: function() {
-        var mo = this.get("active_mo");
-		if (mo) {
-			mo.off();
-			mo.pause();
+        if (this.mo) {
+			this.mo.off();
+			this.mo.pause();
 			this.set("active_mo", null);             
 		}
 	},
     
-    pageChanged: function() {
-        if (this.mo_processing || this.waitForPagesToLoadThenPlay ) {
+    // called by the reflowable view when the page changes
+    reflowPageChanged: function() {
+        // if MO is driving navigation, don't process the page change
+        // it's probably something we triggered ourselves
+        if (this.processingMoTextSrc || this.autoplayNextSpineItem ) {
             return;
         }
-            
-        this.updateMoPosition();
+        
+        var wasPlaying = this.get("active_mo") != null;
+        if (wasPlaying) {
+            this.pauseMo();
+        }
+        
+        this.setMoTarget();
+        
+        // if media overlays were playing, then resume playback
+        if (wasPlaying) {
+            this.playMo();
+        } 
     },
     
-    // reflowable pagination view calls this when it is reloaded with pages, for example when the spine item changes
+    // the pagination view calls this when it has reloaded the pages, for example when the spine item changes
+    // we need to wait for this event because the pages shuffle a bit during reloading, 
+    // which otherwise causes MO to start playback at the wrong point.
     pagesLoaded: function() {
-        if (this.waitForPagesToLoadThenPlay == true) {
-            this.waitForPagesToLoadThenPlay = false;
+        // just to be safe, ignore FXL
+        if (this.currentSection.isFixedLayout()) {
+            return;
+        }
+        if (this.autoplayNextSpineItem == true) {
+            this.autoplayNextSpineItem = false;
             this.playMo();
         }
     },
@@ -119,135 +151,97 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 	//  "PRIVATE" METHODS                                                                   //
 	// ------------------------------------------------------------------------------------ //
     resumeMo: function() {
-        var currentSection = this.epubController.getCurrentSection();
-        var mo = currentSection.getMediaOverlay();
         this.set("mo_text_id", null); // clear it so that any listeners re-hear the event
         this.handleMoTextSrc();
-        mo.resume();
+        this.mo.resume();
     },
     
     handleMoTextSrc: function() {
-        var mo = this.get("active_mo");
-        var textSrc = mo.get("current_text_src");
+        var textSrc = this.mo.get("current_text_src");
         if (textSrc == null) {
+            this.set("mo_text_id", null);
             return;
         }
-        this.mo_processing = true;
+        this.processingMoTextSrc = true;
         this.epubController.goToHref(textSrc);
         var frag = "";
         if (textSrc.indexOf("#") != -1 && textSrc.indexOf("#") < textSrc.length -1) {
             frag = textSrc.substr(textSrc.indexOf("#")+1);
         }
         this.set("mo_text_id", frag);
-        this.mo_processing = false;    
+        this.processingMoTextSrc = false;    
     },
     
     handleMoDocumentDone: function() {
-        var mo = this.get("active_mo");
-        if (mo != null && mo != undefined) {
-            if (mo.get("is_document_done") == false) {
+        if (this.mo != null && this.mo != undefined) {
+            if (this.mo.get("is_document_done") == false) {
                 return;
             }
         }
-        this.mo_target = null;
-        this.set("mo_text_id", null);
+        
+        this.moTargetNode = null;
         this.pauseMo();
         // advance the spine position
         if (this.epubController.hasNextSection()) {
-            this.waitForPagesToLoadThenPlay = true; 
+            this.autoplayNextSpineItem = true; 
             this.epubController.goToNextSection();
         }
     },
     
-    spineChanged: function() {
+    handleSpineChanged: function() {
         this.set("mo_text_id", null);
-        var currentSection = this.epubController.getCurrentSection();
-        if (currentSection == this.currentSection) {
-            // if the spine changed event didn't actually change the section, just return
+        // sometimes the spine changed event fires but the spine didn't actually change
+        if (this.epubController.getCurrentSection() == this.currentSection) {
             return;
         }
-        this.currentSection = currentSection;
-        var mo = currentSection.getMediaOverlay();
-        if (mo == null) {
-            return;
+        // was something playing?
+        if (this.get("active_mo") != null) {
+            this.autoplayNextSpineItem = true; 
+            this.pauseMo();
         }
-        if (currentSection.isFixedLayout()) {
-            // if we were waiting for the next spine item before continuing playback
-            if (this.waitForPagesToLoadThenPlay) {
-                this.waitForPagesToLoadThenPlay = false;
-                mo.reset();
-                this.playMo();
-            }
-            // else just update our position so when playback starts, we'll be at the right point
-            else {
-                this.updateMoPosition();
-            }
-        }
-        
-        // reflowable books
-        else {
-            mo.reset();
-        }
-    },
-    
-    updateMoPosition: function() {
-        // if we are processing an MO event, then don't update MO position:
-        // chances are, it's a page change event that came from MO playback advancing
-        if (this.mo_processing) {
+        this.currentSection = this.epubController.getCurrentSection();
+        this.mo = this.currentSection.getMediaOverlay();
+        if (this.mo == null) {
             return;
         }
         
-        var mo_was_playing = this.get("active_mo") != null;
-        this.pauseMo();
-        var currentSection = this.epubController.getCurrentSection();
-
-        if (currentSection.isFixedLayout()) {
-            var mo = currentSection.getMediaOverlay();
-            if (mo) {
-                // reset so it starts at the beginning of the page 
-                mo.reset(); 
-            }
-        }
-        else {
-            this.setMoTarget();
-        }
-        // if media overlays were playing, then resume playback
-        if (mo_was_playing) {
+        this.mo.reset();
+        if (this.currentSection.isFixedLayout() && this.autoplayNextSpineItem) {
+            this.autoplayNextSpineItem = false;
             this.playMo();
-        } 
+        }
     },
     
     // look at the current page and find the first visible page element that also appears in the document's MO
     setMoTarget: function() {
-
     	var pageElms;
     	var node;
         // using this instead of "active_mo" because this function could be called when MO is not playing
-        var currentSection = this.epubController.getCurrentSection();
-        var mo = currentSection.getMediaOverlay();
-        if (mo == null) {
+        if (this.mo == null) {
             return;
         }
         
-        if (!currentSection.isFixedLayout()) {
+        if (this.currentSection.isFixedLayout()) {
+            // fixed layout doesn't need a target node: the top of the page is always the start of the document
+            this.moTargetNode = null;
+        }
+        else {
         	pageElms = this.currentView.findVisiblePageElements();
-            var doc_href = currentSection.get("href");
+            var doc_href = this.currentSection.get("href");
             
-	        node = null;
+	        var node = null;
+            // TODO
+            console.log("\nVisible");
 	        for (var i = 0; i<pageElms.length; i++) {
 	            var id = $(pageElms[i]).attr("id");
+                console.log(id);
 	            var src = doc_href + "#" + id;
-	            node = mo.findNodeByTextSrc(src);
+	            node = this.mo.findNodeByTextSrc(src);
 	            if (node) {
 	                break;
 	            }
 	        }
+            this.moTargetNode = node;
         }
-        else {
-            // fixed layout doesn't need a target node: the top of the page is always the start of the document
-        	node = null;
-        }
-        
-        this.mo_target = node;
     }
 });

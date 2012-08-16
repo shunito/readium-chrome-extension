@@ -30,6 +30,9 @@ Resume the audio
 
 Set the audio volume. 0 is mute, and 1.0 is max volume.
 
+### `reset()`
+Reset all flags as though the media overlay has not yet started playing.
+
 ## Observable Properties 
 
 ###`current_text_src`

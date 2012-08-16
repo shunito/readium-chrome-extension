@@ -68,6 +68,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         var doc_bottom = doc_top + $(doc).height();
         
         var visibleElms = this.filterElementsByPosition(elmsWithId, doc_top, doc_bottom, doc_left, doc_right);
+            
         return visibleElms;
     },
     
@@ -141,8 +142,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         
         if (this.model.get("two_up") == false || 
             (this.model.get("two_up") && page % 2 === 1)) {
-                // when we change the page, we should tell MO to update its position
-                this.mediaOverlayController.pageChanged();
+                // when we change the page, we have to tell MO to update its position
+                this.mediaOverlayController.reflowPageChanged();
         }
 	},
 
