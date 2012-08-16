@@ -69,7 +69,7 @@ TBD: check above description against final version of book
 This list is a work in progress.
 
  * FXL with only some pages containing media overlays
-
+  
 ## Known behavior
 
  * If an element starts on one page and ends on another, it is treated as though it is on the first of those two pages. There is no reliable way of synchronizing audio at a sub-element level.
