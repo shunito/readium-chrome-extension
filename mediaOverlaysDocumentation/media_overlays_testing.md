@@ -80,9 +80,11 @@ This list is a work in progress.
 
 ### MO position is off
  
- * Moby Dick, 2-page mode. 
- * Start at chapter 1, press play. 
- * Then advance the pages. The pages won't turn. 
+ * Load Moby Dick
+ * Set Readium to 2-page mode. 
+ * Start at Chapter 1 a d press play. 
+ * During playback, go to the next page(s). Playback keeps resetting to the beginning of Chapter 1.
 
 This is caused by an incorrect return value of visiblePageElements. Is there a way to tell when the page elements for a page are ready?
- 
+
+Note that we've seen this problem before, but it disappeared after a Chrome update last week. Of course just 1 day ago (Aug 14), there has just been another Chrome update, and it's a problem again.
