@@ -261,5 +261,5 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
     		"top": "0px",
     		"-webkit-transform": "scale(1.0) translate(0px, 0px)"
     	});
-    },
+    }
 });

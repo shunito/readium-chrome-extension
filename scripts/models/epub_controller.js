@@ -111,11 +111,9 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
   		// only save attrs that should be persisted:
   		return {
-			"current_theme": this.get("current_theme"),
 			"updated_at": this.get("updated_at"),
 			"current_theme": this.get("current_theme"),
 			"current_margin": this.get("current_margin"),
-			"font_size": this.get("font_size"),
 			"two_up": this.get("two_up"),
 			"font_size": this.get("font_size"),
 			"key": this.get("key")
