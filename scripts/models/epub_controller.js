@@ -242,7 +242,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		var cp = this.get("spine_position");
 		var pos = this.packageDocument.getPrevLinearSpinePostition(cp);
 		if(pos > -1) {
-			this.setSpinePos(pos, false);	
+			this.setSpinePos(pos, true);	
 		}
 	},
 
