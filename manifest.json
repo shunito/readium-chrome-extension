@@ -6,7 +6,6 @@
          "local_path": "views/library.html"
       }
    },
-   "update_url": "http://github.readium.org/releases/update.xml",
    "background" : {
       "page": "background/background.html"
     },
