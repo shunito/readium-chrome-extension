@@ -1,3 +1,19 @@
+/**
+ * Within this file all sass variables to the Readium Project are defined
+ */
+/**
+ * Dependent on the location of the calling html file (e. g. viewer.html) the 
+ * file hirarchy may be broken and images are out of range. Also relative 
+ * paths may be preferred to absolute ones. All this can be done with this 
+ * preceding path. As images start from document root with the naming of 
+ * their folder, the path in the path variable should end with a "/".
+ * 
+ * Affected sass files:
+ *   readium_paginator
+ *   toc
+ *   viewer_settings_modal
+ * 
+ */
 .clearfix {
   *zoom: 1; }
   .clearfix:before, .clearfix:after {
@@ -1212,19 +1228,27 @@ html {
 * {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
 
+.offscreenText {
+  display: none; }
+
+#toolbar-el {
+  height: 52px; }
+
 .navbar .nav > li > a {
   padding: 5px 0; }
 .navbar li {
-  margin: 0;
+  margin: 3px;
   padding: 0; }
 .navbar .brand {
-  padding: 5px;
+  padding: 8px;
   margin-left: 10px; }
 .navbar .divider-vertical {
-  height: 46px; }
+  height: 52px;
+  background-color: black;
+  border-right: 1px solid #3D3D3D; }
 .navbar .divider-vertical.stubby {
   margin-top: 8px;
-  height: 30px; }
+  height: 35px; }
 .navbar .nav-icon {
   height: 36px;
   width: 36px; }
@@ -1233,8 +1257,12 @@ html {
   height: 36px; }
 
 #show-toolbar-button {
-  padding: 5px;
-  margin-right: 12px; }
+  padding: 8px;
+  margin-right: 7px;
+  display: none; }
+
+#add-book-li {
+  margin-right: 22px; }
 
 #settings {
   position: fixed;
@@ -1310,8 +1338,11 @@ span.setting-button:hover {
 body {
   margin: 0;
   padding: 0;
-  position: relative;
-  padding-top: 45; }
+  position: absolute;
+  top: 52px;
+  bottom: 0px;
+  overflow: hidden;
+  width: 100%; }
 
 #next-page-button {
   right: 0;
@@ -1393,11 +1424,9 @@ body {
   z-index: 10; }
 
 /*.apple-fixed-layout*/
-.apple-fixed-layout #readium-right-content {
-  height: 90%; }
-
 #readium-right-content {
-  height: 100%; }
+  height: 100%;
+  width: 100%; }
 
 .invisible {
   visibility: hidden;
@@ -1436,14 +1465,6 @@ body {
 .two-up .fixed-page-wrap.center_page {
   z-index: 11; }
 
-body.apple-fixed-layout {
-  height: 100%;
-  width: 100%;
-  overflow: hidden; }
-
-.apple-fixed-layout #readium-book-view-el {
-  margin: auto; }
-
 #readium-info {
   text-align: center;
   padding: 30px;
@@ -1481,10 +1502,7 @@ body.apple-fixed-layout {
   height: 100%;
   margin: 0 auto;
   margin-top: 1%;
-  height: 90%;
-  -webkit-box-shadow: 0 0 5px 5px #888888;
-  -moz-box-shadow: 0 0 5px 5px #888888;
-  box-shadow: 0 0 5px 5px #888888; }
+  height: 90%; }
 
 #viewer-settings-modal {
   text-align: center;
@@ -1512,7 +1530,7 @@ body.apple-fixed-layout {
     -moz-border-radius: 2px;
     border-radius: 2px;
     padding: 5px;
-    height: 100px;
+    height: 80px;
     overflow: hidden;
     text-align: left; }
   #viewer-settings-modal .setting-header {
@@ -1520,7 +1538,7 @@ body.apple-fixed-layout {
     font-family: Helvetica,Arial,sans-serif;
     font-size: 12px;
     color: #777;
-    margin: 14px 0px;
+    margin: 12px 0px;
     padding: 0px; }
   #viewer-settings-modal #settings-margin {
     padding: 20px; }
@@ -1534,10 +1552,19 @@ body.apple-fixed-layout {
     float: right;
     width: 253px;
     margin-top: 7px; }
+  #viewer-settings-modal #margin-radio-wrapper {
+    width: 312px;
+    height: 63px;
+    position: relative;
+    left: 0px;
+    top: 0px; }
   #viewer-settings-modal .margin-radio {
     display: inline-block;
+    position: absolute;
     width: 43px;
-    height: 60px;
+    height: 63px;
+    margin: 0;
+    padding: 0;
     background-repeat: no-repeat;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -1546,26 +1573,27 @@ body.apple-fixed-layout {
     user-select: none; }
   #viewer-settings-modal #margin-option-1 {
     background-image: url("/images/settings_modal/margin1_off.png");
-    margin-right: 20px; }
+    left: 0px; }
     #viewer-settings-modal #margin-option-1.selected {
       background-image: url("/images/settings_modal/margin1_on.png"); }
   #viewer-settings-modal #margin-option-2 {
     background-image: url("/images/settings_modal/margin2_off.png");
-    margin-right: 20px; }
+    left: 67px; }
     #viewer-settings-modal #margin-option-2.selected {
       background-image: url("/images/settings_modal/margin2_on.png"); }
   #viewer-settings-modal #margin-option-3 {
     background-image: url("/images/settings_modal/margin3_off.png");
-    margin-right: 20px; }
+    left: 134px; }
     #viewer-settings-modal #margin-option-3.selected {
       background-image: url("/images/settings_modal/margin3_on.png"); }
   #viewer-settings-modal #margin-option-4 {
     background-image: url("/images/settings_modal/margin4_off.png");
-    margin-right: 20px; }
+    left: 201px; }
     #viewer-settings-modal #margin-option-4.selected {
       background-image: url("/images/settings_modal/margin4_on.png"); }
   #viewer-settings-modal #margin-option-5 {
-    background-image: url("/images/settings_modal/margin5_off.png"); }
+    background-image: url("/images/settings_modal/margin5_off.png");
+    right: 1px; }
     #viewer-settings-modal #margin-option-5.selected {
       background-image: url("/images/settings_modal/margin5_on.png"); }
   #viewer-settings-modal .simple-radio {
@@ -1621,13 +1649,14 @@ body.apple-fixed-layout {
   top: 0;
   z-index: 999;
   bottom: 0;
-  margin-top: 45px;
   border-left: 1px solid #DDD;
   font-size: 0.8em;
   overflow: hidden;
   -webkit-box-shadow: 10px 0px 11px rgba(100, 100, 104, 0.35);
   -moz-box-shadow: 10px 0px 11px rgba(100, 100, 104, 0.35);
   box-shadow: 10px 0px 11px rgba(100, 100, 104, 0.35); }
+  #readium-toc ol {
+    padding-left: 1.5em; }
 
 #toc-body, #toc-header {
   margin-right: 10px;
@@ -1706,33 +1735,9 @@ body.apple-fixed-layout {
       color: #774c27; }
 
 .night-theme {
-  background-color: black;
+  background-color: #141414;
   color: white; }
   .night-theme #readium-content-container.mo-playing {
     color: #666; }
     .night-theme #readium-content-container.mo-playing .current-mo-content {
       color: white; }
-
-#regions-not-available {
-  padding: 10px;
-  color: #B94A48;
-  background-color: #F2DEDE;
-  border-color: #EED3D7;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 15px;
-  line-height: 18px;
-  font-weight: normal; }
-  #regions-not-available div {
-    margin: 10px; }
-  #regions-not-available strong {
-    font-weight: bold; }
-  #regions-not-available code {
-    color: #111111;
-    background-color: white;
-    border: 1px solid #B94A48;
-    padding: 2px 5px;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px; }
-  #regions-not-available li {
-    margin: 10px 0px; }
