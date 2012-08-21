@@ -38,22 +38,20 @@ end
 
 namespace :build do
 
-	desc "build extension" 
-	task :crx do
-		path = File.join @config[:proj_root_dir], @config[:publish_dir]
-		puts "packaging contents of #{path} as a .crx"
-		puts `#{@config[:chrome_command]} --pack-extension=#{path} --pack-extension-key=#{@config[:pem_path]}`
-
-		# have to manually move it where it needs to go:
-		`mv #{@config[:publish_dir]}.crx #{@config[:crx_path]}`
-	end
-
-	# TODO publishing to the chrome web store does not require a packed extension
-	# only a zip of its contents.
 	# desc "build extension" 
 	# task :crx do
-	# 	`zip readium.zip -r readium/*`
+	# 	path = File.join @config[:proj_root_dir], @config[:publish_dir]
+	# 	puts "packaging contents of #{path} as a .crx"
+	# 	puts `#{@config[:chrome_command]} --pack-extension=#{path} --pack-extension-key=#{@config[:pem_path]}`
+
+	# 	# have to manually move it where it needs to go:
+	# 	`mv #{@config[:publish_dir]}.crx #{@config[:crx_path]}`
 	# end
+
+	desc "create a zip of the extension" 
+	task :crx do
+		`zip readium.zip -r readium/*`
+	end
 
 	desc "Minify and copy all scripts into publish dir"
 	task :scripts => "create_workspace" do
