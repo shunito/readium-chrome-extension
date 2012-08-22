@@ -247,9 +247,7 @@ Readium.Views.FilePickerView = Backbone.View.extend({
 
 	handleFileSelect: function(evt) {
 		var files = evt.target.files; // FileList object
-		var url = window.webkitURL.createObjectURL(files[0]);
-		// TODO check src filename
-		var extractor = new Readium.Models.ZipBookExtractor({url: url, src_filename: files[0].name});
+		var extractor = new Readium.Models.ZipBookExtractor({file: files[0], src_filename: files[0].name});
 		this.beginExtraction(extractor);
 	},
 

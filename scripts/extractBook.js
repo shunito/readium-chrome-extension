@@ -155,41 +155,58 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 
 	initialize: function() {
-		var url = this.get("url");
-		if(!url) {
-			throw "A URL to a zip file must be specified"
+		zip.workerScriptsPath = "../lib/"
+		var file_name = this.get("src_filename");
+		if(!this.get("file")) {
+			throw "A zip file must be specified";
 		}
 		else {
-			this.base_dir_name = Readium.Utils.MD5(url + (new Date()).toString());
-			this.set("src", this.get("src_filename"));
+			this.base_dir_name = Readium.Utils.MD5(file_name + (new Date()).toString());
+			this.set("src", file_name);
 		}	
 	},
 	
 	extractEntryByName: function(name, callback) {
-		var found = false;
-		for (var i=0; i < this.zip.entries.length; i++) {
-			if(this.zip.entries[i].name === name) {
-				found = true;
-				if(this.zip.entries[i].uncompressedSize > 0) {
-					this.zip.entries[i].extract(callback);	
-				}
-				else {
-					callback("");
-				}
-				
-				break;
-			}
+		var writer, entry;
+
+		entry = _.find(this.entries, function(entry) {
+			return entry.filename === name;
+		});
+		if(entry) {
+			writer = new zip.TextWriter();
+			entry.getData(writer, callback);
 		}
-		if(!found) {
+		else {
 			throw ("asked to extract non-existent zip-entry: " + name);
 		}
+		
+
+
+
+		// var found = false;
+		// for (var i=0; i < this.zip.entries.length; i++) {
+		// 	if(this.zip.entries[i].name === name) {
+		// 		found = true;
+		// 		if(this.zip.entries[i].uncompressedSize > 0) {
+		// 			this.zip.entries[i].extract(callback);	
+		// 		}
+		// 		else {
+		// 			callback("");
+		// 		}
+				
+		// 		break;
+		// 	}
+		// }
+		// if(!found) {
+		// 	throw ("asked to extract non-existent zip-entry: " + name);
+		// }
 	},
 	
 	extractContainerRoot: function() {
 		var that = this;
 		var path = this.get("root_file_path");
 		try {
-			this.extractEntryByName(path, function(entry, content) {
+			this.extractEntryByName(path, function(content) {
 				that.parseContainerRoot(content);
 			});				
 		} catch(e) {
@@ -200,7 +217,7 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 	extractMetaInfo: function() {
 		var that = this;
 		try {
-			this.extractEntryByName(this.CONTAINER, function(entry, content) {
+			this.extractEntryByName(this.CONTAINER, function(content) {
 				that.parseMetaInfo(content);
 			});
 		} catch (e) {
@@ -212,7 +229,7 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		var that = this;
 		this.set("log_message", "Verifying mimetype");
 		try {
-			this.extractEntryByName(this.MIMETYPE, function(entry, content) {
+			this.extractEntryByName(this.MIMETYPE, function(content) {
 				that.validateMimetype(content);
 			});			
 		} catch (e) {
@@ -223,10 +240,16 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 	
 	validateZip: function() {
 		// set the task
-		// weak test, just make sure MIMETYPE and CONTAINER files are where expected
-		var entries = this.zip.entryNames;
+		// weak test, just make sure MIMETYPE and CONTAINER files are where expected	
+		var that = this;
 		this.set("log_message", "Validating zip file");
-		if(entries.indexOf(this.MIMETYPE) >= 0 && entries.indexOf(this.CONTAINER) >= 0) {
+		var has_mime = _.any(this.entries, function(x){
+			return x.filename === that.MIMETYPE
+		});
+		var has_container = _.any(this.entries, function(x){
+			return x.filename === that.CONTAINER
+		});
+		if(has_mime && has_container) {
 			this.trigger("validated:zip");
 		}
 		else {
@@ -238,23 +261,23 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 	extractBook: function() {
 		// genericly extract a file and then write it to disk
 		var entry;
-		var zip = this.zip;
 		var i = this.get("zip_position");
 		var that = this;
 		
-		if( i === zip.entries.length) {
+		if( i === this.entries.length) {
 			this.set("log_message", "All files unzipped successfully!");
 			this.set("patch_position", 0)
 		} 
 		else {
-			entry = zip.entries[i];
-			if( entry.name.substr(-1) === "/" ) {
+			entry = this.entries[i];
+			if( entry.filename.substr(-1) === "/" ) {
 				that.set("zip_position", i + 1);
 			}
 			else {
-				this.set("log_message", "extracting: " + entry.name);
-				entry.extract(function(entry, content) {
-					that.writeFile(entry.name, content, function() {
+				this.set("log_message", "extracting: " + entry.filename);
+				var writer = new zip.TextWriter();
+				entry.getData(writer, function(content) {
+					that.writeFile(entry.filename, content, function() {
 						that.set("zip_position", i + 1);
 					});
 				});
@@ -265,9 +288,9 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 	beginUnpacking: function() {		
 		var manifest = [];
 		var entry;
-		for(var i = 0; i < this.zip.entries.length; i++) {
-			entry = this.zip.entries[i];
-			if( entry.name.substr(-1) !== "/" ) {
+		for(var i = 0; i < this.entries.length; i++) {
+			entry = this.entries[i];
+			if( entry.filename.substr(-1) !== "/" ) {
 				manifest.push(entry.name);
 			}
 		}
@@ -316,12 +339,20 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 
 	initializeZip: function() {
 		var that = this;
+		
 		this.fsApi.getFileSystem().root.getDirectory(this.base_dir_name, {create: true}, function(dir) {
 			that.set("root_url", dir.toURL());
-			that.zip = new ZipFile(that.get('url'), function() {
-				that.set("task_size", that.zip.entries.length * 2 + 3);
-				that.trigger("initialized:zip");
-			}, 0);
+			zip.createReader(new zip.BlobReader(that.get("file")), function(zipReader) {
+				zipReader.getEntries(function(entries) {
+					that.entries = entries;
+					that.set("task_size", entries.length * 2 + 3);
+					that.trigger("initialized:zip");
+				});
+			}, function() {
+				that.set("error", "File does not appear to be a valid EPUB. Progress cancelled."); 
+				debugger; // TODO: error handler?
+			});
+
 		}, function() {
 			console.log("In beginUnpacking error handler. Does the root dir already exist?");
 		});
