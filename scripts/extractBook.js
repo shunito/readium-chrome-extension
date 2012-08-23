@@ -47,16 +47,16 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 		// If we get passed an APPLE FIXED LAYOUT metadata we need to 
 		// parse it before we write it out. Note, we do not parse this file
 		// again when we open the book
-		if(rel_path.indexOf(this.DISPLAY_OPTIONS) >= 0) {
-			if(typeof content === "string") {
-				this.packageDoc.parseIbooksDisplayOptions(content);
-			}
-			else {
-				this.readEntryByShortName(this.DISPLAY_OPTIONS, function(data) {
-					that.packageDoc.parseIbooksDisplayOptions(data);
-				});
-			}
-		}
+		// if(rel_path.indexOf(this.DISPLAY_OPTIONS) >= 0) {
+		// 	if(typeof content === "string") {
+		// 		this.packageDoc.parseIbooksDisplayOptions(content);
+		// 	}
+		// 	else {
+		// 		this.readEntryByShortName(this.DISPLAY_OPTIONS, function(data) {
+		// 			that.packageDoc.parseIbooksDisplayOptions(data);
+		// 		});
+		// 	}
+		// }
 
 		this.fsApi.writeFile(abs_path, content, cb , function() {
 			that.set("error", "ERROR: while writing to filesystem");
@@ -275,7 +275,7 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 			}
 			else {
 				this.set("log_message", "extracting: " + entry.filename);
-				var writer = new zip.TextWriter();
+				var writer = new zip.BlobWriter();
 				entry.getData(writer, function(content) {
 					that.writeFile(entry.filename, content, function() {
 						that.set("zip_position", i + 1);
