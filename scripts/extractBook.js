@@ -1,11 +1,3 @@
-if(typeof Readium.FileSystemApi === "undefined") {
-	throw "ExtractBook holds Readium::FileSystemApi as a dependency";
-}
-
-if(typeof Readium.Utils.MD5 === "undefined" ) {
-	throw "Extract holds Readium::Utils::MD5 as a dependency";
-}
-
 Readium.Models.BookExtractorBase = Backbone.Model.extend({
 	// Constants
 	MIMETYPE: "mimetype",
@@ -73,7 +65,8 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 			this.set("error", "This epub is not valid. The rootfile could not be located.");
 		}
 		else {
-			// According to the spec more than one rootfile can be specified but we are required to parse the first one only for now...
+			// According to the spec more than one rootfile can be specified 
+			// but we are required to parse the first one only for now...
 			if (rootFiles[0].hasAttribute("full-path")) {
 				this.set("root_file_path", rootFiles[0].attributes["full-path"].value);
 			}
