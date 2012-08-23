@@ -179,27 +179,6 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		else {
 			throw ("asked to extract non-existent zip-entry: " + name);
 		}
-		
-
-
-
-		// var found = false;
-		// for (var i=0; i < this.zip.entries.length; i++) {
-		// 	if(this.zip.entries[i].name === name) {
-		// 		found = true;
-		// 		if(this.zip.entries[i].uncompressedSize > 0) {
-		// 			this.zip.entries[i].extract(callback);	
-		// 		}
-		// 		else {
-		// 			callback("");
-		// 		}
-				
-		// 		break;
-		// 	}
-		// }
-		// if(!found) {
-		// 	throw ("asked to extract non-existent zip-entry: " + name);
-		// }
 	},
 	
 	extractContainerRoot: function() {
@@ -257,31 +236,59 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		}
 		
 	},
+
+	extractEntry: function(entry) {
+		var that = this;
+		var writer = new zip.BlobWriter();
+		entry.getData(writer, function(content) {
+			that.writeFile(entry.filename, content, function() {
+				that.available_workers += 1;
+				that.set("zip_position", that.get("zip_position") + 1);
+			});
+		});
+	},
 	
 	extractBook: function() {
+
 		// genericly extract a file and then write it to disk
 		var entry;
-		var i = this.get("zip_position");
-		var that = this;
-		
-		if( i === this.entries.length) {
-			this.set("log_message", "All files unzipped successfully!");
-			this.set("patch_position", 0)
-		} 
-		else {
-			entry = this.entries[i];
+
+		if(this.get("zip_position") === 0) {
+			this.available_workers = 5;
+			this.entry_position = 0;
+			this.on("change:zip_position", this.checkCompletion, this);
+		}
+
+		while(this.available_workers > 0 && this.entry_position < this.entries.length) {
+			entry = this.entries[this.entry_position];	
 			if( entry.filename.substr(-1) === "/" ) {
-				that.set("zip_position", i + 1);
+				// skip over directories
+				this.entry_position += 1;
+				this.set("zip_position", this.get("zip_position") + 1);
 			}
 			else {
-				this.set("log_message", "extracting: " + entry.filename);
-				var writer = new zip.BlobWriter();
-				entry.getData(writer, function(content) {
-					that.writeFile(entry.filename, content, function() {
-						that.set("zip_position", i + 1);
-					});
-				});
+				this.available_workers -= 1;
+				this.entry_position += 1;
+				this.extractEntry(entry);
 			}
+
+		}
+		
+		for(var i = 0; i < this.entries.length; i++) {
+			
+		}
+	},
+
+	checkCompletion: function() {
+		var pos = this.get("zip_position");
+		if(pos === this.entries.length) {
+			this.set("log_message", "All files unzipped successfully!");
+			this.set("patch_position", 0);
+		}
+		else {
+			// this isn't exactly accurate but it will signal the user
+			// that we are still doing work
+			this.set("log_message", "extracting: " + this.entries[pos].filename);
 		}
 	},
 
