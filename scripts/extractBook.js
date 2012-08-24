@@ -36,20 +36,6 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 		var that = this;
 		var abs_path = this.base_dir_name + "/" + rel_path;
 
-		// If we get passed an APPLE FIXED LAYOUT metadata we need to 
-		// parse it before we write it out. Note, we do not parse this file
-		// again when we open the book
-		// if(rel_path.indexOf(this.DISPLAY_OPTIONS) >= 0) {
-		// 	if(typeof content === "string") {
-		// 		this.packageDoc.parseIbooksDisplayOptions(content);
-		// 	}
-		// 	else {
-		// 		this.readEntryByShortName(this.DISPLAY_OPTIONS, function(data) {
-		// 			that.packageDoc.parseIbooksDisplayOptions(data);
-		// 		});
-		// 	}
-		// }
-
 		this.fsApi.writeFile(abs_path, content, cb , function() {
 			that.set("error", "ERROR: while writing to filesystem");
 		});
@@ -272,6 +258,19 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		}
 	},
 
+	parseIbooksDisplayOptions: function() {
+		var that = this;
+		try {
+			this.extractEntryByName(this.DISPLAY_OPTIONS, function(content) {
+				that.packageDoc.parseIbooksDisplayOptions(content);
+				that.trigger("parsed:ibooks_options");
+			});
+		} catch(e) {
+			// there was no ibook_options file, thats fine....
+			this.trigger("parsed:ibooks_options");	
+		}
+	},
+
 	checkCompletion: function() {
 		var pos = this.get("zip_position");
 		if(pos === this.entries.length) {
@@ -306,7 +305,8 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		this.on("validated:zip", this.extractMimetype, this);
 		this.on("validated:mime", this.extractMetaInfo, this);
 		this.on("change:root_file_path", this.extractContainerRoot, this);
-		this.on("parsed:root_file", this.beginUnpacking, this);
+		this.on("parsed:root_file", this.parseIbooksDisplayOptions, this);
+		this.on("parsed:ibooks_options", this.beginUnpacking, this);
 		this.on("change:zip_position", this.extractBook, this);
 		this.on("change:patch_position", this.correctURIs, this);
 		this.on("change:failure", this.clean, this);
@@ -350,7 +350,6 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 				});
 			}, function() {
 				that.set("error", "File does not appear to be a valid EPUB. Progress cancelled."); 
-				debugger; // TODO: error handler?
 			});
 
 		}, function() {
@@ -401,7 +400,8 @@ Readium.Models.UnpackedBookExtractor = Readium.Models.BookExtractorBase.extend({
 		this.on("validated:dir", this.readMime, this);
 		this.on("validated:mime", this.readMetaInfo, this);
 		this.on("change:root_file_path", this.readContainerRoot, this);
-		this.on("parsed:root_file", this.beginWriting, this);
+		this.on("parsed:root_file", this.parseIbooksDisplayOptions, this);
+		this.on("parsed:ibooks_options", this.beginWriting, this);
 		this.on("change:write_position", this.writeEntry, this);
 		this.on("change:patch_position", this.correctURIs, this);
 		this.on("change:failure", this.clean, this);
@@ -426,6 +426,20 @@ Readium.Models.UnpackedBookExtractor = Readium.Models.BookExtractorBase.extend({
 			});
 		});
 
+	},
+
+	parseIbooksDisplayOptions: function() {
+		this.trigger("parsed:ibooks_options");
+		var that = this;
+		try {
+			this.readEntryByShortName(this.DISPLAY_OPTIONS, function(content) {
+				that.packageDoc.parseIbooksDisplayOptions(content);
+				that.trigger("parsed:ibooks_options");
+			});
+		} catch(e) {
+			// there was no ibook_options file, thats fine....
+			this.trigger("parsed:ibooks_options");	
+		}
 	},
 
 	validateDir: function() {
