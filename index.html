@@ -18,25 +18,25 @@
 			<div class="navbar-inner" id="inner-top-bar">
 				<div class="container" style="width: 100%">
 
-					<a accesskey="i" class="brand" data-toggle="modal" href="#readium-info" id='bar-logo' role="button">
+					<a aria-label="Readium Info" accesskey="i" class="brand" data-toggle="modal" href="#readium-info" id='bar-logo' role="button">
 						<img src="/images/top_bar/readium_logo.png" alt="Readium Info"/>
 					</a>
 
 					<ul class="nav pull-right">
 						<li class="divider-vertical stubby"></li>
 						<li>
-							<a accesskey="l" href="#" id="row-view-btn" role="button">
+							<a aria-label="EBooks in list view" accesskey="l" href="#" id="row-view-btn" role="button">
 								<img src="/images/top_bar/list_view.png" class="small" alt="EBooks in list view"/>
 							</a>
 						</li>
 						<li>
-							<a accesskey="t" href="#" id='block-view-btn' role="button">
+							<a aria-label="EBooks in thumbnail view" accesskey="t" href="#" id='block-view-btn' role="button">
 								<img src="/images/top_bar/thumb_view.png" class="small" alt="EBooks in thumbnail view"/>
 							</a>
 						</li>
 						<li class="divider-vertical stubby"></li>
 						<li id="add-book-li">
-							<a accesskey="o" href="#readium-options-modal" id="options-btn" data-toggle="modal" role="button">
+							<a aria-label="Options" accesskey="o" href="#readium-options-modal" id="options-btn" data-toggle="modal" role="button">
 								<img src="/images/top_bar/options.png" class="small" alt="Options"/>
 							</a>
 						</li>
@@ -226,7 +226,7 @@
 				
 				<img class='cover-image read' src='<%= data.cover_href %>' width='150' height='220' alt='Open ePUB <%= data.title %>'>
 				
-				<a href="#details-modal-<%= data.key %>" class="info-icon" data-toggle="modal" role="button">
+				<a aria-label='<%= data.title %> information' href="#details-modal-<%= data.key %>" class="info-icon" data-toggle="modal" role="button">
 					<img class='info-icon pull-right' src='/images/library/info-icon.png' height="39px" width="39px" alt='<%= data.title %> information'>
 				</a>
 			</div>
@@ -267,7 +267,7 @@
 				<p id='empty-message-text' class='green'>
 					Add items to your</br>library here!
 				</p>
-				<img id='empty-arrow' src='/images/library/empty_library_arrow.png' alt='Empty library arrow suggests adding an ePUB'/>
+				<img id='empty-arrow' src='/images/library/empty_library_arrow.png' alt='Try adding an ePUB'/>
 				
 			</div>
 		</script>

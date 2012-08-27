@@ -9,6 +9,7 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 	initialize: function() {
 		
 		this.model.on("change:full_screen", this.toggleFullscreen, this);
+
 		this.model.on("change:current_theme", this.renderTheme, this);
 		this.model.on("change:toolbar_visible", this.renderPageButtons, this);
 		this.model.on("change:toc_visible", this.renderTocVisible, this);

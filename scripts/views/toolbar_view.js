@@ -27,6 +27,7 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 		var isFs = this.model.get("full_screen");
 		this.$("#go-to-fs-ico").toggle( !isFs );
 		this.$("#leave-fs-ico").toggle( isFs );
+$('#fs-toggle-btn').attr('aria-label', isFs ? 'Fullscreen on' : 'Fullscreen off');
 		return this;
 	},
 
@@ -34,6 +35,7 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 		var isNight = this.model.get("current_theme") === "night-theme";
 		this.$('#night-to-day-ico').toggle(isNight);
 		this.$('#day-to-night-ico').toggle(!isNight);
+$('#nightmode-btn').attr('aria-label', isNight ? 'Nightmode on' : 'Nightmode off');
 		return this;
 	},
 
