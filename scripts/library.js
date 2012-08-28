@@ -1,3 +1,12 @@
+Timer = function() {};
+Timer.prototype.start = function() {this.start = new Date()};
+Timer.prototype.stop = function() {this.stop = new Date()};
+Timer.prototype.report = function() {
+	console.log("===================Timer Report======================");
+	console.log(this.stop - this.start);
+	console.log("===================Timer Report======================");
+};
+
 Readium.Models.LibraryItem = Backbone.Model.extend({
 
 	idAttribute: "key",
@@ -247,9 +256,7 @@ Readium.Views.FilePickerView = Backbone.View.extend({
 
 	handleFileSelect: function(evt) {
 		var files = evt.target.files; // FileList object
-		var url = window.webkitURL.createObjectURL(files[0]);
-		// TODO check src filename
-		var extractor = new Readium.Models.ZipBookExtractor({url: url, src_filename: files[0].name});
+		var extractor = new Readium.Models.ZipBookExtractor({file: files[0], src_filename: files[0].name});
 		this.beginExtraction(extractor);
 	},
 
@@ -262,9 +269,13 @@ Readium.Views.FilePickerView = Backbone.View.extend({
 
 	beginExtraction: function(extractor) {
 		var that = this;
+		var timer = new Timer();
+		timer.start();
 		window._extract_view = new Readium.Views.ExtractItemView({model: extractor});
 		extractor.on("extraction_success", function() {
 			var book = extractor.packageDoc.toJSON();
+			timer.stop();
+			timer.report();
 			that.collection.add(new Readium.Models.LibraryItem(book));
 			that.resetForm();
 			setTimeout(function() {

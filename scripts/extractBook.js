@@ -1,11 +1,3 @@
-if(typeof Readium.FileSystemApi === "undefined") {
-	throw "ExtractBook holds Readium::FileSystemApi as a dependency";
-}
-
-if(typeof Readium.Utils.MD5 === "undefined" ) {
-	throw "Extract holds Readium::Utils::MD5 as a dependency";
-}
-
 Readium.Models.BookExtractorBase = Backbone.Model.extend({
 	// Constants
 	MIMETYPE: "mimetype",
@@ -44,20 +36,6 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 		var that = this;
 		var abs_path = this.base_dir_name + "/" + rel_path;
 
-		// If we get passed an APPLE FIXED LAYOUT metadata we need to 
-		// parse it before we write it out. Note, we do not parse this file
-		// again when we open the book
-		if(rel_path.indexOf(this.DISPLAY_OPTIONS) >= 0) {
-			if(typeof content === "string") {
-				this.packageDoc.parseIbooksDisplayOptions(content);
-			}
-			else {
-				this.readEntryByShortName(this.DISPLAY_OPTIONS, function(data) {
-					that.packageDoc.parseIbooksDisplayOptions(data);
-				});
-			}
-		}
-
 		this.fsApi.writeFile(abs_path, content, cb , function() {
 			that.set("error", "ERROR: while writing to filesystem");
 		});
@@ -73,7 +51,8 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 			this.set("error", "This epub is not valid. The rootfile could not be located.");
 		}
 		else {
-			// According to the spec more than one rootfile can be specified but we are required to parse the first one only for now...
+			// According to the spec more than one rootfile can be specified 
+			// but we are required to parse the first one only for now...
 			if (rootFiles[0].hasAttribute("full-path")) {
 				this.set("root_file_path", rootFiles[0].attributes["full-path"].value);
 			}
@@ -155,32 +134,28 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 
 	initialize: function() {
-		var url = this.get("url");
-		if(!url) {
-			throw "A URL to a zip file must be specified"
+		zip.workerScriptsPath = "../lib/"
+		var file_name = this.get("src_filename");
+		if(!this.get("file")) {
+			throw "A zip file must be specified";
 		}
 		else {
-			this.base_dir_name = Readium.Utils.MD5(url + (new Date()).toString());
-			this.set("src", this.get("src_filename"));
+			this.base_dir_name = Readium.Utils.MD5(file_name + (new Date()).toString());
+			this.set("src", file_name);
 		}	
 	},
 	
 	extractEntryByName: function(name, callback) {
-		var found = false;
-		for (var i=0; i < this.zip.entries.length; i++) {
-			if(this.zip.entries[i].name === name) {
-				found = true;
-				if(this.zip.entries[i].uncompressedSize > 0) {
-					this.zip.entries[i].extract(callback);	
-				}
-				else {
-					callback("");
-				}
-				
-				break;
-			}
+		var writer, entry;
+
+		entry = _.find(this.entries, function(entry) {
+			return entry.filename === name;
+		});
+		if(entry) {
+			writer = new zip.TextWriter();
+			entry.getData(writer, callback);
 		}
-		if(!found) {
+		else {
 			throw ("asked to extract non-existent zip-entry: " + name);
 		}
 	},
@@ -189,7 +164,7 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		var that = this;
 		var path = this.get("root_file_path");
 		try {
-			this.extractEntryByName(path, function(entry, content) {
+			this.extractEntryByName(path, function(content) {
 				that.parseContainerRoot(content);
 			});				
 		} catch(e) {
@@ -200,7 +175,7 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 	extractMetaInfo: function() {
 		var that = this;
 		try {
-			this.extractEntryByName(this.CONTAINER, function(entry, content) {
+			this.extractEntryByName(this.CONTAINER, function(content) {
 				that.parseMetaInfo(content);
 			});
 		} catch (e) {
@@ -212,7 +187,7 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		var that = this;
 		this.set("log_message", "Verifying mimetype");
 		try {
-			this.extractEntryByName(this.MIMETYPE, function(entry, content) {
+			this.extractEntryByName(this.MIMETYPE, function(content) {
 				that.validateMimetype(content);
 			});			
 		} catch (e) {
@@ -223,10 +198,16 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 	
 	validateZip: function() {
 		// set the task
-		// weak test, just make sure MIMETYPE and CONTAINER files are where expected
-		var entries = this.zip.entryNames;
+		// weak test, just make sure MIMETYPE and CONTAINER files are where expected	
+		var that = this;
 		this.set("log_message", "Validating zip file");
-		if(entries.indexOf(this.MIMETYPE) >= 0 && entries.indexOf(this.CONTAINER) >= 0) {
+		var has_mime = _.any(this.entries, function(x){
+			return x.filename === that.MIMETYPE
+		});
+		var has_container = _.any(this.entries, function(x){
+			return x.filename === that.CONTAINER
+		});
+		if(has_mime && has_container) {
 			this.trigger("validated:zip");
 		}
 		else {
@@ -234,40 +215,81 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		}
 		
 	},
+
+	extractEntry: function(entry) {
+		var that = this;
+		var writer = new zip.BlobWriter();
+		entry.getData(writer, function(content) {
+			that.writeFile(entry.filename, content, function() {
+				that.available_workers += 1;
+				that.set("zip_position", that.get("zip_position") + 1);
+			});
+		});
+	},
 	
 	extractBook: function() {
+
 		// genericly extract a file and then write it to disk
 		var entry;
-		var zip = this.zip;
-		var i = this.get("zip_position");
-		var that = this;
-		
-		if( i === zip.entries.length) {
-			this.set("log_message", "All files unzipped successfully!");
-			this.set("patch_position", 0)
-		} 
-		else {
-			entry = zip.entries[i];
-			if( entry.name.substr(-1) === "/" ) {
-				that.set("zip_position", i + 1);
+
+		if(this.get("zip_position") === 0) {
+			this.available_workers = 5;
+			this.entry_position = 0;
+			this.on("change:zip_position", this.checkCompletion, this);
+		}
+
+		while(this.available_workers > 0 && this.entry_position < this.entries.length) {
+			entry = this.entries[this.entry_position];	
+			if( entry.filename.substr(-1) === "/" ) {
+				// skip over directories
+				this.entry_position += 1;
+				this.set("zip_position", this.get("zip_position") + 1);
 			}
 			else {
-				this.set("log_message", "extracting: " + entry.name);
-				entry.extract(function(entry, content) {
-					that.writeFile(entry.name, content, function() {
-						that.set("zip_position", i + 1);
-					});
-				});
+				this.available_workers -= 1;
+				this.entry_position += 1;
+				this.extractEntry(entry);
 			}
+
+		}
+		
+		for(var i = 0; i < this.entries.length; i++) {
+			
+		}
+	},
+
+	parseIbooksDisplayOptions: function() {
+		var that = this;
+		try {
+			this.extractEntryByName(this.DISPLAY_OPTIONS, function(content) {
+				that.packageDoc.parseIbooksDisplayOptions(content);
+				that.trigger("parsed:ibooks_options");
+			});
+		} catch(e) {
+			// there was no ibook_options file, thats fine....
+			this.trigger("parsed:ibooks_options");	
+		}
+	},
+
+	checkCompletion: function() {
+		var pos = this.get("zip_position");
+		if(pos === this.entries.length) {
+			this.set("log_message", "All files unzipped successfully!");
+			this.set("patch_position", 0);
+		}
+		else {
+			// this isn't exactly accurate but it will signal the user
+			// that we are still doing work
+			this.set("log_message", "extracting: " + this.entries[pos].filename);
 		}
 	},
 
 	beginUnpacking: function() {		
 		var manifest = [];
 		var entry;
-		for(var i = 0; i < this.zip.entries.length; i++) {
-			entry = this.zip.entries[i];
-			if( entry.name.substr(-1) !== "/" ) {
+		for(var i = 0; i < this.entries.length; i++) {
+			entry = this.entries[i];
+			if( entry.filename.substr(-1) !== "/" ) {
 				manifest.push(entry.name);
 			}
 		}
@@ -283,7 +305,8 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		this.on("validated:zip", this.extractMimetype, this);
 		this.on("validated:mime", this.extractMetaInfo, this);
 		this.on("change:root_file_path", this.extractContainerRoot, this);
-		this.on("parsed:root_file", this.beginUnpacking, this);
+		this.on("parsed:root_file", this.parseIbooksDisplayOptions, this);
+		this.on("parsed:ibooks_options", this.beginUnpacking, this);
 		this.on("change:zip_position", this.extractBook, this);
 		this.on("change:patch_position", this.correctURIs, this);
 		this.on("change:failure", this.clean, this);
@@ -316,12 +339,19 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 
 	initializeZip: function() {
 		var that = this;
+		
 		this.fsApi.getFileSystem().root.getDirectory(this.base_dir_name, {create: true}, function(dir) {
 			that.set("root_url", dir.toURL());
-			that.zip = new ZipFile(that.get('url'), function() {
-				that.set("task_size", that.zip.entries.length * 2 + 3);
-				that.trigger("initialized:zip");
-			}, 0);
+			zip.createReader(new zip.BlobReader(that.get("file")), function(zipReader) {
+				zipReader.getEntries(function(entries) {
+					that.entries = entries;
+					that.set("task_size", entries.length * 2 + 3);
+					that.trigger("initialized:zip");
+				});
+			}, function() {
+				that.set("error", "File does not appear to be a valid EPUB. Progress cancelled."); 
+			});
+
 		}, function() {
 			console.log("In beginUnpacking error handler. Does the root dir already exist?");
 		});
@@ -370,7 +400,8 @@ Readium.Models.UnpackedBookExtractor = Readium.Models.BookExtractorBase.extend({
 		this.on("validated:dir", this.readMime, this);
 		this.on("validated:mime", this.readMetaInfo, this);
 		this.on("change:root_file_path", this.readContainerRoot, this);
-		this.on("parsed:root_file", this.beginWriting, this);
+		this.on("parsed:root_file", this.parseIbooksDisplayOptions, this);
+		this.on("parsed:ibooks_options", this.beginWriting, this);
 		this.on("change:write_position", this.writeEntry, this);
 		this.on("change:patch_position", this.correctURIs, this);
 		this.on("change:failure", this.clean, this);
@@ -395,6 +426,20 @@ Readium.Models.UnpackedBookExtractor = Readium.Models.BookExtractorBase.extend({
 			});
 		});
 
+	},
+
+	parseIbooksDisplayOptions: function() {
+		this.trigger("parsed:ibooks_options");
+		var that = this;
+		try {
+			this.readEntryByShortName(this.DISPLAY_OPTIONS, function(content) {
+				that.packageDoc.parseIbooksDisplayOptions(content);
+				that.trigger("parsed:ibooks_options");
+			});
+		} catch(e) {
+			// there was no ibook_options file, thats fine....
+			this.trigger("parsed:ibooks_options");	
+		}
 	},
 
 	validateDir: function() {

@@ -93,8 +93,11 @@ Readium.FileSystemApi = function(initCallback) {
 				fileWriter.onerror = function(e) {
 					failureCallback(e);
 				};
-				
-				if(content.webkitRelativePath || content.relativePath) {
+
+				if(content instanceof Blob) {
+					fileWriter.write(content);
+				}
+				else if(content.webkitRelativePath || content.relativePath) {
 					// hacky way to detect if it is a file object
 					var reader = new FileReader();
 					reader.onload = function(e) {
