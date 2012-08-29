@@ -34,6 +34,13 @@ window.Readium = {
 
 		// TODO: this is not how we should do this, we should use a proper backbone view.
 
+		document.body.addEventListener('drop', function(e) {
+		    e.stopPropagation();
+		    e.preventDefault();
+		    // todo stop this!
+		    window._fp_view.handleFileSelect({target: e.dataTransfer});
+		  }, false);
+
 		$("#block-view-btn").click(function(e) {
 			$('#library-items-container').addClass("block-view").removeClass("row-view");
 			Readium.Utils.setCookie("lib_view", "block", 1000);
