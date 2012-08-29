@@ -42,8 +42,8 @@ Readium.Models.ValidatedPackageMetaData = Backbone.Model.extend({
 		// parse the xml
 		var parser = new Readium.Models.PackageDocumentParser(this.uri_obj);
 		var json = parser.parse(xmlDom);
-
-		//  only care about the metadata 
+		// capture the manifest separately
+		this.manifest = json.manifest;
 		return json.metadata;
 	},
 
