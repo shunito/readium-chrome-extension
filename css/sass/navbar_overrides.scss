@@ -42,10 +42,29 @@
 
 }
 
+#toolbar-title {
+	text-align: center;
+	color: #999;
+	font-weight: normal;
+	font-size: 1.0em;
+	letter-spacing: 0.5em;
+	text-transform: uppercase;
+	margin: 18px 0;
+	display: none;
+}
+
+.parchment-theme #toolbar-title {
+	color: #876C67;
+}
+
+
 #show-toolbar-button {
 	padding: 8px;
 	margin-right: 7px;
 	display: none;
+	position: absolute;
+	right: 0;
+	top: 0;
 }
 
 #add-book-li {

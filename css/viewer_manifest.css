@@ -1256,10 +1256,26 @@ html {
   width: 142px;
   height: 36px; }
 
+#toolbar-title {
+  text-align: center;
+  color: #999;
+  font-weight: normal;
+  font-size: 1.0em;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  margin: 18px 0;
+  display: none; }
+
+.parchment-theme #toolbar-title {
+  color: #876C67; }
+
 #show-toolbar-button {
   padding: 8px;
   margin-right: 7px;
-  display: none; }
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 0; }
 
 #add-book-li {
   margin-right: 22px; }

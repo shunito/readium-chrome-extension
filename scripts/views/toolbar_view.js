@@ -13,12 +13,14 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 		this.renderBarVibility();
 		this.renderFullScreen();
 		this.renderThemeButton();
+		this.renderTitle();
 		return this;
 	},
 
 	renderBarVibility: function() {
 		var visible = this.model.get("toolbar_visible");
 		this.$('#show-toolbar-button').toggle( !visible );
+		this.$('#toolbar-title').toggle( !visible );
 		this.$('#top-bar').toggle( visible );
 		return this;
 	},
@@ -34,6 +36,12 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 		var isNight = this.model.get("current_theme") === "night-theme";
 		this.$('#night-to-day-ico').toggle(isNight);
 		this.$('#day-to-night-ico').toggle(!isNight);
+		return this;
+	},
+
+	renderTitle: function() {
+		var title = this.model.epub.get("title");
+		this.$('#toolbar-title').html(title);
 		return this;
 	},
 
