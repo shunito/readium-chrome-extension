@@ -1,0 +1,1 @@
+for(var elems=document.getElementsByTagName("span"),i=0;i<elems.length;i++)if(elems[i].id!=null)if(elems[i].id.indexOf("i18n_html_",0)==0){var msg=chrome.i18n.getMessage(elems[i].id);if(msg!="")elems[i].innerHTML=msg}else if(elems[i].id.indexOf("i18n_",0)==0&&(msg=chrome.i18n.getMessage(elems[i].id),msg!=""))elems[i].innerText=msg;
