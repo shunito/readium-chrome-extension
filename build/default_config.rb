@@ -24,7 +24,7 @@
 
 # list of files and dirs that need to be copied over to 
 # the deploy dir as are with no processing
-@config[:simple_copies] = ["background/**/*", "css/viewer_manifest.css", "css/library.css", "images/**/*", "manifest.json", "LICENSE", ]
+@config[:simple_copies] = ["background/**/*", "css/viewer_manifest.css", "css/library.css", "images/**/*", "manifest.json", "LICENSE", "_locales/**/*"]
 
 # list of js libraries that need to be copied over (right now these are just simple copies)
 @config[:js_libs] = ["lib/jquery-1.7.1.min.js", "lib/mathjax/**/*", "lib/pan_and_zoom.js", "scripts/libs/plugins.js", "scripts/libs/web_plugins.js", "lib/modernizr-2.5.3.min.js", "lib/2.5.3-crypto-sha1.js"]
