@@ -1,1 +1,0 @@
-BBFileSystemSync=function(a,b,c){if(!b.file_path)throw"Cannot sync the model to the fs without a path";switch(a){case "read":Readium.FileSystemApi(function(a){a.readTextFile(b.file_path,function(a){c.success(a)},function(a){c.error(a)})});break;case "create":throw"Not yet implemented";case "update":throw"Not yet implemented";case "delete":throw"Not yet implemented";}return null};

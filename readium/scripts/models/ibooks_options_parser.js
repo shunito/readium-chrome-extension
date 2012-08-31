@@ -1,2 +1,0 @@
-Readium.Models.IbooksOptionsParser=function(){};Readium.Models.IbooksOptionsParser.prototype.parseBool=function(a){return a.toLowerCase().trim()==="true"};
-Readium.Models.IbooksOptionsParser.prototype.parse=function(a){var b,c;b=(new window.DOMParser).parseFromString(a,"text/xml");a=b.getElementsByName("fixed-layout")[0];b=b.getElementsByName("open-to-spread")[0];c={};c.open_to_spread=!!b&&this.parseBool(b.textContent);c.fixedLayout=!!a&&this.parseBool(a.textContent);c.apple_fixed=!!a&&this.parseBool(a.textContent);return c};

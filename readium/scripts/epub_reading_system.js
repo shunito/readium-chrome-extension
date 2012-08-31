@@ -1,1 +1,0 @@
-navigator.epubReadingSystem={name:"Readium",version:"0.4.2",layoutStyle:"paginated",hasFeature:function(a,b){return b&&b!=="1.0"?!1:a==="dom-manipulation"?!0:a==="layout-changes"?!0:a==="touch-events"?!1:a==="mouse-events"?!0:a==="keyboard-events"?!0:a==="spine-scripting"?!0:!1}};

@@ -1,1 +1,0 @@
-window.Readium={Models:{},Collections:{},Views:{},Routers:{},Utils:{},Init:function(){_router=new Readium.Routers.ViewerRouter;Backbone.history.start({pushState:!0})}};$(function(){window.Readium.Init()});

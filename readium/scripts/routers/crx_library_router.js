@@ -1,1 +1,0 @@
-Readium.Routers.LibraryRouter=Backbone.Router.extend({initialize:function(a){this.picker=a.picker},routes:{options:"showOptions","/unpack/*url":"beginExtraction"},showOptions:function(){$("#readium-options-modal").modal("show")},beginExtraction:function(a){this.picker.beginExtraction(new Readium.Models.ZipBookExtractor({url:a,src_filename:a}))}});
