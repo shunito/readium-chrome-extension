@@ -69,7 +69,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         this.set("active_mo", this.mo);
         this.mo.on("change:current_text_src", this.handleMoTextSrc, this);
 		this.mo.on("change:is_document_done", this.handleMoDocumentDone, this);
-            
+        
         var target = this.moTargetNode;
         this.moTargetNode = null;
             
@@ -230,12 +230,9 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             var doc_href = this.currentSection.get("href");
             
 	        var node = null;
-            // TODO
-            console.log("\nVisible");
-	        for (var i = 0; i<pageElms.length; i++) {
+            for (var i = 0; i<pageElms.length; i++) {
 	            var id = $(pageElms[i]).attr("id");
-                console.log(id);
-	            var src = doc_href + "#" + id;
+                var src = doc_href + "#" + id;
 	            node = this.mo.findNodeByTextSrc(src);
 	            if (node) {
 	                break;

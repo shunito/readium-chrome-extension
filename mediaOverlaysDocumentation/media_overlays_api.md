@@ -33,6 +33,15 @@ Set the audio volume. 0 is mute, and 1.0 is max volume.
 ### `reset()`
 Reset all flags as though the media overlay has not yet started playing.
 
+### `setRate(value)`
+Set the audio playback rate. Guidelines are as follows:
+
+ * 1.0: normal speed
+ * 2.5: very fast
+ * 0.5: very slow
+ * < 0.5: too slow (inaudible)
+ * > 4.0: too fast (inaudible)
+
 ## Observable Properties 
 
 ###`current_text_src`
@@ -60,9 +69,9 @@ Indicates whether audio is playing or not.
 
 Indicates that the file is loaded and ready to play.
 
-# Future API functions
+# Future API
 
-These are expected to become available in a future revision.
+Expected to become available in a future revision.
 
 ## Functions
 

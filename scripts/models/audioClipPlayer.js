@@ -20,6 +20,9 @@ Readium.Models.AudioClipPlayer = function() {
     // ID of the setInterval timer
     var intervalId = null;
     
+    // current rate; default is normal speed
+    var rate = 1.0;
+    
     this.setNotifyClipDone = function(notifyClipDoneFn) {
         notifyClipDone = notifyClipDoneFn;
     };
@@ -43,6 +46,7 @@ Readium.Models.AudioClipPlayer = function() {
         }
         // the element is already loaded; just need to continue playing at the right point
         else {
+            elm.playbackRate = rate;
             continueRender();
         }
     };
@@ -99,6 +103,14 @@ Readium.Models.AudioClipPlayer = function() {
             elm.volume = value;
         }
     };
+    // reasonable rate values are from 0.5 (slow) to 2.5 (fast),
+    // though no restrictions are hardcoded here
+    this.setRate = function(value) {
+        if (this.isPlaying()) {
+            elm.playbackRate = value;
+        }
+        rate = value;  
+    };
     function loadData(){
         debugPrint("Loading file " + src);
         elm.setAttribute("src", src);
@@ -114,6 +126,7 @@ Readium.Models.AudioClipPlayer = function() {
                 clipEnd = elm.duration;
             }
             debugPrint("Audio data loaded");
+            elm.playbackRate = rate;
             continueRender();        
         }
         
