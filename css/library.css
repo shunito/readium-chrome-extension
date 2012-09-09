@@ -2416,8 +2416,21 @@ body {
 .green {
   color: #6FA64D; }
 
-/*************** BEGIN: LIBRARY BOOKS ************/
-/***** General Rules ***********/
+#empty-message {
+  padding: 7px 0px;
+  text-align: right; }
+
+#empty-message-text {
+  text-align: center;
+  width: 250px;
+  font-size: 2em;
+  line-height: 1.1;
+  font-weight: 200;
+  display: inline-block;
+  position: relative;
+  left: 54px;
+  top: 62px; }
+
 .book-item .cover-image {
   -webkit-box-shadow: -7px 6px 12px rgba(50, 50, 50, 0.75);
   -moz-box-shadow: -7px 6px 12px rgba(50, 50, 50, 0.75);
@@ -2436,33 +2449,6 @@ body {
 
 img.read:hover {
   cursor: pointer; }
-
-/***** The book details modal *******/
-.details-modal {
-  height: 300px;
-  padding: 20px; }
-
-.modal-book-info {
-  text-align: left; }
-
-.modal-title {
-  font-weight: 300;
-  font-size: 1.5em; }
-
-.modal-cover-wrap {
-  margin-right: 20px; }
-
-.modal-detail.gap {
-  margin-bottom: 25px; }
-
-img.details-cover-image {
-  width: 150px;
-  height: 220px; }
-
-.modal-detail.source {
-  clear: both;
-  text-align: left;
-  padding-top: 20px; }
 
 /**** library block item *******/
 .block-view .book-item {
@@ -2544,23 +2530,6 @@ img.details-cover-image {
   margin-top: -5px;
   padding-bottom: 20px; }
 
-/***** No Books message ******/
-#empty-message {
-  padding: 7px 0px;
-  text-align: right; }
-
-#empty-message-text {
-  text-align: center;
-  width: 250px;
-  font-size: 2em;
-  line-height: 1.1;
-  font-weight: 200;
-  display: inline-block;
-  position: relative;
-  left: 54px;
-  top: 62px; }
-
-/*************** END: LIBRARY BOOKS ************/
 #progress-container {
   position: fixed;
   bottom: 0;
