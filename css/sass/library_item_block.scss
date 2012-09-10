@@ -1,54 +1,105 @@
-/**** library block item *******/
-.block-view .book-item {
+.block-view {
   text-align: center;
-  float: left;
-  margin: 20px 50px;
-}
+  margin: auto;
 
-.block-view .btn.read {
-  float: left;
-}
+  .book-item {
+    position: relative;
+    text-align: center;
+    float: left;
+    margin-bottom: 20px;
+  }
 
-.block-view .btn.details {
-  float: right;
-}
+  .info-wrap {
+    position: relative;
+  }
 
-.block-view .info-icon {
-  display: none;
-}
+  .caption.book-info {
+    padding: 0 10px;
+    height: 50px;
+  }
 
-.block-view .info-wrap {
-  width: 150px;
-}
+  .buttons {
+    margin: 10px 0;
+    position: relative;
 
-.block-view .cover-image {
-  width: 150px;
-  height: 220px;
-}
+    .btn.read {
+      margin-right: 13px;
+      width: 36px;
+    }
 
-.block-view .info-icon {
-  visibility: hidden;
-}
+    .btn.details {
+      margin-left: 13px;
+      width: 36px;
+    }
+  }
 
-.block-view .info-item {
-  width: 150px;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
+  
 
-.block-view .info-item.title {
-  width: 200px;
-  font-weight: 300;
-  position: relative;
-  left: -25px;
-}
+  .info-icon {
+    display: none;
+  }
 
-.block-view .info-item.epub-version {
-  display: none;
-}
+  .cover-image {
+    width: 150px;
+    height: 220px;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+  }
 
-.block-view .info-item.author {
-  margin-top: -5px;
+  .info-icon {
+    visibility: hidden;
+  }
+
+  .info-item {
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .info-item.title {
+    font-weight: 300;
+    position: relative;
+  }
+
+  .info-item.epub-version {
+    display: none;
+  }
+
+  .info-item.author {
+    margin-top: -5px;
+  }  
+
+  .book-item {
+    width: 16.6%;
+  }
+
+  @media (max-width: 1200px) {
+    .book-item {
+      width: 20%;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .book-item {
+      width: 25%;
+    }
+  }
+  @media (max-width: 800px) {
+    .book-item {
+      width: 33%;
+    }
+  }
+  @media (max-width: 600px) {
+    .book-item {
+      width: 50%;
+    }
+  }
+  @media (max-width: 400px) {
+    .book-item {
+      width: 100%;
+    }
+  }
+
 }

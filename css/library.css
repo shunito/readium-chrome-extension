@@ -2437,9 +2437,6 @@ body {
   -moz-box-shadow: -7px 6px 12px rgba(50, 50, 50, 0.75);
   box-shadow: -7px 6px 12px rgba(50, 50, 50, 0.75); }
 
-.book-item .buttons {
-  margin-top: 10px; }
-
 .book-item .info-item.title {
   font-weight: 300; }
 
@@ -2451,49 +2448,67 @@ body {
 img.read:hover {
   cursor: pointer; }
 
-/**** library block item *******/
-.block-view .book-item {
+.block-view {
   text-align: center;
-  float: left;
-  margin: 20px 50px; }
-
-.block-view .btn.read {
-  float: left; }
-
-.block-view .btn.details {
-  float: right; }
-
-.block-view .info-icon {
-  display: none; }
-
-.block-view .info-wrap {
-  width: 150px; }
-
-.block-view .cover-image {
-  width: 150px;
-  height: 220px; }
-
-.block-view .info-icon {
-  visibility: hidden; }
-
-.block-view .info-item {
-  width: 150px;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden; }
-
-.block-view .info-item.title {
-  width: 200px;
-  font-weight: 300;
-  position: relative;
-  left: -25px; }
-
-.block-view .info-item.epub-version {
-  display: none; }
-
-.block-view .info-item.author {
-  margin-top: -5px; }
+  margin: auto; }
+  .block-view .book-item {
+    position: relative;
+    text-align: center;
+    float: left;
+    margin-bottom: 20px; }
+  .block-view .info-wrap {
+    position: relative; }
+  .block-view .caption.book-info {
+    padding: 0 10px;
+    height: 50px; }
+  .block-view .buttons {
+    margin: 10px 0;
+    position: relative; }
+    .block-view .buttons .btn.read {
+      margin-right: 13px;
+      width: 36px; }
+    .block-view .buttons .btn.details {
+      margin-left: 13px;
+      width: 36px; }
+  .block-view .info-icon {
+    display: none; }
+  .block-view .cover-image {
+    width: 150px;
+    height: 220px;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto; }
+  .block-view .info-icon {
+    visibility: hidden; }
+  .block-view .info-item {
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden; }
+  .block-view .info-item.title {
+    font-weight: 300;
+    position: relative; }
+  .block-view .info-item.epub-version {
+    display: none; }
+  .block-view .info-item.author {
+    margin-top: -5px; }
+  .block-view .book-item {
+    width: 16.6%; }
+  @media (max-width: 1200px) {
+    .block-view .book-item {
+      width: 20%; } }
+  @media (max-width: 1000px) {
+    .block-view .book-item {
+      width: 25%; } }
+  @media (max-width: 800px) {
+    .block-view .book-item {
+      width: 33%; } }
+  @media (max-width: 600px) {
+    .block-view .book-item {
+      width: 50%; } }
+  @media (max-width: 400px) {
+    .block-view .book-item {
+      width: 100%; } }
 
 /**** library row item ********/
 .row-view .book-item {

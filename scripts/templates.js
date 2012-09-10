@@ -62,7 +62,7 @@ templates['library_item_template'] = template(function (Handlebars,depth0,helper
   var buffer = "", stack1, stack2, foundHelper, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
 
 
-  buffer += "<div class='info-wrap clearfix'>\n	<div class='caption book-info'>\n		<h2 class='green info-item title'>";
+  buffer += "<div class='info-wrap'>\n	<div class='caption book-info'>\n		<h2 class='green info-item title'>";
   foundHelper = helpers.data;
   stack1 = foundHelper || depth0.data;
   stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.title);
@@ -110,7 +110,7 @@ templates['library_item_template'] = template(function (Handlebars,depth0,helper
   stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.title);
   if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
   else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "data.title", { hash: {} }); }
-  buffer += escapeExpression(stack1) + " information'>\n	</a>\n</div>\n\n<div class=\"caption clearfix buttons\">\n	<a href=\"#todo\" class=\"btn read\" data-book='";
+  buffer += escapeExpression(stack1) + " information'>\n	</a>\n</div>\n\n<div class=\"caption buttons\">\n	<a href=\"#todo\" class=\"btn read\" data-book='";
   foundHelper = helpers.data;
   stack1 = foundHelper || depth0.data;
   stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.key);
@@ -148,7 +148,7 @@ templates['library_item_template'] = template(function (Handlebars,depth0,helper
   stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.cover_href);
   if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
   else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "data.cover_href", { hash: {} }); }
-  buffer += escapeExpression(stack1) + "' width='150' height='220' alt='ePUB cover'>\n		<div class=\"caption clearfix modal-buttons\">\n			<a href=\"#\" class=\"btn read\" data-book='<%= data.key %>' role='button'>";
+  buffer += escapeExpression(stack1) + "' width='150' height='220' alt='ePUB cover'>\n		<div class=\"caption modal-buttons\">\n			<a href=\"#\" class=\"btn read\" data-book='<%= data.key %>' role='button'>";
   stack1 = "i18n_read";
   foundHelper = helpers.fetchInzMessage;
   stack2 = foundHelper || depth0.fetchInzMessage;

@@ -1,4 +1,4 @@
-<div class='info-wrap clearfix'>
+<div class='info-wrap'>
 	<div class='caption book-info'>
 		<h2 class='green info-item title'>{{ data.title }}</h2>
 		<div class='info-item author'>{{orUnknown data.author}}</div>
@@ -13,7 +13,7 @@
 	</a>
 </div>
 
-<div class="caption clearfix buttons">
+<div class="caption buttons">
 	<a href="#todo" class="btn read" data-book='{{ data.key }}' role='button'>{{fetchInzMessage "i18n_read"}}</a>
 	<a href="#details-modal-{{ data.key }}" class="btn details" data-toggle="modal" role="button">
 		{{fetchInzMessage "i18n_details"}}
@@ -23,7 +23,7 @@
 <div id='details-modal-{{ data.key }}' class='modal fade details-modal'>
 	<div class="pull-left modal-cover-wrap">
 		<img class='details-cover-image' src='{{ data.cover_href }}' width='150' height='220' alt='ePUB cover'>
-		<div class="caption clearfix modal-buttons">
+		<div class="caption modal-buttons">
 			<a href="#" class="btn read" data-book='<%= data.key %>' role='button'>{{fetchInzMessage "i18n_read"}}</a>
 			<a class="btn btn-danger delete pull-right" role='button'>{{fetchInzMessage "i18n_delete"}}</a>
 		</div>
