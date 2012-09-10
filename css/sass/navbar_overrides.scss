@@ -42,6 +42,28 @@
 
 }
 
+#logo-replace {
+	height: 36px;
+	width: 142px;
+	@include bg_image("top_bar/readium_logo.png");
+	text-indent: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+@media (max-width: 500px) {
+	#logo-replace {
+		height: 48px;
+		width: 48px;
+		@include bg_image("main_icon/medium.png");
+	}
+
+	.navbar .brand {
+		padding: 2px;
+	}
+}
+
+
 #toolbar-title {
 	text-align: center;
 	color: #999;

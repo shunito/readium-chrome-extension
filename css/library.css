@@ -2336,6 +2336,22 @@ a.label:hover, a.badge:hover {
   width: 142px;
   height: 36px; }
 
+#logo-replace {
+  height: 36px;
+  width: 142px;
+  background-image: url("/images/top_bar/readium_logo.png");
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden; }
+
+@media (max-width: 500px) {
+  #logo-replace {
+    height: 48px;
+    width: 48px;
+    background-image: url("/images/main_icon/medium.png"); }
+
+  .navbar .brand {
+    padding: 2px; } }
 #toolbar-title {
   text-align: center;
   color: #999;
