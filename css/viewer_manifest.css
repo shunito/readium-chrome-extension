@@ -1218,6 +1218,9 @@ html {
 #toolbar-el {
   height: 52px; }
 
+.navbar ul.nav.pull-right {
+  padding-left: 0;
+  margin-left: 0; }
 .navbar .nav > li > a {
   padding: 5px 0; }
 .navbar li {
@@ -1246,7 +1249,8 @@ html {
   background-image: url("/images/top_bar/readium_logo.png");
   text-indent: 100%;
   white-space: nowrap;
-  overflow: hidden; }
+  overflow: hidden;
+  margin: 0; }
 
 @media (max-width: 500px) {
   #logo-replace {
