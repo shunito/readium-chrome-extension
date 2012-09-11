@@ -21,56 +21,65 @@
 			<div class="navbar-inner" id="top-bar">
 				<div class="container" style="width: 100%">
 
-					<a aria-label="Readium Info" accesskey="i" class="brand" data-toggle="modal" href="#readium-info" id='bar-logo' role="button">
-						<img src="/images/top_bar/readium_logo.png" id="bar-logo-img" alt="Readium Info"/>
+					<a title="Readium Info" accesskey="i" class="brand" data-toggle="modal" href="#readium-info" id='bar-logo' role="button">
+						<img src="/images/top_bar/readium_logo.png" id="bar-logo-img" alt=""/>
+<span class="offscreenText">Readium Info</span>
 					</a>
 
 					<ul class="nav pull-right">
 						<li class="divider-vertical stubby"></li>
 						<li>
-							<a aria-label="Library" accesskey="b" href="/index.html" id="back-to-lib-button" role="button">
-								<img src="/images/top_bar/ico_library.png" class="nav-icon" alt="Library"/>
+							<a title="Library" accesskey="b" href="/index.html" id="back-to-lib-button" role="button">
+								<img src="/images/top_bar/ico_library.png" class="nav-icon" alt=""/>
+<span class="offscreenText">Library</span>
 							</a>
 						</li>
 						<li>
-							<a aria-label="Table of contents" accesskey="t" href="#" id='toggle-toc-btn' role="button">
-								<img src="/images/top_bar/ico_toc.png" class="nav-icon" alt="Table of contents"/>
+							<a title="Table of contents" accesskey="t" href="#" id='toggle-toc-btn' role="button">
+								<img src="/images/top_bar/ico_toc.png" class="nav-icon" alt=""/>
+<span class="offscreenText">Table of contents</span>
 							</a>
 						</li>
 						<li>
-							<a aria-label="Media overlays" accesskey="m" href="#" id='play-mo-btn' role="button">
-								<img src="/images/top_bar/ico_tts.png" class="nav-icon" alt="Media overlays"/>
+							<a title="Media overlays" accesskey="m" href="#" id='play-mo-btn' role="button">
+								<img src="/images/top_bar/ico_tts.png" class="nav-icon" alt=""/>
+<span class="offscreenText">Media overlays</span>
 							</a>
 						</li>
 						<li class="divider-vertical stubby"></li>
 						<li>
-							<a aria-label="Options" accesskey="o" href="#viewer-settings-modal" id="options-btn" data-toggle="modal" role="button">
-								<img src="/images/top_bar/options.png" class="nav-icon" alt="Options"/>
+							<a title="Options" accesskey="o" href="#viewer-settings-modal" id="options-btn" data-toggle="modal" role="button">
+								<img src="/images/top_bar/options.png" class="nav-icon" alt=""/>
+<span class="offscreenText">Options</span>
 							</a>
 						</li>
 						<li>
 							<a accesskey="n" href="#" id="nightmode-btn" role="button">
-								<img src="/images/top_bar/ico_nightmode_toggle_off.png" class="nav-icon" id="day-to-night-ico" alt="Nightmode off"/>
-								<img src="/images/top_bar/ico_nightmode_toggle_on.png" class="nav-icon" id="night-to-day-ico" alt="Nightmode on"/>
+								<img src="/images/top_bar/ico_nightmode_toggle_off.png" class="nav-icon" id="day-to-night-ico" alt=""/>
+								<img src="/images/top_bar/ico_nightmode_toggle_on.png" class="nav-icon" id="night-to-day-ico" alt=""/>
+<span id="nmOT" class="offscreenText"></span>
 							</a>
 						</li>
 						<li>
 							<a accesskey="f" href="#" id="fs-toggle-btn" role="button">
-								<img src="/images/top_bar/ico_fs_toggle_on.png" class="nav-icon" id="go-to-fs-ico" alt="Fullscreen on"/>
-								<img src="/images/top_bar/ico_fs_toggle_off.png" class="nav-icon" id="leave-fs-ico" alt="Fullscreen off"/>
+								<img src="/images/top_bar/ico_fs_toggle_on.png" class="nav-icon" id="go-to-fs-ico" alt=""/>
+								<img src="/images/top_bar/ico_fs_toggle_off.png" class="nav-icon" id="leave-fs-ico" alt=""/>
+<span id="fsOT" class="offscreenText"></span>
 							</a>
 						</li>
 						<li class="divider-vertical"></li>
 						<li style="margin-right: 15px">
-							<a aria-label="Hide Readium user interface" accesskey="x" id="hide-toolbar-button" class="toggle-bar-btn" href="#" role="button">
-		 						<img src="/images/top_bar/ico_closeUI.png" class="nav-icon" alt="Hide Readium user interface"/>
+							<a title="Hide Readium user interface" accesskey="x" id="hide-toolbar-button" class="toggle-bar-btn" href="#" role="button">
+		 						<img src="/images/top_bar/ico_closeUI.png" class="nav-icon" alt=""/>
+<span class="offscreenText">Hide Readium user interface</span>
 							</a>
 						</li>
 					</ul>
 				</div>
 			</div>
-			<span aria-label="Show Readium user interface" accesskey="v" tabindex="0" id="show-toolbar-button" class="pull-right" role="button" >
- 				<img src="/images/top_bar/ico_openUI.png" class="nav-icon" alt="Show Readium user interface"/>
+			<span title="Show Readium user interface" accesskey="v" tabindex="0" id="show-toolbar-button" class="pull-right" role="button" >
+ 				<img src="/images/top_bar/ico_openUI.png" class="nav-icon" alt=""/>
+<span class="offscreenText">Show Readium user interface</span>
 			</span>
     	</div><!-- end le top bar -->
 
@@ -78,7 +87,9 @@
 <div class="offscreenText"> Table of Contents Start </div>
 
     		<div id="toc-header">
-    			<span id="close-toc-button" tabindex="0" role="button" aria-label="Close Table of Contents"></span>
+    			<span id="close-toc-button" tabindex="0" role="button">
+<span class="offscreenText">Close Table of Contents</span>
+</span>
     		</div>
     		<div id="toc-body">
     		</div>
@@ -88,8 +99,12 @@
 
  		<div id="readium-right-content">
 
-    	<a id="next-page-button" onclick="void(0)" href="#" role="button" aria-label="Next Page" accesskey="2"></a>
-    	<a id="prev-page-button" onclick="void(0)" href="#" role="button" aria-label="Previous Page" accesskey="1"></a>
+    	<a id="next-page-button" onclick="void(0)" href="#" role="button" accesskey="2">
+<span class="offscreenText">Next Page</span>
+</a>
+    	<a id="prev-page-button" onclick="void(0)" href="#" role="button" accesskey="1">
+<span class="offscreenText">Previous Page</span>
+</a>
 
 
 		<div id="readium-book-view-el">

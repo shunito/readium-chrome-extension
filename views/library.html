@@ -17,32 +17,37 @@
 			<div class="navbar-inner" id="inner-top-bar">
 				<div class="container" style="width: 100%">
 
-					<a aria-label="Readium Info" accesskey="i" class="brand" data-toggle="modal" href="#readium-info" id='bar-logo' role="button">
-						<img src="/images/top_bar/readium_logo.png" alt="Readium Info"/>
+					<a title="Readium Info" accesskey="i" class="brand" data-toggle="modal" href="#readium-info" id='bar-logo' role="button">
+						<img src="/images/top_bar/readium_logo.png" alt=""/>
+<span class="offscreenText">Readium Info</span>
 					</a>
 
 					<ul class="nav pull-right">
 						<li class="divider-vertical stubby"></li>
 						<li>
-							<a aria-label="EBooks in list view" accesskey="l" href="#" id="row-view-btn" role="button">
-								<img src="/images/top_bar/list_view.png" class="small"/ alt="List view of ePUB library">
+							<a title="EBooks in list view" accesskey="l" href="#" id="row-view-btn" role="button">
+								<img src="/images/top_bar/list_view.png" class="small"/ alt=""/>
+<span class="offscreenText">List view of ePUB library</span>
 							</a>
 						</li>
 						<li>
-							<a aria-label="EBooks in thumbnail view" accesskey="t" href="#" id='block-view-btn' role="button">
-								<img src="/images/top_bar/thumb_view.png" class="small" alt="Thumbnail view of ePUB library"/>
+							<a title="EBooks in thumbnail view" accesskey="t" href="#" id='block-view-btn' role="button">
+								<img src="/images/top_bar/thumb_view.png" class="small" alt=""/>
+<span class="offscreenText">Thumbnail view of ePUB library</span>
 							</a>
 						</li>
 						<li class="divider-vertical stubby"></li>
 						<li>
-							<a aria-label="Options" accesskey="o" href="#readium-options-modal" id="options-btn" data-toggle="modal" role="button">
-								<img src="/images/top_bar/options.png" class="small" alt="Options"/>
+							<a title="Options" accesskey="o" href="#readium-options-modal" id="options-btn" data-toggle="modal" role="button">
+								<img src="/images/top_bar/options.png" class="small" alt=""/>
+<span class="offscreenText">Options</span>
 							</a>
 						</li>
 						<li class="divider-vertical"></li>
 						<li id="add-book-li">
-							<a aria-label="Add a new ePUB" accesskey="a" href="#add-book-modal" data-toggle="modal" role="button">
-								<img src="/images/top_bar/add_book.png" class="small" alt="Add a new ePUB"/>
+							<a title="Add a new ePUB" accesskey="a" href="#add-book-modal" data-toggle="modal" role="button">
+								<img src="/images/top_bar/add_book.png" class="small" alt=""/>
+<span class="offscreenText">Add a new ePUB</span>
 							</a>
 						</li>
 
@@ -88,7 +93,10 @@
 			<div class="modal fade" id="readium-options-modal"  style="display: none">
 <div class="offscreenText"> Options Start </div>
 				<div class="modal-header">
-					<a class="close" data-dismiss="modal" role="button" aria-label="Close">&times;</a>
+					<a class="close" data-dismiss="modal" role="button">
+<span class="offscreenText">Close</span>
+&times;
+</a>
 				<h1 tabindex="-1" id="options-heading">Readium Options:</h1>
 				</div>
 				
@@ -142,7 +150,10 @@
 		
 <div class="offscreenText"> Add Start </div>
 				<div class="modal-header">
-					<a class="close" data-dismiss="modal" role="button" aria-label="Close">&times;</a>
+					<a class="close" data-dismiss="modal" role="button">
+<span class="offscreenText">Close</span>
+&times;
+</a>
 					<h1>Add Book To Readium Library:</h1>
 				</div>
 
@@ -204,8 +215,9 @@
 				
 				<img class='cover-image read' src='<%= data.cover_href %>' width='150' height='220' alt='Read <%= data.title %>' >
 				
-				<a aria-label='<%= data.title %> information' href="#details-modal-<%= data.key %>" class="info-icon" data-toggle="modal" role="button">
-					<img class='info-icon pull-right' src='/images/library/info-icon.png' height="39px" width="39px" alt='Info for <%= data.title %>' >
+				<a title='<%= data.title %> information' href="#details-modal-<%= data.key %>" class="info-icon" data-toggle="modal" role="button">
+					<img class='info-icon pull-right' src='/images/library/info-icon.png' height="39px" width="39px" alt='' />
+<span class="offscreenText"><%= data.title %> information</span>
 				</a>
 			</div>
 			
