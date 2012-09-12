@@ -230,9 +230,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var that = this;
 		var contentDocument;
 		var epubCFIs;
-		// Check epub for cfi elements for the current spine item
-
-		// Inject them if there are any
 
 		// Get the content document (assumes a reflowable publication)
 		contentDocument = $("#readium-flowing-content").contents()[0];
@@ -240,17 +237,14 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// TODO: Could check to make sure the document returned from the iframe has the same name as the 
 		//   content document specified by the href returned by the CFI.
 
-		// inject an element using the cfi library
-		EPUBcfi.Config.cfiMarkerElements.textPointMarker = "<span id='foundit' class='cfi_marker'></span>";
-
-		// Find CFIs for the current spine position 
+		// Inject elements for all the CFIs that reference this content document
 		epubCFIs = this.model.get("epubCFIs");
-
 		_.each(epubCFIs, function (cfi, key) {
 
 			if (cfi.contentDocSpinePos === that.model.get("spine_position")) {
 
-				EPUBcfi.Interpreter.injectElement(key, contentDocument);	
+				// TODO: handle exceptions
+				EPUBcfi.Interpreter.injectElement(key, contentDocument, cfi.payload);	
 			}
 		});
 	},

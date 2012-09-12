@@ -156,9 +156,9 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 			this.handleCFIReference(splitUrl[2]);
 		}
+		// The href is a standard hash fragment
 		else {
 
-			// handle the base url first:
 			if(splitUrl[1]) {
 				var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
 				this.setSpinePos(spine_pos, false, false, splitUrl[2]);
@@ -205,6 +205,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		var packageDocument;
 		var hrefOfFirstContentDoc;
 		var spinePos;
+		var elementId;
 
 		// REFACTORING CANDIDATE: This is a temporary approach for retrieving a document representation of the 
 		//   package document. Probably best that the package model be able to return this representation of itself.
@@ -225,8 +226,12 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 		// get the spine position of the content document and add the cfi to the current list, set the spine position
 		spinePos = this.packageDocument.spineIndexFromHref(hrefOfFirstContentDoc);
-		this.addCFIwithPayload(CFI, spinePos, "<span id='foundit' class=cfi_marker></span>");
-		this.setSpinePos(spinePos, false, true, 'foundit');
+
+		// Generate an element id from the CFI
+		var elementId = Crypto.SHA1(CFI);
+
+		this.addCFIwithPayload(CFI, spinePos, "<span id='" + elementId + "' class=cfi_marker style=background:red;>CFI</span>");
+		this.setSpinePos(spinePos, false, true, elementId);
 	},
 
 	restorePosition: function() {
@@ -261,7 +266,6 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		if(pos > -1) {
 			this.setSpinePos(pos, false, false);	
 		}
-		
 	},
 	
 	// goes the previous linear section in the spine. Non-linear sections should be
@@ -349,7 +353,6 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 	// REFACTORING CANDIDATE: The methods related to maintaining a hash of cfi information and payloads
 	//   will likely be refactored into its own backbone object.
-
 	addCFIwithPayload : function (CFI, spinePosition, htmlPayload) {
 
 		var cfiPayload = { contentDocSpinePos : spinePosition, payload : htmlPayload };
