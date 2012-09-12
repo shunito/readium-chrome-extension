@@ -104,7 +104,8 @@ Readium.Models.EPUBController = Backbone.Model.extend({
     	"toc_visible": false,
     	"rendered_spine_items": [],
     	"current_theme": "default-theme",
-    	"current_margin": 3
+    	"current_margin": 3,
+    	"epubCFIs" : {}
   	},
 
   	// Description: serialize this models state to `JSON` so that it can
@@ -155,17 +156,25 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		// of the url:
 		var splitUrl = href.match(/([^#]*)(?:#(.*))?/);
 
-		// handle the base url first:
-		if(splitUrl[1]) {
-			var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
-			this.setSpinePos(spine_pos);
-		}
+		// Check if the hash contained a CFI reference
+		if (splitUrl[2].match(/epubcfi/)) {
 
-		// now try to handle the fragment if there was one,
-		if(splitUrl[2]) {
-			// just set observable property to broadcast event
-			// to anyone who cares
-			this.set({hash_fragment: splitUrl[2]});
+			this.handleCFIReference(splitUrl[2]);
+		}
+		else {
+
+			// handle the base url first:
+			if(splitUrl[1]) {
+				var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
+				this.setSpinePos(spine_pos);
+			}
+
+			// now try to handle the fragment if there was one,
+			if(splitUrl[2]) {
+				// just set observable property to broadcast event
+				// to anyone who cares
+				this.set({hash_fragment: splitUrl[2]});
+			}
 		}
 	},
 
@@ -202,6 +211,38 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 	// ------------------------------------------------------------------------------------ //
 	//  "PRIVATE" HELPERS                                                                   //
 	// ------------------------------------------------------------------------------------ //
+
+	handleCFIReference : function (CFI) {
+
+		var packageDocument;
+		var hrefOfFirstContentDoc;
+		var spinePos;
+
+		// REFACTORING CANDIDATE: This is a temporary approach for retrieving a document representation of the 
+		//   package document. Probably best that the package model be able to return this representation of itself.
+        $.ajax({
+
+            type: "GET",
+            url: this.epub.get("root_url"),
+            dataType: "xml",
+            async: false,
+            success: function (response) {
+
+                packageDocument = response;
+            }
+        });
+
+		// get the href of the first content document
+		hrefOfFirstContentDoc = EPUBcfi.Interpreter.getContentDocHref(CFI, $(packageDocument));
+
+		// get the spine position of the content document and add the cfi to the current list, set the spine position
+		spinePos = this.packageDocument.spineIndexFromHref(hrefOfFirstContentDoc);
+		this.addCFIwithPayload(CFI, spinePos, "<span id='foundit' class=cfi_marker></span>");
+		this.setSpinePos(spinePos);
+
+		// set the hash_fragment to the id of the injected element
+		this.set({hash_fragment: 'foundit'});
+	},
 
 	restorePosition: function() {
 		var pos = Readium.Utils.getCookie(this.epub.get("key"));
@@ -275,6 +316,11 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		this.trigger("FXL_goToPage");
 
 		// Render the new spine position if it is not already rendered. 
+		// Rationale: There are some hidden dependencies here. The renderSpineItems method call will cause some 
+		//   set of spine items (content documents, svgs etc.) to be rendered in a view. Once rendered, a position must 
+		//   be set for the loaded document (where the user will start reading). There are a number of cases to consider: 
+		//   
+		//  1) The spine position is already rendered and setSpine position 
 		if (!spinePosIsRendered) {
 
 			var renderedItems = this.paginator.renderSpineItems(goToLastPageOfSection);
@@ -295,5 +341,14 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 			});
 		}
 		this.meta_section.on("change:meta_height", this.setMetaSize, this);
+	},
+
+	// REFACTORING CANDIDATE: The methods related to maintaining a hash of cfi information and payloads
+	//   will likely be refactored into its own backbone object.
+
+	addCFIwithPayload : function (CFI, spinePosition, htmlPayload) {
+
+		var cfiPayload = { contentDocSpinePos : spinePosition, payload : htmlPayload };
+		this.get("epubCFIs")[CFI] = cfiPayload;
 	}
 });
