@@ -10,6 +10,8 @@
 //   that Backbone attributes (getting/setting) and the backbone attribute event model (events fired on attribute changes) should 
 //   the primary ways of interacting with this model.
 
+// REFACTORING CANDIDATE: Need to think about the purpose and implementation of the hash_fragment attribute
+
 Readium.Models.EPUBController = Backbone.Model.extend({
 
 	// ------------------------------------------------------------------------------------ //
@@ -152,16 +154,18 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		var splitUrl = href.match(/([^#]*)(?:#(.*))?/);
 
 		// Check if the hash contained a CFI reference
-		if (splitUrl[2].match(/epubcfi/)) {
+		if (splitUrl[2] && splitUrl[2].match(/epubcfi/)) {
 
 			this.handleCFIReference(splitUrl[2]);
 		}
 		// The href is a standard hash fragment
 		else {
 
+			// REFACTORING CANDIDATE: Move this into its own "private" method
 			if(splitUrl[1]) {
 				var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
 				this.setSpinePos(spine_pos, false, false, splitUrl[2]);
+				this.set("hash_fragment", splitUrl[2]);
 			}
 		}
 	},
@@ -232,6 +236,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 		this.addCFIwithPayload(CFI, spinePos, "<span id='" + elementId + "' class=cfi_marker style=background:red;>CFI</span>");
 		this.setSpinePos(spinePos, false, true, elementId);
+		this.set("hash_fragment", elementId);
 	},
 
 	restorePosition: function() {
@@ -259,22 +264,24 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 	
 	// goes the next linear section in the spine. Non-linear sections should be
 	// skipped as per [the spec](http://idpf.org/epub/30/spec/epub30-publications.html#sec-itemref-elem)
+	// REFACTORING CANDIDATE: I think this is a public method
 	goToNextSection: function() {
 
 		var cp = this.get("spine_position");
 		var pos = this.packageDocument.getNextLinearSpinePostition(cp);
 		if(pos > -1) {
-			this.setSpinePos(pos, false, false);	
+			this.setSpinePos(pos, false, false);
 		}
 	},
 	
 	// goes the previous linear section in the spine. Non-linear sections should be
 	// skipped as per [the spec](http://idpf.org/epub/30/spec/epub30-publications.html#sec-itemref-elem)
+	// REFACTORING CANDIDATE: I think this is a public method
 	goToPrevSection: function() {
 		var cp = this.get("spine_position");
 		var pos = this.packageDocument.getPrevLinearSpinePostition(cp);
 		if(pos > -1) {
-			this.setSpinePos(pos, true, false);	
+			this.setSpinePos(pos, true, false);
 		}
 	},
 

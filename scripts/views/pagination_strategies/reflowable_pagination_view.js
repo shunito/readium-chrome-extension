@@ -414,6 +414,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	windowSizeChangeHandler: function() {
 		this.adjustIframeColumns();
+		
+		// Make sure we return to the correct position in the epub (This also requires clearing the hash fragment) on resize.
+		this.goToHashFragment(this.model.get("hash_fragment"));
 	},
     
 	marginCallback: function() {

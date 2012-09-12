@@ -98,6 +98,9 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		var curr_pg = this.get("current_page");
 		var lastPage = curr_pg[0] - 1;
 
+		// Clear the hash fragment if the user has decided to navigate away from it
+		this.epubController.set("hash_fragment", undefined);
+
 		if (curr_pg[0] <= 1) {
 
 			this.epubController.goToPrevSection();
@@ -144,6 +147,9 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 
 		var curr_pg = this.get("current_page");
 		var firstPage = curr_pg[curr_pg.length - 1] + 1;
+
+		// Clear the hash fragment if the user has decided to navigate away from it
+		this.epubController.set("hash_fragment", undefined);
 
 		if (curr_pg[curr_pg.length - 1] >= this.get("num_pages")) {
 
