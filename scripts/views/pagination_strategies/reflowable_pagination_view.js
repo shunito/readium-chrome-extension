@@ -29,11 +29,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.on("change:two_up", this.setUpMode, this);
 		this.model.on("change:two_up", this.adjustIframeColumns, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
-        this.model.on("change:hash_fragment", this.goToHashFragment, this);
-        
 	},
 
-	render: function(goToLastPage) {
+	render: function(goToLastPage, hashFragmentId) {
 		var that = this;
 		var json = this.model.getCurrentSection().toJSON();
 
@@ -49,12 +47,21 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			that.injectTheme();
 			that.setNumPages();
 
-			if(goToLastPage) {
-				that.pages.goToLastPage();
+			if (hashFragmentId) {
+
+				that.goToHashFragment(hashFragmentId);
 			}
 			else {
-				that.pages.goToPage(1);
-			}		
+
+				if (goToLastPage) {
+
+					that.pages.goToLastPage();
+				}
+				else {
+
+					that.pages.goToPage(1);
+				}		
+			}
 		});
 		
 		return [this.model.get("spine_position")];
@@ -110,6 +117,34 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		);
 	},
     
+	// Description: navigate to a url hash fragment by calculating the page of
+	//   the corresponding elem and setting the page number on `this.model`
+	//   as precondition the hash fragment should identify an element in the
+	//   section rendered by this view
+	goToHashFragment: function(hashFragmentId) {
+
+		// this method is triggered in response to 
+		var fragment = hashFragmentId;
+		if(fragment) {
+			var el = $("#" + fragment, this.getBody())[0];
+
+			if(!el) {
+				// couldn't find the el. just give up
+                return;
+			}
+
+			// we get more precise results if we look at the first children
+			while (el.children.length > 0) {
+				el = el.children[0];
+			}
+
+			var page = this.getElemPageNumber(el);
+            if (page > 0) {
+                this.pages.goToPage(page);	
+			}
+		}
+		// else false alarm no work to do
+	},
 
 	// ------------------------------------------------------------------------------------ //
 	//  "PRIVATE" HELPERS                                                                   //
@@ -146,35 +181,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
                 // when we change the page, we have to tell MO to update its position
                 this.mediaOverlayController.reflowPageChanged();
         }
-	},
-
-	// Description: navigate to a url hash fragment by calculating the page of
-	//   the corresponding elem and setting the page number on `this.model`
-	//   as precondition the hash fragment should identify an element in the
-	//   section rendered by this view
-	goToHashFragment: function() {
-
-		// this method is triggered in response to 
-		var fragment = this.model.get("hash_fragment");
-		if(fragment) {
-			var el = $("#" + fragment, this.getBody())[0];
-
-			if(!el) {
-				// couldn't find the el. just give up
-                return;
-			}
-
-			// we get more precise results if we look at the first children
-			while (el.children.length > 0) {
-				el = el.children[0];
-			}
-
-			var page = this.getElemPageNumber(el);
-            if (page > 0) {
-                this.pages.goToPage(page);	
-			}
-		}
-		// else false alarm no work to do
 	},
 
 	setFontSize: function() {

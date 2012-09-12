@@ -10,11 +10,6 @@
 //   that Backbone attributes (getting/setting) and the backbone attribute event model (events fired on attribute changes) should 
 //   the primary ways of interacting with this model.
 
-// REFACTORING CANDIDATE: hash_fragment now has two responsibilities with media overlays included in the source: To act as a broadcast
-//   attribute that triggers the view to go to a particular hash_fragment, as well as to do something for media overlays. It would
-//   probably make sense for the first reason to have a function make a direct call through the pagination strategy selector. 
-// Update (Marisa 20120814): right now it looks like hash_fragment is only monitored by the view, not MO.
-
 Readium.Models.EPUBController = Backbone.Model.extend({
 
 	// ------------------------------------------------------------------------------------ //
@@ -166,14 +161,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 			// handle the base url first:
 			if(splitUrl[1]) {
 				var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
-				this.setSpinePos(spine_pos);
-			}
-
-			// now try to handle the fragment if there was one,
-			if(splitUrl[2]) {
-				// just set observable property to broadcast event
-				// to anyone who cares
-				this.set({hash_fragment: splitUrl[2]});
+				this.setSpinePos(spine_pos, false, false, splitUrl[2]);
 			}
 		}
 	},
@@ -238,10 +226,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		// get the spine position of the content document and add the cfi to the current list, set the spine position
 		spinePos = this.packageDocument.spineIndexFromHref(hrefOfFirstContentDoc);
 		this.addCFIwithPayload(CFI, spinePos, "<span id='foundit' class=cfi_marker></span>");
-		this.setSpinePos(spinePos);
-
-		// set the hash_fragment to the id of the injected element
-		this.set({hash_fragment: 'foundit'});
+		this.setSpinePos(spinePos, false, true, 'foundit');
 	},
 
 	restorePosition: function() {
@@ -274,7 +259,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		var cp = this.get("spine_position");
 		var pos = this.packageDocument.getNextLinearSpinePostition(cp);
 		if(pos > -1) {
-			this.setSpinePos(pos, false);	
+			this.setSpinePos(pos, false, false);	
 		}
 		
 	},
@@ -285,16 +270,25 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		var cp = this.get("spine_position");
 		var pos = this.packageDocument.getPrevLinearSpinePostition(cp);
 		if(pos > -1) {
-			this.setSpinePos(pos, true);	
+			this.setSpinePos(pos, true, false);	
 		}
 	},
 
 	// Description: Sets the current spine position for the epub, checking if the spine
-	//   item is already rendered.
+	//   item is already rendered. 
 	// Arguments (
 	//	 pos (integer): The index of the spine element to set as the current spine position
+	//   goToLastPageOfSection (boolean): Set the viewer to the last page of the spine item (content document/svg)
+	//     that will be loaded.
+	//   reRenderSpinePos (boolean): Force the spine item to be re-rendered, regardless of whether it is the 
+	//     currently set spine item.
+	//   goToHashFragmentId: Set the view position to the element with the specified id. This parameter 
+	//     overrides the behaviour of "goToLastPageOfSection"
 	//	)
-	setSpinePos: function(pos, goToLastPageOfSection) {
+	// REFACTORING CANDIDATE: The abstraction here is getting sloppy, as goToHashFragmentId overrides goToLastPageOfSection
+	//   and generally, the behaviour of this method is not entirely clear from its name. Perhaps a simple renaming of the
+	//   method would suffice? Additionally, the internal impementation could be reviewed to tightened up (comments below).
+	setSpinePos: function(pos, goToLastPageOfSection, reRenderSpinePos, goToHashFragmentId) {
 
 		// check for invalid spine position
 		if (pos < 0 || pos >= this.packageDocument.spineLength()) {
@@ -306,25 +300,35 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		var spinePosIsRendered = spineItems.indexOf(pos) >=0 ? true : false;
 
 		// REFACTORING CANDIDATE: There is a somewhat hidden dependency here between the paginator
-		//   and the setting of the spine_position. The paginator re-renders based on the currently
-		//   set spine_position on this model; the paginator has a reference to this model, which is 
-		//   how it accesses the new spine_position. This would be clearer if the spine_position to set were passed 
-		//   explicitly to the paginator. 
+		//   and the setting of the spine_position. The pagination strategy selector re-renders based on the currently
+		//   set spine_position on this model. The pagination strategy selector has a reference to this model, which is 
+		//   how it accesses the new spine_position, through the "getCurrentSection" method. 
+		//   This would be clearer if the spine_position to set were passed explicitly to the paginator. 
 		this.set("spine_position", pos);
 
 		// REFACTORING CANDIDATE: This event should only be triggered for fixed layout sections
 		this.trigger("FXL_goToPage");
 
-		// Render the new spine position if it is not already rendered. 
-		// Rationale: There are some hidden dependencies here. The renderSpineItems method call will cause some 
-		//   set of spine items (content documents, svgs etc.) to be rendered in a view. Once rendered, a position must 
-		//   be set for the loaded document (where the user will start reading). There are a number of cases to consider: 
-		//   
-		//  1) The spine position is already rendered and setSpine position 
+		// Render the new spine position if it is not already rendered. Otherwise, check if a re-render should
+		// be forced (in case a new CFI has to be injected, for example). 
 		if (!spinePosIsRendered) {
 
-			var renderedItems = this.paginator.renderSpineItems(goToLastPageOfSection);
+			var renderedItems = this.paginator.renderSpineItems(goToLastPageOfSection, goToHashFragmentId);
 			this.set("rendered_spine_items", renderedItems);
+		}
+		else {
+
+			if (reRenderSpinePos) {
+
+				var renderedItems = this.paginator.renderSpineItems(goToLastPageOfSection, goToHashFragmentId);
+				this.set("rendered_spine_items", renderedItems);				
+			}
+			else {
+
+				if (!this.isFixedLayout() && goToHashFragmentId) {
+					this.paginator.v.goToHashFragment(goToHashFragmentId);
+				}
+			}
 		}
 	},
 
