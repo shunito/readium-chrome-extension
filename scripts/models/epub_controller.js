@@ -226,12 +226,15 @@ Readium.Models.EPUBController = Backbone.Model.extend({
         });
 
 		// get the href of the first content document
-		hrefOfFirstContentDoc = EPUBcfi.Interpreter.getContentDocHref(CFI, $(packageDocument));
+		hrefOfFirstContentDoc = EPUBcfi.Interpreter.getContentDocHref(CFI, packageDocument);
 
 		// get the spine position of the content document and add the cfi to the current list, set the spine position
 		spinePos = this.packageDocument.spineIndexFromHref(hrefOfFirstContentDoc);
 
 		// Generate an element id from the CFI
+		// REFACTORING CANDIDATE: There is no need for this to be a cryptographic hash function. It was chosen 
+		//   because the Crypto library was already part of Readium. All that is required here is a unique id
+		//   for injected elements. 
 		var elementId = Crypto.SHA1(CFI);
 
 		this.addCFIwithPayload(CFI, spinePos, "<span id='" + elementId + "' class=cfi_marker style=background:red;>CFI</span>");
@@ -264,7 +267,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 	
 	// goes the next linear section in the spine. Non-linear sections should be
 	// skipped as per [the spec](http://idpf.org/epub/30/spec/epub30-publications.html#sec-itemref-elem)
-	// REFACTORING CANDIDATE: I think this is a public method
+	// REFACTORING CANDIDATE: I think this is a public method and should be moved to the public section
 	goToNextSection: function() {
 
 		var cp = this.get("spine_position");
@@ -276,7 +279,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 	
 	// goes the previous linear section in the spine. Non-linear sections should be
 	// skipped as per [the spec](http://idpf.org/epub/30/spec/epub30-publications.html#sec-itemref-elem)
-	// REFACTORING CANDIDATE: I think this is a public method
+	// REFACTORING CANDIDATE: I think this is a public method and should be moved to the public section
 	goToPrevSection: function() {
 		var cp = this.get("spine_position");
 		var pos = this.packageDocument.getPrevLinearSpinePostition(cp);
