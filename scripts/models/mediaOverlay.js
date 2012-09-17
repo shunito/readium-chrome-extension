@@ -131,20 +131,17 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         }    
         return elm;
     },
-    setVolume: function(volume) {
-        if (this.get("is_ready") == false) {
-            this.debugPrint("document not ready");
-            return;
-        }
-        
-        this.audioplayer.setVolume(volume);
+    setVolume: function(value) {
+        this.audioplayer.setVolume(value);
     },
     setRate: function(value) {
-        if (this.get("is_ready") == false) {
-            this.debugPrint("document not ready");
-            return;
-        }
         this.audioplayer.setRate(value);
+    },
+    getVolume: function() {
+        return this.audioplayer.getVolume();
+    },
+    getRate: function() {
+        return this.audioplayer.getRate();
     },
     reset: function() {
         this.set("current_text_src", null);
@@ -157,6 +154,5 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         if (this.consoleTrace) {
             console.log("MediaOverlay: " + str);
         }
-        
     }
 });

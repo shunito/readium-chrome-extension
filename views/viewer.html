@@ -38,9 +38,22 @@
 						</li>
 						<li>
 							<a href="#" id='play-mo-btn' role="button">
-								<img src="/images/top_bar/ico_tts.png" class="nav-icon" alt="Media overlays"/>
+								<img src="/images/top_bar/ico_tts.png" class="nav-icon" alt="Play/pause media overlays"/>
 							</a>
 						</li>
+                        <li>
+                            <a href="#" id='mo-volume-btn-group' role="slider">
+                                <img src="/images/top_bar/ico_volume.png" id="mo-volume-btn" class="nav-icon" alt="Mute media overlays"/>
+                                <img src="/images/top_bar/ico_volume_muted.png" id="mo-volume-muted-btn" class="nav-icon" alt="Unmute media overlays"/>
+                                <input id="mo-volume-slider" type="range"  min="0" max="1.0" value="1.0" step=".05"/>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id='mo-rate-btn-group' role="slider">
+                                <img src="/images/top_bar/ico_rate.png" id="mo-rate-btn" class="nav-icon" alt="Media overlays rate"/>
+                                <input id="mo-rate-slider" type="range"  min="0.5" max="2.5" value="1.0" step=".05"/>
+                            </a>
+                        </li>
 						<li class="divider-vertical stubby"></li>
 						<li>
 							<a href="#viewer-settings-modal" id="options-btn" data-toggle="modal" role="button">
