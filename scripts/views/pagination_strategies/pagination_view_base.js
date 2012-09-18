@@ -109,7 +109,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 		var href = e.srcElement.attributes["href"].value;
 		if(href.match(/^http(s)?:/)) {
-			chrome.tabs.create({"url": href});
+			window.open(href);
 		} else {
 			this.model.goToHref(href);
 		}
