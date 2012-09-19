@@ -3,7 +3,7 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 	el: "#toolbar-el",
 
 	initialize: function() {
-		this.model.on("change:toolbar_visible", this.renderBarVibility, this);
+		this.model.on("change:toolbar_visible", this.renderBarVisibility, this);
 		this.model.on("change:full_screen", this.renderFullScreen, this);
 		this.model.on("change:current_theme", this.renderThemeButton, this);
         this.model.on("change:spine_position", this.renderMoButtons, this);
@@ -14,7 +14,7 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.renderBarVibility();
+		this.renderBarVisibility();
 		this.renderFullScreen();
 		this.renderThemeButton();
 		this.renderTitle();
@@ -22,7 +22,7 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 		return this;
 	},
 
-	renderBarVibility: function() {
+	renderBarVisibility: function() {
 		var visible = this.model.get("toolbar_visible");
 		this.$('#show-toolbar-button').toggle( !visible );
 		this.$('#toolbar-title').toggle( !visible );
