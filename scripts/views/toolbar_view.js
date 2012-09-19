@@ -18,7 +18,6 @@ Readium.Views.ToolbarView = Backbone.View.extend({
 		this.renderFullScreen();
 		this.renderThemeButton();
 		this.renderTitle();
-        this.renderMoButtons();
 		return this;
 	},
 
