@@ -54,13 +54,27 @@ Readium.Views.NcxTocView = Readium.Views.TocViewBase.extend({
 
 Readium.Views.XhtmlTocView = Readium.Views.TocViewBase.extend({ 
 
+	// ------------------------------------------------------------------------------------ //
+	//  "PUBLIC" METHODS (THE API)                                                          //
+	// ------------------------------------------------------------------------------------ //
+
 	render: function() {
 			
+		this.$('#toc-body').html( this.model.get("body").html() );
+		this.formatPageListNavigation();
+		this.$('#toc-body').append("<div id='toc-end-spacer'>");
+		return this;
+	},
+
+	// ------------------------------------------------------------------------------------ //
+	//  "PRIVATE" HELPERS                                                                   //
+	// ------------------------------------------------------------------------------------ //
+
+	formatPageListNavigation : function () {
+
 		var $navElements;
 		var $pageListNavElement;
 		var pageListData = [];
-
-		this.$('#toc-body').html( this.model.get("body").html() );
 
 		// Search for a nav element with epub:type="page-list". A nav element of this type must not occur more than once.
 		$navElements = this.$("nav");
@@ -68,6 +82,7 @@ Readium.Views.XhtmlTocView = Readium.Views.TocViewBase.extend({
 
 			if ($(this).attr("epub:type") === 'page-list') {
 
+				// Hide the standard XHTML page-list nav element, as we'll be displaying a select2 drop-down control for this.
 				$(this).hide();
 				return true;
 			}
@@ -82,19 +97,18 @@ Readium.Views.XhtmlTocView = Readium.Views.TocViewBase.extend({
 			pageListData.push({
 
 				id : $navTarget.attr("href"),
-				text : $navTarget.text()
+				text : "Page-" + $navTarget.text()
 			});
 		});
 
 		// Create the select2 control
-		this.$("#toc-body").append("<input type='hidden' id='page-list-select'></input>");
+		this.$("#toc-body").append("<div type='hidden' id='page-list-select'></div>");
 		$("#page-list-select").select2({
 
 			data : pageListData
 		});
 
-		this.$('#toc-body').append("<div id='toc-end-spacer'>");
-		return this;
+		$("#s2id_page-list-select").css("padding-left", "1.5em");
+		$("#s2id_page-list-select").css("width", "20em");
 	}
-
 });
