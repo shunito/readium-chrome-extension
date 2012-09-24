@@ -55,7 +55,44 @@ Readium.Views.NcxTocView = Readium.Views.TocViewBase.extend({
 Readium.Views.XhtmlTocView = Readium.Views.TocViewBase.extend({ 
 
 	render: function() {
+			
+		var $navElements;
+		var $pageListNavElement;
+		var pageListData = [];
+
 		this.$('#toc-body').html( this.model.get("body").html() );
+
+		// Search for a nav element with epub:type="page-list". A nav element of this type must not occur more than once.
+		$navElements = this.$("nav");
+		$pageListNavElement = $navElements.filter(function () {
+
+			if ($(this).attr("epub:type") === 'page-list') {
+
+				$(this).hide();
+				return true;
+			}
+		});
+
+		// Each nav element has a single ordered list of page numbers. Extract this data into an array so it can be 
+		//   loaded in the page-list control
+		// TODO: span elements can be used to create sub-headings. Implement functionality to account for this at some point.
+		$.each($('a', $pageListNavElement), function () { 
+
+			var $navTarget = $(this);
+			pageListData.push({
+
+				id : $navTarget.attr("href"),
+				text : $navTarget.text()
+			});
+		});
+
+		// Create the select2 control
+		this.$("#toc-body").append("<input type='hidden' id='page-list-select'></input>");
+		$("#page-list-select").select2({
+
+			data : pageListData
+		});
+
 		this.$('#toc-body').append("<div id='toc-end-spacer'>");
 		return this;
 	}
