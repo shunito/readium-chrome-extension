@@ -65,6 +65,8 @@ Readium.Views.XhtmlTocView = Readium.Views.TocViewBase.extend({
 
 	events : {
 
+		"click a": "handleClick",
+		"click #close-toc-button": "closeToc",
 		"change #toc-body" : "handleSelect"
 	},
 
