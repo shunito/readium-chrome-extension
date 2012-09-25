@@ -115,6 +115,7 @@ Readium.Views.XhtmlTocView = Readium.Views.TocViewBase.extend({
 		// Create the select2 control
 		$("#page-list-select").select2({
 
+			placeholder : "Select a page",
 			data : pageListData
 		});
 
