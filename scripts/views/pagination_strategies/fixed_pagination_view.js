@@ -121,6 +121,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
 		view.on("iframe_loaded", function() {
 			this.iframeLoadCallback({srcElement: view.iframe()});
+			that.applyKeydownHandler($(view.iframe()));
 		}, this);
 
 		var content = spineItem.getPageView().render().el;
@@ -189,6 +190,22 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		var size = this.model.get("font_size") / 10;
 		$('#readium-content-container').css("font-size", size + "em");
 		this.showCurrentPages();
+	},
+
+	applyKeydownHandler : function ($pageViewContainer) {
+
+		var that = this;
+
+		$pageViewContainer.contents().keydown(function (e) {
+
+			if (e.which == 39) {
+				that.model.paginator.v.pages.goRight();
+			}
+							
+			if (e.which == 37) {
+				that.model.paginator.v.pages.goLeft();
+			}
+		});
 	}
 });
 

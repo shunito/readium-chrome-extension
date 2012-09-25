@@ -46,6 +46,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			that.setFontSize();
 			that.injectTheme();
 			that.setNumPages();
+			that.applyKeydownHandler();
 
 			if (hashFragmentId) {
 
@@ -164,6 +165,22 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.off("change:current_margin", this.marginCallback);
 		// call the super destructor
 		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
+	},
+
+	applyKeydownHandler : function () {
+
+		var that = this;
+
+		this.$("#readium-flowing-content").contents().keydown(function (e) {
+
+			if (e.which == 39) {
+				that.model.paginator.v.pages.goRight();
+			}
+							
+			if (e.which == 37) {
+				that.model.paginator.v.pages.goLeft();
+			}
+		});
 	},
 
 	// REFACTORING CANDIDATE: I think this is actually part of the public interface
