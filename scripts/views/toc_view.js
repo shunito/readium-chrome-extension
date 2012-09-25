@@ -22,6 +22,12 @@ Readium.Views.TocViewBase = Backbone.View.extend({
 		this.model.handleLink(href);
 	},
 
+	handleSelect : function (e) {
+
+		var href = e.val;
+		this.model.handleLink(href);
+	},
+
 	closeToc: function(e) {
 		e.preventDefault();
 		this.model.hide();
@@ -57,6 +63,11 @@ Readium.Views.XhtmlTocView = Readium.Views.TocViewBase.extend({
 	// ------------------------------------------------------------------------------------ //
 	//  "PUBLIC" METHODS (THE API)                                                          //
 	// ------------------------------------------------------------------------------------ //
+
+	events : {
+
+		"change #toc-body" : "handleSelect"
+	},
 
 	render: function() {
 			
@@ -110,5 +121,8 @@ Readium.Views.XhtmlTocView = Readium.Views.TocViewBase.extend({
 
 		$("#s2id_page-list-select").css("padding-left", "1.5em");
 		$("#s2id_page-list-select").css("width", "20em");
+
+		// $("#toc-body").on("change", this.handleSelect);
+
 	}
 });
