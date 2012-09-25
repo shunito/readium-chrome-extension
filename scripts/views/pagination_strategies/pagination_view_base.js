@@ -107,7 +107,18 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	linkClickHandler: function(e) {
 		e.preventDefault();
 
-		var href = e.srcElement.attributes["href"].value;
+		var href;
+
+		// Check for both href and xlink:href attribute and get value
+		if (e.currentTarget.attributes["xlink:href"]) {
+
+			href = e.currentTarget.attributes["xlink:href"].value;
+		}
+		else {
+
+			href = e.currentTarget.attributes["href"].value;
+		}
+
 		if(href.match(/^http(s)?:/)) {
 			window.open(href);
 		} else {
