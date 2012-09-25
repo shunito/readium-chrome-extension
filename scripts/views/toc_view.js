@@ -32,7 +32,6 @@ Readium.Views.TocViewBase = Backbone.View.extend({
 		e.preventDefault();
 		this.model.hide();
 	}
-
 });
 
 
@@ -94,6 +93,7 @@ Readium.Views.XhtmlTocView = Readium.Views.TocViewBase.extend({
 			if ($(this).attr("epub:type") === 'page-list') {
 
 				// Hide the standard XHTML page-list nav element, as we'll be displaying a select2 drop-down control for this.
+				$(this).attr("id", "page-list-select");
 				$(this).hide();
 				return true;
 			}
@@ -113,7 +113,6 @@ Readium.Views.XhtmlTocView = Readium.Views.TocViewBase.extend({
 		});
 
 		// Create the select2 control
-		this.$("#toc-body").append("<div type='hidden' id='page-list-select'></div>");
 		$("#page-list-select").select2({
 
 			data : pageListData
@@ -121,8 +120,5 @@ Readium.Views.XhtmlTocView = Readium.Views.TocViewBase.extend({
 
 		$("#s2id_page-list-select").css("padding-left", "1.5em");
 		$("#s2id_page-list-select").css("width", "20em");
-
-		// $("#toc-body").on("change", this.handleSelect);
-
 	}
 });
