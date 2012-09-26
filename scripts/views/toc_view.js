@@ -124,8 +124,5 @@ Readium.Views.XhtmlTocView = Readium.Views.TocViewBase.extend({
 		// the select2 adds no-op inline click handlers, but these are not allowed
 		// by chromes content securty policy so just remove them
 		this.$('[onclick]').removeAttr('onclick');
-
-		$("#s2id_page-list-select").css("padding-left", "1.5em");
-		$("#s2id_page-list-select").css("width", "20em");
 	}
 });
