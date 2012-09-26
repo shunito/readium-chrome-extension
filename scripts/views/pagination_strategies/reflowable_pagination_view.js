@@ -384,7 +384,23 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
     getElemPageNumber: function(elem) {
 		
+		var $elem;
+		var elemWasInvisible = false;
 		var rects, shift;
+
+		// Rationale: Elements with an epub:type="pagebreak" attribute value are likely to be set as 
+		//   display:none, as they indicate the end of a page in the corresponding physical version of a book. We need 
+		//   the position of these elements to get the reflowable page number to set in the viewer. Therefore, 
+		//   we check if the element has this epub:type value, set it visible, find its location and then set it to 
+		//   display:none again. 
+		// REFACTORING CANDIDATE: We might want to do this for any element with display:none. 
+		$elem = $(elem);
+		if ($elem.attr("epub:type") === "pagebreak" && !$elem.is(":visible")) {
+
+			elemWasInvisible = true;
+			$elem.show();
+		}
+
 		rects = elem.getClientRects();
 		if(!rects || rects.length < 1) {
 			// if there were no rects the elem had display none
@@ -396,6 +412,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// calculate to the center of the elem (the edge will cause off by one errors)
 		shift += Math.abs(rects[0].left - rects[0].right);
 		
+		// Re-hide the element if it was original set as display:none
+		$elem.hide();
+
 		// `clientRects` are relative to the top left corner of the frame, but
 		// for right to left we actually need to measure relative to right edge
 		// of the frame
