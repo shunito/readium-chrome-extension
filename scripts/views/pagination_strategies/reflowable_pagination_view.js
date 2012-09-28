@@ -412,8 +412,10 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// calculate to the center of the elem (the edge will cause off by one errors)
 		shift += Math.abs(rects[0].left - rects[0].right);
 		
-		// Re-hide the element if it was original set as display:none
-		$elem.hide();
+        // Re-hide the element if it was original set as display:none
+        if (elemWasInvisible) {
+            $elem.hide();
+        }
 
 		// `clientRects` are relative to the top left corner of the frame, but
 		// for right to left we actually need to measure relative to right edge
