@@ -145,7 +145,10 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 	//    the backbone event broadcast.
 	// Arguments (
 	//   href (URL): The url and hash fragment that indicates the position in the epub to set as
-	//   the epub's current position.
+	//   the epub's current position. This argument either has to be the absolute path of the resource in 
+	//   the filesystem, or the path of the resource RELATIVE to the package document.
+	//   When a URI is resolved by the package document model, it assumes that any relative path for a resource is
+	//   relative to the package document.
 	// )
 	goToHref: function(href) {
 		// URL's with hash fragments require special treatment, so
