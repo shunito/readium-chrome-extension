@@ -167,6 +167,49 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
 	},
 
+	// Description: Handles clicks of anchor tags by navigating to
+	// the proper location in the epub spine, or opening
+	// a new window for external links
+	linkClickHandler: function (e) {
+		e.preventDefault();
+
+		var href;
+
+		// Check for both href and xlink:href attribute and get value
+		if (e.currentTarget.attributes["xlink:href"]) {
+
+			href = e.currentTarget.attributes["xlink:href"].value;
+		}
+		else {
+
+			href = e.currentTarget.attributes["href"].value;
+		}
+
+		// Resolve the relative path for the requested resource.
+		href = this.resolveRelativeURI(href);
+
+		if (href.match(/^http(s)?:/)) {
+			window.open(href);
+		} 
+		else {
+			this.model.goToHref(href);
+		}
+	},
+
+	// Rationale: For the purpose of looking up EPUB resources in the package document manifest, Readium expects that 
+	//   all relative links be specified as relative to the package document URI (or absolute references). However, it is 
+	//   valid XHTML for a link to another resource in the EPUB to be specfied relative to the current document's
+	//   path, rather than to the package document. As such, URIs passed to Readium must be either absolute references or 
+	//   relative to the package document. This method resolves URIs to conform to this condition. 
+	resolveRelativeURI: function (rel_uri) {
+		var relativeURI = new URI(rel_uri);
+
+		// Get URI for resource currently loaded in the view's iframe
+		var iframeDocURI = new URI($("#readium-flowing-content").attr("src"));
+
+		return relativeURI.resolve(iframeDocURI).toString();
+	},
+
 	applyKeydownHandler : function () {
 
 		var that = this;

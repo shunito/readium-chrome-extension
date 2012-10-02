@@ -101,31 +101,6 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.resetEl();
 	},
 
-	// Description: Handles clicks of anchor tags by navigating to
-	// the proper location in the epub spine, or opening
-	// a new window for external links
-	linkClickHandler: function(e) {
-		e.preventDefault();
-
-		var href;
-
-		// Check for both href and xlink:href attribute and get value
-		if (e.currentTarget.attributes["xlink:href"]) {
-
-			href = e.currentTarget.attributes["xlink:href"].value;
-		}
-		else {
-
-			href = e.currentTarget.attributes["href"].value;
-		}
-
-		if(href.match(/^http(s)?:/)) {
-			window.open(href);
-		} else {
-			this.model.goToHref(href);
-		}
-	},
-
 	getBindings: function() {
 		var packDoc = this.model.epub.getPackageDocument();
 		var bindings = packDoc.get('bindings');
