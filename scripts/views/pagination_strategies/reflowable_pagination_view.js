@@ -168,8 +168,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Description: Handles clicks of anchor tags by navigating to
-	// the proper location in the epub spine, or opening
-	// a new window for external links
+	//   the proper location in the epub spine, or opening
+	//   a new window for external links
 	linkClickHandler: function (e) {
 		e.preventDefault();
 
@@ -309,6 +309,20 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		});
 	},
 
+	// Get text node and character offset
+
+
+
+	// Override the context menu with something else
+
+
+
+	// Handle context menu click
+
+
+
+
+
 	adjustIframeColumns: function() {
 		var prop_dir = this.offset_dir;
 		var $frame = this.$('#readium-flowing-content');
@@ -323,7 +337,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		else {
 			this.page_width = this.frame_width;
 		}
-		
 
 		// it is important for us to make sure there is no padding or
 		// margin on the <html> elem, or it will mess with our column code
