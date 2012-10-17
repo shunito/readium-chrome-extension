@@ -6,6 +6,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	// ------------------------------------------------------------------------------------ //
 
 	initialize: function(options) {
+
+		var that = this;
+
 		// call the super ctor
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this, options);
 		this.page_template = Handlebars.templates.reflowing_template;
@@ -29,6 +32,11 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.on("change:two_up", this.setUpMode, this);
 		this.model.on("change:two_up", this.adjustIframeColumns, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
+
+		// Set a handler for saving the current position in the EPUB, on window close
+        $(window).bind("beforeunload", function (e) {
+            that.savePosition();
+        });
 	},
 
 	render: function(goToLastPage, hashFragmentId) {
@@ -69,32 +77,16 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
     findVisiblePageElements: function() {
-        var elmsWithId = $(this.getBody()).find("[id]");
+
+        var $elements = $(this.getBody()).find("[id]");
         var doc = $("#readium-flowing-content").contents()[0].documentElement;
         var doc_top = 0;
         var doc_left = 0;
         var doc_right = doc_left + $(doc).width();
         var doc_bottom = doc_top + $(doc).height();
         
-        var visibleElms = this.filterElementsByPosition(elmsWithId, doc_top, doc_bottom, doc_left, doc_right);
+        var visibleElms = this.filterElementsByPosition($elements, doc_top, doc_bottom, doc_left, doc_right);
             
-        return visibleElms;
-    },
-    
-    // returns all the elements in the set that are inside the box
-    // separated this function from the one above in order to debug it
-    filterElementsByPosition: function(elements, documentTop, documentBottom, documentLeft, documentRight) {
-        var visibleElms = elements.filter(function(idx) {
-            var elm_top = $(this).offset().top;
-            var elm_left = $(this).offset().left;
-            var elm_right = elm_left + $(this).width();
-            var elm_bottom = elm_top + $(this).height();
-            
-            var is_ok_x = elm_left >= documentLeft && elm_right <= documentRight;
-            var is_ok_y = elm_top >= documentTop && elm_bottom <= documentBottom;
-            
-            return is_ok_x && is_ok_y;
-        });  
         return visibleElms;
     },
     
@@ -167,6 +159,49 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
 	},
 
+	// REFACTORING CANDIDATE: These find methods could be refactored so that a collection is passed into 
+	findVisibleTextNodes: function () {
+
+		// Rationale: The intention here is to get a list of all the text nodes in the document, after which we'll
+		//   reduce this to the subset of text nodes that is visible on the page. We'll then select one text node
+		//   for which we can create a character offset CFI. This CFI will then refer to a "last position" in the 
+		//   EPUB, which can be used if the reader re-opens the EPUB.
+		var $elements = $("body", this.getBody()).find(":not(iframe)").contents().filter(function () {
+			if (this.nodeType === 3) {
+				return true;
+			} else {
+				return false;
+			}
+		});
+
+        var doc = $("#readium-flowing-content").contents()[0].documentElement;
+        var doc_top = 0;
+        var doc_left = 0;
+        var doc_right = doc_left + $(doc).width();
+        var doc_bottom = doc_top + $(doc).height();
+        
+        var $visibleElms = this.filterElementsByPosition($elements, doc_top, doc_bottom, doc_left, doc_right);
+            
+        return visibleElms;
+	},
+
+	// returns all the elements in the set that are inside the box
+    // separated this function from the one above in order to debug it
+    filterElementsByPosition: function($elements, documentTop, documentBottom, documentLeft, documentRight) {
+        var $visibleElms = $elements.filter(function(idx) {
+            var elm_top = $(this).offset().top;
+            var elm_left = $(this).offset().left;
+            var elm_right = elm_left + $(this).width();
+            var elm_bottom = elm_top + $(this).height();
+            
+            var is_ok_x = elm_left >= documentLeft && elm_right <= documentRight;
+            var is_ok_y = elm_top >= documentTop && elm_bottom <= documentBottom;
+            
+            return is_ok_x && is_ok_y;
+        });  
+        return $visibleElms;
+    },
+
 	// Description: Handles clicks of anchor tags by navigating to
 	//   the proper location in the epub spine, or opening
 	//   a new window for external links
@@ -177,11 +212,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 		// Check for both href and xlink:href attribute and get value
 		if (e.currentTarget.attributes["xlink:href"]) {
-
 			href = e.currentTarget.attributes["xlink:href"].value;
 		}
 		else {
-
 			href = e.currentTarget.attributes["href"].value;
 		}
 
@@ -307,6 +340,31 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 				EPUBcfi.Interpreter.injectElement(key, contentDocument, cfi.payload);	
 			}
 		});
+	},
+
+	// Save position in epub
+	savePosition : function () {
+
+		var $visibleTextNodes;
+		var selectedTextNode;
+
+		// Get first visible element with a text node 
+		$visibleTextNodes = this.findVisibleTextNodes();
+
+		// Generate CFI
+		$.each($visibleTextNodes, function () {
+
+			if (this.length > 0) {
+
+				selectedTextNode = this;
+
+				// break out of loop
+				return false;
+			}
+		});
+
+		// Save the position marker
+		EPUBcfi.Generator.generateCharacterOffsetCFI(selectedTextNode, 1, "contentDocId", packageDoc);
 	},
 
 	adjustIframeColumns: function() {
