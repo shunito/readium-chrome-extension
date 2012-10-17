@@ -175,19 +175,36 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		});
 
         var doc = $("#readium-flowing-content").contents()[0].documentElement;
-        var doc_top = 0;
-        var doc_left = 0;
-        var doc_right = doc_left + $(doc).width();
-        var doc_bottom = doc_top + $(doc).height();
+        var documentTop = 0;
+        var documentLeft = 0;
+        var documentRight = documentLeft + $(doc).width();
+        var documentBottom = documentTop + $(doc).height();
         
-        var $visibleElms = this.filterElementsByPosition($elements, doc_top, doc_bottom, doc_left, doc_right);
+        var $visibleTextNodes;
+
+        // Find if the parent of the text node is visible, if it is, say the text node is "visible"
+        $visibleTextNodes = $elements.filter(function (idx) {
+
+        	var $textNodeParent = $(this).parent();
+
+            var elm_top = $textNodeParent.offset().top;
+            var elm_left = $textNodeParent.offset().left;
+            var elm_right = elm_left + $textNodeParent.width();
+            var elm_bottom = elm_top + $textNodeParent.height();
             
-        return visibleElms;
+            var is_ok_x = elm_left >= documentLeft && elm_right <= documentRight;
+            var is_ok_y = elm_top >= documentTop && elm_bottom <= documentBottom;
+            
+            return is_ok_x && is_ok_y;
+        });  
+            
+        return $visibleTextNodes;
 	},
 
 	// returns all the elements in the set that are inside the box
     // separated this function from the one above in order to debug it
     filterElementsByPosition: function($elements, documentTop, documentBottom, documentLeft, documentRight) {
+        
         var $visibleElms = $elements.filter(function(idx) {
             var elm_top = $(this).offset().top;
             var elm_left = $(this).offset().left;
@@ -199,6 +216,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
             
             return is_ok_x && is_ok_y;
         });  
+
         return $visibleElms;
     },
 
@@ -347,6 +365,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 		var $visibleTextNodes;
 		var selectedTextNode;
+		var contentDocumentIdref;
+		var packageDocument;
+		var generatedCFI;
 
 		// Get first visible element with a text node 
 		$visibleTextNodes = this.findVisibleTextNodes();
@@ -363,8 +384,33 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			}
 		});
 
+		// Get the content document idref
+		contentDocumentIdref = this.model.getCurrentSection().get("idref");
+
+		// Get the package document
+		// REFACTORING CANDIDATE: This is a temporary approach for retrieving a document representation of the 
+		//   package document. Probably best that the package model be able to return this representation of itself.
+        $.ajax({
+
+            type: "GET",
+            url: this.model.epub.get("root_url"),
+            dataType: "xml",
+            async: false,
+            success: function (response) {
+
+                packageDocument = response;
+            }
+        });
+
 		// Save the position marker
-		EPUBcfi.Generator.generateCharacterOffsetCFI(selectedTextNode, 1, "contentDocId", packageDoc);
+		generatedCFI = EPUBcfi.Generator.generateCharacterOffsetCFI(
+			selectedTextNode, 
+			1, 
+			contentDocumentIdref, 
+			packageDocument, 
+			["cfi_marker"], 
+			[], 
+			["MathJax_Message"]);
 	},
 
 	adjustIframeColumns: function() {
