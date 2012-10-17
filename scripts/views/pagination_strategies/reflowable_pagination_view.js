@@ -309,20 +309,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		});
 	},
 
-	// Get text node and character offset
-
-
-
-	// Override the context menu with something else
-
-
-
-	// Handle context menu click
-
-
-
-
-
 	adjustIframeColumns: function() {
 		var prop_dir = this.offset_dir;
 		var $frame = this.$('#readium-flowing-content');
