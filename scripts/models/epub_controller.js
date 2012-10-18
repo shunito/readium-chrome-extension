@@ -78,7 +78,10 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 	save: function(attrs, options) {
 		// TODO: this should be done properly with a backbone sync
 		var ops = {
-			success: function() {}
+			success: function() {
+
+				console.log("save successful");
+			}
 		}
 		_.extend(ops,options);
 		var that = this;
@@ -116,7 +119,8 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 			"current_margin": this.get("current_margin"),
 			"two_up": this.get("two_up"),
 			"font_size": this.get("font_size"),
-			"key": this.get("key")
+			"key": this.get("key"),
+			"epubCFIs" : this.get("epubCFIs")
 		};
 	},
 
@@ -366,9 +370,41 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 	// REFACTORING CANDIDATE: The methods related to maintaining a hash of cfi information and payloads
 	//   will likely be refactored into its own backbone object.
-	addCFIwithPayload : function (CFI, spinePosition, htmlPayload) {
+	addCFIwithPayload : function (CFI, spinePosition, htmlPayload, bodyType) {
 
-		var cfiPayload = { contentDocSpinePos : spinePosition, payload : htmlPayload };
+		var cfiPayload = { contentDocSpinePos : spinePosition, payload : htmlPayload, type : bodyType };
 		this.get("epubCFIs")[CFI] = cfiPayload;
+	},
+
+	addLastPageCFI : function (CFI, spinePosition) {
+
+		// Create last page marker
+		var elementId = Crypto.SHA1(CFI);
+		var marker = "<span id='" + elementId + "' data-last-page-cfi:'" + CFI + "'></span>";
+
+		// Create payload
+		var cfiPayload = { contentDocSpinePos : spinePosition, payload : marker, type : "last-page" };
+
+		// Check if a last page marker already exists
+		var CFIPayloads = this.get("epubCFIs");
+
+		var prevLastPageCFI; 
+		$.each(CFIPayloads, function (currCFI, payloadObject) {
+
+			if (this.type === "last-page") {
+				prevLastPageCFI = currCFI;
+
+				// break out of loop
+				return false;
+			}
+		});
+
+		// Get rid of the previous last page marker 
+		if (prevLastPageCFI) {
+			delete(CFIPayloads.prevLastPageCFI);
+		}
+
+		// Add the new last page marker
+		this.get("epubCFIs")[CFI] = cfiPayload;	
 	}
 });

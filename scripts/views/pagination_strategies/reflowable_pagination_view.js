@@ -411,6 +411,13 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			["cfi_marker"], 
 			[], 
 			["MathJax_Message"]);
+
+		this.model.addLastPageCFI(
+			generatedCFI, 
+			this.model.get("spine_position"));
+
+		// Save the last page marker been added
+		this.model.save();
 	},
 
 	adjustIframeColumns: function() {
