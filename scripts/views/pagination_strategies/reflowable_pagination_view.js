@@ -49,7 +49,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.$('#container').html( this.page_template(json) );
 		
 		this.$('#readium-flowing-content').on("load", function(e) {
-			that.injectCFIElements();
+
+			var lastPageElementId = that.injectCFIElements();
 			that.adjustIframeColumns();
 			that.iframeLoadCallback(e);
 			that.setFontSize();
@@ -57,9 +58,17 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			that.setNumPages();
 			that.applyKeydownHandler();
 
+			// Rationale: The assumption here is that if a hash fragment is specified, it is the result of Readium 
+			//   following a clicked linked, either an internal link, or a link from the table of contents. The intention
+			//   to follow a link should supersede restoring the last-page position, as this should only be done for the 
+			//   case where Readium is re-opening the book, from the library view. 
 			if (hashFragmentId) {
 
 				that.goToHashFragment(hashFragmentId);
+			}
+			else if (lastPageElementId) {
+
+				that.goToHashFragment(lastPageElementId);
 			}
 			else {
 
@@ -342,6 +351,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var that = this;
 		var contentDocument;
 		var epubCFIs;
+		var lastPageElementId;
 
 		// Get the content document (assumes a reflowable publication)
 		contentDocument = $("#readium-flowing-content").contents()[0];
@@ -356,9 +366,22 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			if (cfi.contentDocSpinePos === that.model.get("spine_position")) {
 
 				// TODO: handle exceptions
-				EPUBcfi.Interpreter.injectElement(key, contentDocument, cfi.payload);	
+				EPUBcfi.Interpreter.injectElement(
+					key, 
+					contentDocument, 
+					cfi.payload,
+					["cfi_marker"],
+  					[],
+  					["MathJax_Message"]);
+
+				if (cfi.type === "last-page") {
+					lastPageElementId = $(cfi.payload).attr("id");
+				}
 			}
 		});
+
+		// This will be undefined unless there is a "last-page" element injected into the page
+		return lastPageElementId;
 	},
 
 	// Save position in epub
@@ -601,6 +624,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.hideContent();
 		setTimeout(function() {
 			that.goToPage(that.pages.get("current_page")[0]);
+			that.model.paginator.v.savePosition();
 		}, 150);
 	},
 
