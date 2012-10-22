@@ -58,6 +58,7 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		else {
 			this.nextPage();	
 		}
+		this.epubController.paginator.v.savePosition();
 	},
 
 	// Description: Turn pages in the leftward direction
@@ -70,6 +71,7 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		else {
 			this.prevPage();	
 		}
+		this.epubController.paginator.v.savePosition();
 	},
 
 	goToPage: function(gotoPageNumber) {
@@ -81,6 +83,7 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 							this.epubController.epub.get("page_prog_dir")
 							);
 		this.set("current_page", pagesToGoto);
+		this.epubController.paginator.v.savePosition();
 	},
 
 	// Description: Return true if the pageNum argument is a currently visible 

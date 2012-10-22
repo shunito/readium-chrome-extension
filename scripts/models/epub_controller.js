@@ -388,21 +388,13 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		// Check if a last page marker already exists
 		var CFIPayloads = this.get("epubCFIs");
 
-		var prevLastPageCFI; 
+		// Check every CFI payload for a "last-page" type, in case more than one exists
 		$.each(CFIPayloads, function (currCFI, payloadObject) {
 
 			if (this.type === "last-page") {
-				prevLastPageCFI = currCFI;
-
-				// break out of loop
-				return false;
+				delete CFIPayloads[currCFI]
 			}
 		});
-
-		// Get rid of the previous last page marker 
-		if (prevLastPageCFI) {
-			delete(CFIPayloads.prevLastPageCFI);
-		}
 
 		// Add the new last page marker
 		this.get("epubCFIs")[CFI] = cfiPayload;	
