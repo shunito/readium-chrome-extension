@@ -169,14 +169,22 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
 	},
 
-	// REFACTORING CANDIDATE: These find methods could be refactored so that a collection is passed into 
-	findVisibleTextNodes: function () {
+	// TODO: Extend this to be correct for right-to-left pagination
+	findVisibleTextNode: function () {
+
+        var documentLeft = 0;
+        var documentRight;
+        var columnGap;
+        var columnWidth;
+        var doc;
+        var $elements;
+        var $firstVisibleTextNode;
 
 		// Rationale: The intention here is to get a list of all the text nodes in the document, after which we'll
 		//   reduce this to the subset of text nodes that is visible on the page. We'll then select one text node
 		//   for which we can create a character offset CFI. This CFI will then refer to a "last position" in the 
 		//   EPUB, which can be used if the reader re-opens the EPUB.
-		var $elements = $("body", this.getBody()).find(":not(iframe)").contents().filter(function () {
+		$elements = $("body", this.getBody()).find(":not(iframe)").contents().filter(function () {
 			if (this.nodeType === 3) {
 				return true;
 			} else {
@@ -184,31 +192,85 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			}
 		});
 
-        var doc = $("#readium-flowing-content").contents()[0].documentElement;
-        var documentTop = 0;
-        var documentLeft = 0;
-        var documentRight = documentLeft + $(doc).width();
-        var documentBottom = documentTop + $(doc).height();
-        
-        var $visibleTextNodes;
+        doc = $("#readium-flowing-content").contents()[0].documentElement;
 
-        // Find if the parent of the text node is visible, if it is, say the text node is "visible"
-        $visibleTextNodes = $elements.filter(function (idx) {
+        if (this.model.get("two_up")) {
+        	columnGap = parseInt($(doc).css("-webkit-column-gap").replace("px",""));
+        	columnWidth = parseInt($(doc).css("-webkit-column-width").replace("px",""));
+        	documentRight = documentLeft + columnGap + (columnWidth * 2);
+        } 
+        else {
+        	documentRight = documentLeft + $(doc).width();
+        }
 
+        // Find the first visible text node 
+        $firstVisibleTextNode;
+        $.each($elements, function() {
+
+        	var POSITION_ERROR_MARGIN = 5;
         	var $textNodeParent = $(this).parent();
+        	var elementLeft = $textNodeParent.position().left;
+        	var elementRight = elementLeft + $textNodeParent.width(); 
 
-            var elm_top = $textNodeParent.offset().top;
-            var elm_left = $textNodeParent.offset().left;
-            var elm_right = elm_left + $textNodeParent.width();
-            var elm_bottom = elm_top + $textNodeParent.height();
-            
-            var is_ok_x = elm_left >= documentLeft && elm_right <= documentRight;
-            var is_ok_y = elm_top >= documentTop && elm_bottom <= documentBottom;
-            
-            return is_ok_x && is_ok_y;
-        });  
-            
-        return $visibleTextNodes;
+        	// Correct for minor right and left position errors
+        	elementLeft = Math.abs(elementLeft) < POSITION_ERROR_MARGIN ? 0 : elementLeft;
+        	elementRight = Math.abs(elementRight - documentRight) < POSITION_ERROR_MARGIN ? documentRight : elementRight;
+
+        	if (elementLeft <= documentRight 
+        		&& elementRight >= documentLeft
+        		&& this.length > 10) { // 10 is so the text node is actually a text node with writing
+
+        		$firstVisibleTextNode = $(this);
+
+        		// Break the loop
+        		return false;
+        	}
+        });
+
+        return $firstVisibleTextNode;
+	},
+
+	// Currently for left-to-right pagination only
+	findVisibleCharacterOffset : function($textNode) {
+
+		var $parentNode;
+		var elementTop;
+		var elementBottom;
+		var POSITION_ERROR_MARGIN = 5;
+		var $document;
+		var documentTop;
+		var documentBottom;
+		var percentOfTextOffPage;
+		var characterOffset;
+
+		// Get parent
+		$parentNode = $textNode.parent();
+
+		// get document
+		$document = $($("#readium-flowing-content").contents()[0].documentElement);
+
+		// Find percentage of visible node on page
+		documentTop = $document.position().top;
+		documentBottom = documentTop + $document.height();
+
+		elementTop = $parentNode.position().top;
+		elementBottom = elementTop + $parentNode.height();
+
+		// Element overlaps top
+		if (elementTop < documentTop) {
+
+			percentOfTextOffPage = Math.abs(elementTop - documentTop) / $parentNode.height();
+			characterOffsetByPercent = Math.ceil(percentOfTextOffPage * $textNode[0].length);
+			characterOffset = Math.ceil(0.5 * ($textNode[0].length - characterOffsetByPercent)) + characterOffsetByPercent;
+		}
+		else if (elementTop >= documentTop && elementTop <= documentBottom) {
+			characterOffset = 1;
+		}
+		else if (elementTop < documentBottom) {
+			characterOffset = 1;
+		}
+
+		return characterOffset;
 	},
 
 	// returns all the elements in the set that are inside the box
@@ -365,17 +427,23 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 			if (cfi.contentDocSpinePos === that.model.get("spine_position")) {
 
-				// TODO: handle exceptions
-				EPUBcfi.Interpreter.injectElement(
-					key, 
-					contentDocument, 
-					cfi.payload,
-					["cfi_marker"],
-  					[],
-  					["MathJax_Message"]);
+				try {
+					// TODO: handle exceptions
+					EPUBcfi.Interpreter.injectElement(
+						key, 
+						contentDocument, 
+						cfi.payload,
+						["cfi-marker"],
+	  					[],
+	  					["MathJax_Message"]);
 
-				if (cfi.type === "last-page") {
-					lastPageElementId = $(cfi.payload).attr("id");
+					if (cfi.type === "last-page") {
+						lastPageElementId = $(cfi.payload).attr("id");
+					}
+				} 
+				catch (e) {
+
+					console.log("Could not inject CFI");
 				}
 			}
 		});
@@ -387,26 +455,33 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	// Save position in epub
 	savePosition : function () {
 
-		var $visibleTextNodes;
-		var selectedTextNode;
+		var $visibleTextNode;
+		var lastPageMarkerExists = false;
+		var characterOffset;
 		var contentDocumentIdref;
 		var packageDocument;
 		var generatedCFI;
 
 		// Get first visible element with a text node 
-		$visibleTextNodes = this.findVisibleTextNodes();
+		$visibleTextNode = this.findVisibleTextNode();
 
-		// Generate CFI
-		$.each($visibleTextNodes, function () {
+		// Check if a last page marker already exists on this page
+		$.each($visibleTextNode.parent().contents(), function () {
 
-			if (this.length > 0) {
+			if ($(this).hasClass("last-page")) {
+				lastPageMarkerExists = true;
 
-				selectedTextNode = this;
-
-				// break out of loop
+				// Break out of loop
 				return false;
 			}
 		});
+
+		// Don't change the last page marker, as there is already one on this page
+		if (lastPageMarkerExists) {
+			return; 
+		}
+
+		characterOffset = this.findVisibleCharacterOffset($visibleTextNode);
 
 		// Get the content document idref
 		contentDocumentIdref = this.model.getCurrentSection().get("idref");
@@ -428,11 +503,11 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 		// Save the position marker
 		generatedCFI = EPUBcfi.Generator.generateCharacterOffsetCFI(
-			selectedTextNode, 
-			1, 
+			$visibleTextNode[0], 
+			characterOffset, 
 			contentDocumentIdref, 
 			packageDocument, 
-			["cfi_marker"], 
+			["cfi-marker"], 
 			[], 
 			["MathJax_Message"]);
 
