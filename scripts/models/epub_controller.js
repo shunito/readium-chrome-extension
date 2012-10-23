@@ -79,8 +79,6 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		// TODO: this should be done properly with a backbone sync
 		var ops = {
 			success: function() {
-
-				console.log("save successful");
 			}
 		}
 		_.extend(ops,options);

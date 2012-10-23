@@ -210,15 +210,20 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         	var POSITION_ERROR_MARGIN = 5;
         	var $textNodeParent = $(this).parent();
         	var elementLeft = $textNodeParent.position().left;
-        	var elementRight = elementLeft + $textNodeParent.width(); 
+        	var elementRight = elementLeft + $textNodeParent.width();
+        	var nodeText;
 
         	// Correct for minor right and left position errors
         	elementLeft = Math.abs(elementLeft) < POSITION_ERROR_MARGIN ? 0 : elementLeft;
         	elementRight = Math.abs(elementRight - documentRight) < POSITION_ERROR_MARGIN ? documentRight : elementRight;
 
+        	// Heuristic to find a text node with actual text
+        	nodeText = this.nodeValue.replace(/\n/g, "");
+        	nodeText = nodeText.replace(/ /g, "");
+
         	if (elementLeft <= documentRight 
         		&& elementRight >= documentLeft
-        		&& this.length > 10) { // 10 is so the text node is actually a text node with writing
+        		&& nodeText.length > 10) { // 10 is so the text node is actually a text node with writing
 
         		$firstVisibleTextNode = $(this);
 
