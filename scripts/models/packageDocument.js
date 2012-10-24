@@ -34,7 +34,6 @@ Readium.Models.PackageDocument = Backbone.Model.extend({
     	}
     },
 
-
 	// just want to make sure that we do not slip into an
 	// invalid state
 	validate: function(attrs) {
@@ -211,6 +210,13 @@ Readium.Models.PackageDocument = Backbone.Model.extend({
 			// crunch spine attrs and manifest attrs together into one obj
 			var book = that.get("book");
 			return _.extend({}, spineItem, manItem.attributes, {"spine_index": index}, {"page_prog_dir": book.get("page_prog_dir")});
+		});
+
+		// Add the index of the spine item to the manifest item's id to prevent the backbone collection
+		//   from finding duplicate manifest items when different itemref elements in the spine reference
+		//   the same manifest item through the "idref" attribute.
+		$.each(bbSpine, function () {
+			this.id = this.id + this.spine_index;
 		});
 
 		return new Readium.Collections.Spine(bbSpine, {packageDocument: this});
