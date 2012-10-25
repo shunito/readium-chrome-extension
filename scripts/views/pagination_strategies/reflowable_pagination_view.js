@@ -33,11 +33,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.on("change:two_up", this.adjustIframeColumns, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
 		this.model.on("save_position", this.savePosition, this);
-
-		// Set a handler for saving the current position in the EPUB, on window close
-        // $(window).bind("beforeunload", function (e) {
-        //     that.savePosition();
-        // });
 	},
 
 	render: function(goToLastPage, hashFragmentId) {
