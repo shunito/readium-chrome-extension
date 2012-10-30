@@ -47,8 +47,8 @@ Readium.Views.NcxTocView = Readium.Views.TocViewBase.extend({
 		var ol;
 
 		this.setVisibility();
-		
-		// this.model.get("navs");
+
+		// Construct html for the navPoints in the document		
 		ol = this.addNavPointElements(this.model.get("navs"));
 
 		this.$('#toc-body').html("<h2>" + (this.model.get("title") || "Contents") + "</h2>")
@@ -56,7 +56,9 @@ Readium.Views.NcxTocView = Readium.Views.TocViewBase.extend({
 		this.$('#toc-body').append("<div id='toc-end-spacer'>");
 		return this;
 	},
- 
+
+	// Description: Constructs an html representation of NCX navPoints, based on an object of navPoint information
+	// Rationale: This is a recursive method, as NCX navPoint elements can nest 0 or more of themselves as children
 	addNavPointElements: function (jsonNavs) {
 
 		var ol = $("<ol></ol>");
@@ -64,10 +66,14 @@ Readium.Views.NcxTocView = Readium.Views.TocViewBase.extend({
 
 		$.each(jsonNavs, function (navIndex) {
 
-			// Add each nav element
+			var hasNavs;
+
+			// Add the current navPoint element to the TOC html 
 			ol.append( that.nav_template(jsonNavs[navIndex]) );
 
-			if (jsonNavs[navIndex].navs.length > 0) {
+			// Check if the current navPoint has navPoints of its own
+			hasNavs = jsonNavs[navIndex].navs.length > 0 ? true : false;
+			if (hasNavs) {
 
 				var li = $("<li></li>");
 				li.append(that.addNavPointElements(jsonNavs[navIndex].navs));

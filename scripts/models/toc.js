@@ -86,8 +86,8 @@ Readium.Models.NcxToc = Readium.Models.Toc.extend({
 
 	// Rationale: This method does not use JATH to parse an NCX document, as JATH doesn't really support elements nested 
 	//   recursively, as is possibly the case for navPoint elements in an NCX document. 
-	parse: function(xmlDom) {
-		var json = {};
+	parse: function (xmlDom) {
+		var ncxJson = {};
 
 		var $navMap;
 		var that = this;
@@ -97,49 +97,31 @@ Readium.Models.NcxToc = Readium.Models.Toc.extend({
       		xmlDom = parser.parseFromString(xmlDom, 'text/xml');
 		}
 
-		// Start at navMap
-		json.title = $($("text", $("docTitle", xmlDom)[0])[0]).text();
+		// Get NCX TOC text title
+		ncxJson.title = $($("text", $("docTitle", xmlDom)[0])[0]).text();
 		
-		// For each navpoint, add navpoints recursively
-		// REFACTORING CANDIDATE: The addNavPoint method should be able to be called directly.
-		json.navs = [];
+		// For each navpoint, create navPoint objects recursively
+		ncxJson.navs = [];
 		$navMap = $("navMap", xmlDom);
 		$.each($navMap.children(), function() {
 
 			if ($(this).is("navPoint")) {
 
-				json.navs.push(that.addNavPoint($(this)));
+				ncxJson.navs.push(that.createNavPointObject($(this)));
 			}
 		});
 
-
-
-
-
-		
-		// Jath.resolver = function(prefix) {
-		// 	if(prefix === "ncx") {
-		// 		return "http://www.daisy.org/z3986/2005/ncx/";	
-		// 	}
-		// 	return "";
-		// }
-
-		// // Allow for recursive structure of "navPoint" elements
-		// var navsTemplate = [ "navPoint", { 
-		// 	text: "navLabel/text",
-		// 	href: "content/@src"
-		// } ];
-		// this.jath_template.navs[1].navs = navsTemplate;
-
-		// json = Jath.parse(this.jath_template, xmlDom);
-		return json;
+		return ncxJson;
 	},
 
-	addNavPoint : function ($navPoint) {
+	// Description: Creates an object that represents a NCX navPoint.   
+	// Rationale: Since navPoints can be nested within each other, this method creates each navPoint object recursively.
+	createNavPointObject : function ($navPoint) {
 
 		var jsonNavPoint = {};
 		var that = this;
 
+		// Each navPoint object has a content src, a label and 0 or more child navPoints
 		jsonNavPoint.navs = [];
 		$.each($navPoint.children(), function () {
 
@@ -154,7 +136,7 @@ Readium.Models.NcxToc = Readium.Models.Toc.extend({
 			}
 			else if ($currElement.is("navPoint")) {
 
-				jsonNavPoint.navs.push(that.addNavPoint($currElement));
+				jsonNavPoint.navs.push(that.createNavPointObject($currElement));
 			}
 		});
 
