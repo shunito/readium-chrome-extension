@@ -101,6 +101,7 @@ Readium.Models.NcxToc = Readium.Models.Toc.extend({
 		json.title = $($("text", $("docTitle", xmlDom)[0])[0]).text();
 		
 		// For each navpoint, add navpoints recursively
+		// REFACTORING CANDIDATE: The addNavPoint method should be able to be called directly.
 		json.navs = [];
 		$navMap = $("navMap", xmlDom);
 		$.each($navMap.children(), function() {
