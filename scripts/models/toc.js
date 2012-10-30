@@ -84,28 +84,85 @@ Readium.Models.NcxToc = Readium.Models.Toc.extend({
 		} ]
 	},
 
+	// Rationale: This method does not use JATH to parse an NCX document, as JATH doesn't really support elements nested 
+	//   recursively, as is possibly the case for navPoint elements in an NCX document. 
 	parse: function(xmlDom) {
-		var json;
-		if(typeof(xmlDom) === "string" ) {
+		var json = {};
+
+		var $navMap;
+		var that = this;
+
+		if (typeof(xmlDom) === "string") {
 			var parser = new window.DOMParser;
       		xmlDom = parser.parseFromString(xmlDom, 'text/xml');
 		}
-		
-		Jath.resolver = function(prefix) {
-			if(prefix === "ncx") {
-				return "http://www.daisy.org/z3986/2005/ncx/";	
-			}
-			return "";
-		}
 
-		json = Jath.parse( this.jath_template, xmlDom);
+		// Start at navMap
+		json.title = $($("text", $("docTitle", xmlDom)[0])[0]).text();
+		
+		// For each navpoint, add navpoints recursively
+		json.navs = [];
+		$navMap = $("navMap", xmlDom);
+		$.each($navMap.children(), function() {
+
+			if ($(this).is("navPoint")) {
+
+				json.navs.push(that.addNavPoint($(this)));
+			}
+		});
+
+
+
+
+
+		
+		// Jath.resolver = function(prefix) {
+		// 	if(prefix === "ncx") {
+		// 		return "http://www.daisy.org/z3986/2005/ncx/";	
+		// 	}
+		// 	return "";
+		// }
+
+		// // Allow for recursive structure of "navPoint" elements
+		// var navsTemplate = [ "navPoint", { 
+		// 	text: "navLabel/text",
+		// 	href: "content/@src"
+		// } ];
+		// this.jath_template.navs[1].navs = navsTemplate;
+
+		// json = Jath.parse(this.jath_template, xmlDom);
 		return json;
+	},
+
+	addNavPoint : function ($navPoint) {
+
+		var jsonNavPoint = {};
+		var that = this;
+
+		jsonNavPoint.navs = [];
+		$.each($navPoint.children(), function () {
+
+			$currElement = $(this);
+			if ($currElement.is("content")) {
+
+				jsonNavPoint.href = $currElement.attr("src");
+			}
+			else if ($currElement.is("navLabel")) {
+
+				jsonNavPoint.text = $($("text", $currElement)[0]).text();
+			}
+			else if ($currElement.is("navPoint")) {
+
+				jsonNavPoint.navs.push(that.addNavPoint($currElement));
+			}
+		});
+
+		return jsonNavPoint;
 	},
 
 	TocView: function() {
 		return new Readium.Views.NcxTocView({model: this});
 	}
-
 });
 
 Readium.Models.XhtmlToc = Readium.Models.Toc.extend({
