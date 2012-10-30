@@ -466,15 +466,24 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		$visibleTextNode = this.findVisibleTextNode();
 
 		// Check if a last page marker already exists on this page
-		$.each($visibleTextNode.parent().contents(), function () {
+		try {
+			$.each($visibleTextNode.parent().contents(), function () {
 
-			if ($(this).hasClass("last-page")) {
-				lastPageMarkerExists = true;
+				if ($(this).hasClass("last-page")) {
+					lastPageMarkerExists = true;
 
-				// Break out of loop
-				return false;
-			}
-		});
+					// Break out of loop
+					return false;
+				}
+			});
+		}
+		catch (e) {
+
+			console.log("Could not generate CFI for non-text node as first visible element on page");
+
+			// No need to execute the rest of the save position method if the first visible element is not a text node
+			return;
+		}
 
 		// Don't change the last page marker, as there is already one on this page
 		if (lastPageMarkerExists) {
