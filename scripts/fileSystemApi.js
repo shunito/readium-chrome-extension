@@ -81,10 +81,11 @@ Readium.FileSystemApi = function(initCallback) {
 		
 	};
 	
-	var writeFile = function(path, content, rootDir, successCallback, failureCallback)  {
+	var writeFile = function (path, content, rootDir, successCallback, failureCallback)  {
+
 		rootDir.getFile(path, { create: true, exclusive: false }, function(fileEntry) {
 			fileEntry.createWriter(function(fileWriter) {
-				var bb; // for building blobs of data
+				var blob;
 
 				fileWriter.onwriteend = function(e) {
 					successCallback(e);
@@ -94,30 +95,28 @@ Readium.FileSystemApi = function(initCallback) {
 					failureCallback(e);
 				};
 
-				if(content instanceof Blob) {
+				if (content instanceof Blob) {
 					fileWriter.write(content);
 				}
-				else if(content.webkitRelativePath || content.relativePath) {
+				else if (content.webkitRelativePath || content.relativePath) {
 					// hacky way to detect if it is a file object
 					var reader = new FileReader();
 					reader.onload = function(e) {
-						bb = new WebKitBlobBuilder();
-						bb.append(e.target.result);
-						fileWriter.write(bb.getBlob());
+						blob = new Blob([e.target.result]);
+						fileWriter.write(blob);
 					}
   					reader.readAsArrayBuffer(content);
 				}
 				else {
 					// Create a new Blob and write it
-					bb = new WebKitBlobBuilder(); 
-					if(typeof content === "string") {
-						bb.append(content);
-						fileWriter.write(bb.getBlob('text/plain'));
+					if (typeof content === "string") {
+						blob = new Blob([content], {type: 'text/plain'});
+						fileWriter.write(blob);
 					}
 					else {
 						var byteArr = new Uint8Array(content);
-						bb.append(byteArr.buffer);
-						fileWriter.write(bb.getBlob());
+						blob = new Blob([byteArr.buffer]);
+						fileWriter.write(blob);
 					}
 				}
 
