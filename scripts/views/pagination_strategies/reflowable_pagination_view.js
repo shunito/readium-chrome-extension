@@ -428,7 +428,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			if (cfi.contentDocSpinePos === that.model.get("spine_position")) {
 
 				try {
-					// TODO: handle exceptions
+					
 					EPUBcfi.Interpreter.injectElement(
 						key, 
 						contentDocument, 
