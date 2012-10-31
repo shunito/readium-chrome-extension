@@ -199,7 +199,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         }
 
         // Find the first visible text node 
-        $firstVisibleTextNode;
         $.each($elements, function() {
 
         	var POSITION_ERROR_MARGIN = 5;

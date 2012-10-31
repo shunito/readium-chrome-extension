@@ -242,7 +242,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		//   for injected elements. 
 		var elementId = Crypto.SHA1(CFI);
 
-		this.addCFIwithPayload(CFI, spinePos, "<span id='" + elementId + "' class=cfi_marker style=background:red;>CFI</span>");
+		this.addCFIwithPayload(CFI, spinePos, "<span id='" + elementId + "' class='cfi_marker' data-cfi='" + CFI + "'></span>");
 		this.setSpinePos(spinePos, false, true, elementId);
 		this.set("hash_fragment", elementId);
 	},
