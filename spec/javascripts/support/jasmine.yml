@@ -20,6 +20,8 @@ src_files:
   - lib/backbone.min.js
   - lib/jath.js
   - lib/URI.js
+  - lib/modernizr-2.5.3.min.js
+  - lib/modernizr.css-regions.js
   - scripts/fileSystemApi.js
   - scripts/utils/bb_file_system_sync.js
   - scripts/utils/cookie_utils.js
@@ -36,10 +38,12 @@ src_files:
   - scripts/models/ibooks_options_parser.js
   - scripts/models/epub_controller.js
   - scripts/models/epub.js
-  - scripts/models/pagination_strategy_selector.js
   - scripts/models/readium_pagination.js
   - scripts/models/page_number_display_logic.js
   - scripts/epub_reading_system.js
+  - scripts/models/media_overlay_controller.js
+  - scripts/views/fixed_layout_book_zoomer.js
+
 
 # stylesheets
 #
