@@ -378,7 +378,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 		// Create last page marker
 		var elementId = Crypto.SHA1(CFI);
-		var marker = "<span id='" + elementId + "' data-last-page-cfi:'" + CFI + "' class='cfi-marker last-page'></span>";
+		var marker = "<span id='" + elementId + "' data-last-page-cfi='" + CFI + "' class='cfi-marker last-page'></span>";
 
 		// Create payload
 		var cfiPayload = { contentDocSpinePos : spinePosition, payload : marker, type : "last-page" };

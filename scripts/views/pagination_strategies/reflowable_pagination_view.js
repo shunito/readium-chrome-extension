@@ -253,7 +253,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		documentTop = $document.position().top;
 		documentBottom = documentTop + $document.height();
 
-		elementTop = $parentNode.position().top;
+		elementTop = $parentNode.offset().top;
 		elementBottom = elementTop + $parentNode.height();
 
 		// Element overlaps top
@@ -310,7 +310,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 		// Resolve the relative path for the requested resource.
 		href = this.resolveRelativeURI(href);
-
 		if (href.match(/^http(s)?:/)) {
 			window.open(href);
 		} 
@@ -456,6 +455,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	savePosition : function () {
 
 		var $visibleTextNode;
+		var existingCFI;
 		var lastPageMarkerExists = false;
 		var characterOffset;
 		var contentDocumentIdref;
@@ -471,6 +471,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 				if ($(this).hasClass("last-page")) {
 					lastPageMarkerExists = true;
+					existingCFI = $(this).attr("data-last-page-cfi");
 
 					// Break out of loop
 					return false;
@@ -485,8 +486,12 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			return;
 		}
 
-		// Don't change the last page marker, as there is already one on this page
+		// Re-add the CFI for the marker on this page and shortcut the method
+		// REFACTORING CANDIDATE: This shortcut makes this method confusing, it needs to be refactored for simplicity
 		if (lastPageMarkerExists) {
+
+			this.model.addLastPageCFI(existingCFI, this.model.get("spine_position"));
+			this.model.save();
 			return; 
 		}
 
