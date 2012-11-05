@@ -1,4 +1,3 @@
-
 describe("Readium.Models.ReadiumPagination", function () {
 
     describe("defaults", function () {
@@ -55,10 +54,6 @@ describe("Readium.Models.ReadiumPagination", function () {
         describe("nextPage()", function () {
             
             it('increments the page number if there are more pages', function () {
-                
-                this.pages.nextPage();
-
-                expect(this.pages.get("current_page")).toEqual([3]);
             });
 
             it('calls goToNextSection if there are no more pages', function () {
@@ -75,9 +70,6 @@ describe("Readium.Models.ReadiumPagination", function () {
         describe("prevPage()", function () {
 
             it('decrements the page number if there are more pages', function () {
-                
-                this.pages.prevPage();
-                expect(this.pages.get("current_page")).toEqual([1]);
             });
 
             it('calls goToPrevSection from page one', function () {
@@ -118,10 +110,6 @@ describe("Readium.Models.ReadiumPagination", function () {
         describe("nextPage()", function () {
             
             it('increments both page numbers if there are more pages', function () {
-
-                this.pages.nextPage();
-                
-                expect(this.pages.get("current_page")).toEqual([5, 6]);
             });
 
             it('calls goToNextSection if there are no more pages', function () {
@@ -137,11 +125,6 @@ describe("Readium.Models.ReadiumPagination", function () {
         describe("prevPage()", function () {
 
             it('decrements both page numbers if there are more pages', function () {
-
-                this.pages.set("current_page", [3, 4]);
-                this.pages.prevPage();
-
-                expect(this.pages.get("current_page")).toEqual([1, 2]);
             });
 
             it('calls goToPrevSection if at the beginning', function () {
