@@ -38,16 +38,6 @@ end
 
 namespace :build do
 
-	# desc "build extension" 
-	# task :crx do
-	# 	path = File.join @config[:proj_root_dir], @config[:publish_dir]
-	# 	puts "packaging contents of #{path} as a .crx"
-	# 	puts `#{@config[:chrome_command]} --pack-extension=#{path} --pack-extension-key=#{@config[:pem_path]}`
-
-	# 	# have to manually move it where it needs to go:
-	# 	`mv #{@config[:publish_dir]}.crx #{@config[:crx_path]}`
-	# end
-
 	desc "create a zip of the extension" 
 	task :crx do
 		`zip readium.zip -r readium/*`
@@ -117,9 +107,6 @@ namespace :build do
 			hash_name = hash_script_name script_name
 			hash_name = File.join "/", @config[:scripts_dir], hash_name
 			File.rename script_name, File.join(@config[:publish_dir], hash_name)
-
-			
-
 
 			x = content.gsub @config[:scripts_regex], script_tag(hash_name)
 

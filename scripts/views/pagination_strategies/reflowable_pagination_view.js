@@ -179,8 +179,10 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		//   reduce this to the subset of text nodes that is visible on the page. We'll then select one text node
 		//   for which we can create a character offset CFI. This CFI will then refer to a "last position" in the 
 		//   EPUB, which can be used if the reader re-opens the EPUB.
+		// REFACTORING CANDIDATE: The "audiError" check is a total hack to solve a problem for a particular epub. This 
+		//   issue needs to be addressed.
 		$elements = $("body", this.getBody()).find(":not(iframe)").contents().filter(function () {
-			if (this.nodeType === 3) {
+			if (this.nodeType === 3 && !$(this).parent().hasClass("audiError")) {
 				return true;
 			} else {
 				return false;
@@ -431,7 +433,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 						key, 
 						contentDocument, 
 						cfi.payload,
-						["cfi-marker"],
+						["cfi-marker", "audiError"],
 	  					[],
 	  					["MathJax_Message"]);
 
@@ -520,7 +522,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			characterOffset, 
 			contentDocumentIdref, 
 			packageDocument, 
-			["cfi-marker"], 
+			["cfi-marker", "audiError"], 
 			[], 
 			["MathJax_Message"]);
 
