@@ -654,6 +654,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var $elem;
 		var elemWasInvisible = false;
 		var rects, shift;
+		var elemRectWidth;
 
 		// Rationale: Elements with an epub:type="pagebreak" attribute value are likely to be set as 
 		//   display:none, as they indicate the end of a page in the corresponding physical version of a book. We need 
@@ -675,9 +676,19 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		}
 
 		shift = rects[0][this.offset_dir];
-		
-		// calculate to the center of the elem (the edge will cause off by one errors)
-		shift += Math.abs(rects[0].left - rects[0].right);
+
+		// calculate to the center of the elem
+		// Rationale: The -1 or +1 adjustment is to account for the case in which the target element for which the shift offset
+		//   is calculated is at the edge of a page and has 0 width. In this case, if a minor arbitrary adjustment is not applied, 
+		//   the calculated page number will be off by 1.   
+		elemRectWidth = rects[0].left - rects[0].right;
+		if (this.offset_dir === "right" && elemRectWidth === 0) {
+			shift -= 1;
+		}
+		else if (this.offset_dir === "left" && elemRectWidth === 0) {
+			shift += 1;
+		} // Rationale: There shouldn't be any other case here. The explict second (if else) condition is for clarity.
+		shift += Math.abs(elemRectWidth);
 		
         // Re-hide the element if it was original set as display:none
         if (elemWasInvisible) {
