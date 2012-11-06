@@ -60,8 +60,10 @@ namespace :build do
 			dir_path = File.dirname(out_path)
 			FileUtils.mkdir_p dir_path unless File.exists? dir_path
 
-			puts "compressing #{in_path}"
-			output = `java -jar #{@config[:cc_jar_path]} --js #{in_path} --js_output_file #{out_path}`
+			FileUtils.cp in_path, out_path
+
+			# puts "compressing #{in_path}"
+			#output = `java -jar #{@config[:cc_jar_path]} --js #{in_path} --js_output_file #{out_path}`
 		end
 	end
 

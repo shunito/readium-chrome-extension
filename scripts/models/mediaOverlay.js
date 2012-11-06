@@ -71,7 +71,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
             }, 
             "text": function(){
                 var src = $(this).attr("src");
-                self.debugPrint("Text: " + src)
+                self.debugPrint("Text: " + src);
                 self.set("current_text_src", src);
             }
         });
@@ -85,7 +85,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     // node is a SMIL node that indicates the starting point
     // if node is null, playback starts at the beginning
     startPlayback: function(node) {
-        if (this.get("is_ready") == false) {
+        if (this.get("is_ready") === false) {
             this.debugPrint("document not ready");
             return;
         }
