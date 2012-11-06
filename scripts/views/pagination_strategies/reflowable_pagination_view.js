@@ -179,8 +179,10 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		//   reduce this to the subset of text nodes that is visible on the page. We'll then select one text node
 		//   for which we can create a character offset CFI. This CFI will then refer to a "last position" in the 
 		//   EPUB, which can be used if the reader re-opens the EPUB.
+		// REFACTORING CANDIDATE: The "audiError" check is a total hack to solve a problem for a particular epub. This 
+		//   issue needs to be addressed.
 		$elements = $("body", this.getBody()).find(":not(iframe)").contents().filter(function () {
-			if (this.nodeType === 3) {
+			if (this.nodeType === 3 && !$(this).parent().hasClass("audiError")) {
 				return true;
 			} else {
 				return false;
@@ -431,7 +433,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 						key, 
 						contentDocument, 
 						cfi.payload,
-						["cfi-marker"],
+						["cfi-marker", "audiError"],
 	  					[],
 	  					["MathJax_Message"]);
 
@@ -520,7 +522,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			characterOffset, 
 			contentDocumentIdref, 
 			packageDocument, 
-			["cfi-marker"], 
+			["cfi-marker", "audiError"], 
 			[], 
 			["MathJax_Message"]);
 
@@ -652,6 +654,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var $elem;
 		var elemWasInvisible = false;
 		var rects, shift;
+		var elemRectWidth;
 
 		// Rationale: Elements with an epub:type="pagebreak" attribute value are likely to be set as 
 		//   display:none, as they indicate the end of a page in the corresponding physical version of a book. We need 
@@ -673,9 +676,19 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		}
 
 		shift = rects[0][this.offset_dir];
-		
-		// calculate to the center of the elem (the edge will cause off by one errors)
-		shift += Math.abs(rects[0].left - rects[0].right);
+
+		// calculate to the center of the elem
+		// Rationale: The -1 or +1 adjustment is to account for the case in which the target element for which the shift offset
+		//   is calculated is at the edge of a page and has 0 width. In this case, if a minor arbitrary adjustment is not applied, 
+		//   the calculated page number will be off by 1.   
+		elemRectWidth = rects[0].left - rects[0].right;
+		if (this.offset_dir === "right" && elemRectWidth === 0) {
+			shift -= 1;
+		}
+		else if (this.offset_dir === "left" && elemRectWidth === 0) {
+			shift += 1;
+		} // Rationale: There shouldn't be any other case here. The explict second (if else) condition is for clarity.
+		shift += Math.abs(elemRectWidth);
 		
         // Re-hide the element if it was original set as display:none
         if (elemWasInvisible) {
