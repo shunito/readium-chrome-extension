@@ -169,7 +169,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 			// REFACTORING CANDIDATE: Move this into its own "private" method
 			if(splitUrl[1]) {
 				var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
-				this.setSpinePos(spine_pos, false, false, splitUrl[2]);
+				this.setSpinePos(spine_pos, false, true, splitUrl[2]);
 				this.set("hash_fragment", splitUrl[2]);
 			}
 		}
@@ -317,6 +317,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 		var spineItems = this.get("rendered_spine_items");
 		var spinePosIsRendered = spineItems.indexOf(pos) >=0 ? true : false;
+		var renderedItems;
 
 		// REFACTORING CANDIDATE: There is a somewhat hidden dependency here between the paginator
 		//   and the setting of the spine_position. The pagination strategy selector re-renders based on the currently
@@ -332,14 +333,15 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		// be forced (in case a new CFI has to be injected, for example). 
 		if (!spinePosIsRendered) {
 
-			var renderedItems = this.paginator.renderSpineItems(goToLastPageOfSection, goToHashFragmentId);
+			renderedItems = this.paginator.renderSpineItems(goToLastPageOfSection, goToHashFragmentId);
 			this.set("rendered_spine_items", renderedItems);
 		}
 		else {
 
 			if (reRenderSpinePos) {
 
-				var renderedItems = this.paginator.renderSpineItems(goToLastPageOfSection, goToHashFragmentId);
+				this.removeLastPageCFI();
+				renderedItems = this.paginator.renderSpineItems(goToLastPageOfSection, goToHashFragmentId);
 				this.set("rendered_spine_items", renderedItems);				
 			}
 			else {
@@ -396,5 +398,16 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 		// Add the new last page marker
 		this.get("epubCFIs")[CFI] = cfiPayload;	
+	},
+
+	removeLastPageCFI : function () {
+
+		var activeCFIs = this.get("epubCFIs");
+		$.each(activeCFIs, function (currCFI, payloadObject) {
+
+			if (this.type === "last-page") {
+				delete activeCFIs[currCFI];
+			}
+		});
 	}
 });
