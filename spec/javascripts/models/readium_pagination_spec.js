@@ -33,37 +33,107 @@ describe("Readium.Models.ReadiumPagination", function () {
                 });
 
                 spyOn(this.epubController, "getCurrentSection").andReturn(section);
+                spyOn(this.epubController.paginator, "shouldScroll").andReturn(false);
             });
 
-            describe("nextPage()", function () {
-                
-                it('increments the page number if there are more pages', function () {
+            describe("left-to-right", function () {
+
+                beforeEach(function () {
+                    this.epub.set("page_prog_dir", "ltr");
                 });
 
-                it('calls goToNextSection if there are no more pages', function () {
-
-                    this.pages.set("num_pages", 1);
-                    spyOn(this.epubController, "goToNextSection");
-                    this.pages.nextPage();
-
-                    expect(this.pages.get("current_page")).toEqual([1]);
-                    expect(this.epubController.goToNextSection).toHaveBeenCalled();
-                });
-            });
-
-            describe("prevPage()", function () {
-
-                it('decrements the page number if there are more pages', function () {
-                });
-
-                it('calls goToPrevSection from page one', function () {
+                describe("goRight()", function () {
                     
-                    this.pages.set("current_page", [1]);
-                    spyOn(this.epubController, "goToPrevSection");
-                    this.pages.prevPage();
+                    it('increments the page number if there are more pages', function () {
 
-                    expect(this.pages.get("current_page")).toEqual([1]);
-                    expect(this.epubController.goToPrevSection).toHaveBeenCalled();
+                        spyOn(this.epubController, "goToNextSection");
+                        this.pages.goRight();
+
+                        expect(this.pages.get("current_page")).toEqual([3]);
+                        expect(this.epubController.goToNextSection).not.toHaveBeenCalled();
+                    });
+
+                    it('calls goToNextSection if there are no more pages', function () {
+
+                        this.pages.set("num_pages", 1);
+                        spyOn(this.epubController, "goToNextSection");
+                        this.pages.goRight();
+
+                        expect(this.pages.get("current_page")).toEqual([1]);
+                        expect(this.epubController.goToNextSection).toHaveBeenCalled();
+                    });
+                });
+
+                describe("goLeft()", function () {
+
+                    it('decrements the page number if there are more pages', function () {
+
+                        spyOn(this.epubController, "goToPrevSection");
+                        this.pages.goLeft();
+
+                        expect(this.pages.get("current_page")).toEqual([1]);
+                        expect(this.epubController.goToPrevSection).not.toHaveBeenCalled();
+                    });
+
+                    it('calls goToPrevSection from page one', function () {
+                        
+                        this.pages.set("current_page", [1]);
+                        spyOn(this.epubController, "goToPrevSection");
+                        this.pages.goLeft();
+
+                        expect(this.pages.get("current_page")).toEqual([1]);
+                        expect(this.epubController.goToPrevSection).toHaveBeenCalled();
+                    });
+                });
+            });
+
+            describe("right-to-left", function () {
+
+                beforeEach(function () {
+                    this.epub.set("page_prog_dir", "rtl");
+                });
+
+                describe("goRight()", function () {
+                    
+                    it('decrements the page number if there are more pages', function () {
+
+                        spyOn(this.epubController, "goToPrevSection");
+                        this.pages.goRight();
+
+                        expect(this.pages.get("current_page")).toEqual([1]);
+                        expect(this.epubController.goToPrevSection).not.toHaveBeenCalled();
+                    });
+
+                    it('calls goToPrevSection if there are no more pages', function () {
+
+                        this.pages.set("num_pages", 1);
+                        spyOn(this.epubController, "goToPrevSection");
+                        this.pages.goRight();
+
+                        expect(this.pages.get("current_page")).toEqual([1]);
+                        expect(this.epubController.goToPrevSection).toHaveBeenCalled();
+                    });
+                });
+
+                describe("goLeft()", function () {
+
+                    it('increments the page number if there are more pages', function () {
+
+                        spyOn(this.epubController, "goToNextSection");
+                        this.pages.goLeft();
+
+                        expect(this.pages.get("current_page")).toEqual([3]);
+                        expect(this.epubController.goToNextSection).not.toHaveBeenCalled();
+                    });
+
+                    it('calls goToNextSection from last page', function () {
+                        
+                        this.pages.set("current_page", [10]);
+                        spyOn(this.epubController, "goToNextSection");
+                        this.pages.goLeft();
+
+                        expect(this.epubController.goToNextSection).toHaveBeenCalled();
+                    });
                 });
             });
         });

@@ -6,7 +6,7 @@ Readium is in early beta stages. The goal of the project is to create an open so
 
 ## Contributing
 
-Readium is in active development and we are keen to build a community of developers to help make it awesome. If you would like to be invited as a contributor leave a message in the issue tracker or [send Matthew an email](mailto:matthewr@evidentpoint.com)
+Readium is in active development and we are keen to build a community of developers to help make it awesome. If you would like to be invited as a contributor leave a message in the issue tracker or [send Justin an email](mailto:justinh@evidentpoint.com)
 
 ## Dependencies
 
