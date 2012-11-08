@@ -13,8 +13,6 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 
 	initialize: function () {},
 
-	// REFACTORING CANDIDATE: This might be better named as getPageNumsToDisplay; the "goto" is confusing; also some
-	//   deep nesting here that could be refactored for clarity.
     // Description: This method determines the page numbers to display, given a single page number to "go to"
     // Arguments (
     //   gotoPageNumber (integer): The page number to "go to"
@@ -22,6 +20,8 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
     //   isFixedLayout (boolean): Are the current set of pages fixed layout pages? 
     //   pageProgDirection ("rtl" or "ltr): The page progression direction
     //	)
+	// REFACTORING CANDIDATE: This might be better named as getPageNumsToDisplay; the "goto" is confusing; also some
+	//   deep nesting here that could be refactored for clarity.
 	getGotoPageNumsToDisplay: function(gotoPageNumber, twoUp, isFixedLayout, pageProgDirection) {
 
 		if (twoUp) {
@@ -32,15 +32,12 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 				if (pageProgDirection === "rtl") {
 
 					if (this.displayedPageIsLeft(gotoPageNumber)) {
-
 						return [gotoPageNumber - 1, gotoPageNumber];
 					}
 					else if (this.displayedPageIsRight(gotoPageNumber)) {
-
 						return [gotoPageNumber, gotoPageNumber + 1];
 					}
 					else {
-
 						return [gotoPageNumber];
 					}
 				}
@@ -48,15 +45,12 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 				else {
 
 					if (this.displayedPageIsLeft(gotoPageNumber)) {
-
 						return [gotoPageNumber, gotoPageNumber + 1];
 					}
 					else if (this.displayedPageIsRight(gotoPageNumber)) {
-
 						return [gotoPageNumber - 1, gotoPageNumber];
 					}
 					else {
-
 						return [gotoPageNumber];
 					}
 				}
@@ -66,17 +60,14 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 				// in reflowable format, we want this config always:
 				// ODD_PAGE |spine| EVEN_PAGE
 				if (gotoPageNumber % 2 === 1) {
-
 					return [gotoPageNumber, gotoPageNumber + 1];	
-				}
+				} 
 				else {
-
 					return [gotoPageNumber - 1, gotoPageNumber];
 				}	
 			}
 		}
-		else {
-			
+		else {	
 			return [gotoPageNumber];
 		}
 	},
@@ -173,7 +164,7 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 	},
 
 	// Description: This method determines which page numbers to display when switching
-	// between a single page and side-by-side page views and vice versa.
+	//   between a single page and side-by-side page views and vice versa.
 	// Arguments (
 	//   twoUp (boolean): Are two pages currently displayed in the reader?
 	//   displayedPageNumbers (array of integers): An array of page numbers that are currently displayed	
@@ -259,13 +250,13 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 
 	// Description: The `displayedPageIs...` methods determine if a fixed layout page is right, left or center.
 	//
-	// Note: This is not an ideal approach, as we're pulling properties directly out of the dom, rather than
-	// out of our models. The rationale is that as of Readium 0.4.1, the page-spread-* value
-	// is not maintained in the model hierarchy accessible from an ebook object. An alternative
-	// would be to infer the left/right/center value from model attributes on ebook, or other objects in
-	// ebook's object hierarchy. However, this would duplicate the logic that exists elsewhere for determining right/left/center
-	// for a page, which is probably worse than pulling out of the dom. This approach also avoids having to convert
-	// from the page number (based on what is rendered on the screen) to spine index. 
+	// Rationale: This is not an ideal approach, as we're pulling properties directly out of the dom, rather than
+	//   out of our models. The rationale is that as of Readium 0.4.1, the page-spread-* value
+	//   is not maintained in the model hierarchy accessible from an ebook object. An alternative
+	//   would be to infer the left/right/center value from model attributes on ebook, or other objects in
+	//   ebook's object hierarchy. However, this would duplicate the logic that exists elsewhere for determining right/left/center
+	//   for a page, which is probably worse than pulling out of the dom. This approach also avoids having to convert
+	//   from the page number (based on what is rendered on the screen) to spine index. 
 	displayedPageIsRight: function (displayedPageNum) {
 
 		return $("#page-" + displayedPageNum).hasClass("right_page") ? true : false;

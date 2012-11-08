@@ -9,9 +9,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	// Description: All strategies are linked to the same dom element
 	el: "#readium-book-view-el",
 
-	/* ------------------------------------------------------------------------------------ */
+	// ------------------------------------------------------------------------------------ //
 	//  "PUBLIC" METHODS (THE API)                                                          //
-	/* ------------------------------------------------------------------------------------ */
+	// ------------------------------------------------------------------------------------ //
 
 	initialize: function(options) {
 		this.zoomer = options.zoomer;
