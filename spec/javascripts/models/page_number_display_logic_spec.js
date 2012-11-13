@@ -235,12 +235,128 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
 
     describe("getting previous page", function () {
 
+        beforeEach(function () {
+            this.pageNumSelector = new Readium.Models.PageNumberDisplayLogic();
 
+            // Rationale: This function will make these sets of repetitive tests clearer - as in, the conditions of the 
+            //   EPUB, the page to navigate to, and the expected result.
+            this.testPrevPage = function (params) {
+
+                var selectedPageNums = this.pageNumSelector.getPrevPageNumsToDisplay(
+                    params.prevPageNum, 
+                    params.isFXL, // is FXL? 
+                    params.pageProgDir, // page prog. direction
+                    params.firstPageOffset // first page offset
+                    );
+
+                return selectedPageNums;
+            };
+        });
+
+        describe("reflowable", function () {
+
+            it("go to p in [p-1, p]", function () {
+
+                var pageNums = this.testPrevPage({ isFXL : false, pageProgDir : "ltr", firstPageOffset : false,
+                    prevPageNum : 2});
+            
+                expect(pageNums).toEqual([1, 2]);
+            });
+
+            it("doesn't decrement page numbers below 0", function () {
+
+                var pageNums = this.testPrevPage({ isFXL : false, pageProgDir : "ltr", firstPageOffset : false,
+                    prevPageNum : 1});
+            
+                expect(pageNums).not.toEqual([0, 1]);
+            });
+        });
+
+        describe("FXL", function () {
+
+            it("gets page numbers; RTL; Going to p in [p, p-1], p is left, p-1 is right", function () {
+
+                spyOn(this.pageNumSelector, "displayedPageIsLeft").andCallFake(function (pageNum) {
+                    return pageNum === 2 ? true : false; });
+                spyOn(this.pageNumSelector, "displayedPageIsRight").andCallFake(function (pageNum) {
+                    return pageNum === 1 ? true : false; });
+
+                var pageNums = this.testPrevPage({isFXL : true, pageProgDir : "rtl", firstPageOffset : false,
+                    prevPageNum : 2});
+            
+                expect(pageNums).toEqual([1, 2]);
+            });
+
+            it("gets page numbers; RTL; Going to p in [p, p-1], p is left, p-1 is left", function () {
+
+                spyOn(this.pageNumSelector, "displayedPageIsLeft").andCallFake(function (pageNum) {
+                    return pageNum === 1 || pageNum === 2 ? true : false; });
+
+                var pageNums = this.testPrevPage({isFXL : true, pageProgDir : "rtl", firstPageOffset : false,
+                    prevPageNum : 2});
+            
+                expect(pageNums).toEqual([2]);
+            });
+
+            it("gets page numbers; RTL; Going to p in [p, p-1], p is right", function () {
+
+                spyOn(this.pageNumSelector, "displayedPageIsRight").andCallFake(function (pageNum) {
+                    return pageNum === 2 ? true : false; });
+                spyOn(this.pageNumSelector, "displayedPageIsLeft").andCallFake(function (pageNum) {
+                    return pageNum === 1 ? true : false; });
+
+                var pageNums = this.testPrevPage({isFXL : true, pageProgDir : "rtl", firstPageOffset : false,
+                    prevPageNum : 2});
+            
+                expect(pageNums).toEqual([2]);
+            });
+
+            it("gets page numbers; RTL; Going to p in [p, p-1], p is center", function () {
+
+                spyOn(this.pageNumSelector, "displayedPageIsCenter").andCallFake(function (pageNum) {
+                    return pageNum === 2 ? true : false; });
+                spyOn(this.pageNumSelector, "displayedPageIsLeft").andCallFake(function (pageNum) {
+                    return pageNum === 1 ? true : false; });
+
+                var pageNums = this.testPrevPage({isFXL : true, pageProgDir : "rtl", firstPageOffset : false,
+                    prevPageNum : 2});
+            
+                expect(pageNums).toEqual([2]);
+            });
+
+            // LTR; Going to p in [p-1, p], p is left, p-1 is right
+            // LTR; Going to p in [p-1, p], p is left, p-1 is left
+            // LTR; Going to p in [p-1, p], p is right
+            // LTR; Going to p in [p-1, p], p is center
+        });
     });
 
     describe("getting next page", function () {
 
+        // Reflowable
+            // decrements both page numbers, as expected
 
+            // doesn't decrement below 0
+
+        // FXL 
+
+            // RTL
+
+            // Going to p in [p, p+1], p is left, p-1 is right
+            // Going to p in [p, p+1], p is left, p-1 is left
+            // Going to p in [p, p+1], p is right
+            // Going to p in [p, p+1], p is center
+
+            // doesn't decrement below 0
+
+            // LTR
+
+            // Going to p in [p, p+1], p is left, p-1 is right
+            // Going to p in [p, p+1], p is left, p-1 is left
+            // Going to p in [p, p+1], p is right
+            // Going to p in [p, p+1], p is center
+
+            // doesn't decrement below 0
     });
 
     describe("toggling two-up pages", function () {
