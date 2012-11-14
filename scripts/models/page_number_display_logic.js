@@ -22,7 +22,7 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
     //	)
 	// REFACTORING CANDIDATE: This might be better named as getPageNumsToDisplay; the "goto" is confusing; also some
 	//   deep nesting here that could be refactored for clarity.
-	getGotoPageNumsToDisplay: function(gotoPageNumber, twoUp, isFixedLayout, pageProgDirection) {
+	getGotoPageNumsToDisplay: function(gotoPageNumber, twoUp, isFixedLayout, pageProgDirection, firstPageOffset) {
 
 		if (twoUp) {
 			
@@ -57,13 +57,25 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 			}
 			// This is a reflowable page
 			else {
-				// in reflowable format, we want this config always:
-				// ODD_PAGE |spine| EVEN_PAGE
-				if (gotoPageNumber % 2 === 1) {
-					return [gotoPageNumber, gotoPageNumber + 1];	
-				} 
+
+				if (firstPageOffset) {
+
+					if (gotoPageNumber % 2 === 1) {
+						return [gotoPageNumber - 1, gotoPageNumber];
+					}
+					else {
+						return [gotoPageNumber, gotoPageNumber + 1];
+					}
+				}
 				else {
-					return [gotoPageNumber - 1, gotoPageNumber];
+					// in reflowable format, we want this config always:
+					// ODD_PAGE |spine| EVEN_PAGE
+					if (gotoPageNumber % 2 === 1) {
+						return [gotoPageNumber, gotoPageNumber + 1];	
+					} 
+					else {
+						return [gotoPageNumber - 1, gotoPageNumber];
+					}
 				}	
 			}
 		}
@@ -173,7 +185,7 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 	//	)
 	// Notes: Authors can specify a fixed layout page as a "center" page, which prevents more than one page
 	//   being displayed. This case is not handled yet.
-	getPageNumbersForTwoUp: function(twoUp, displayedPageNumbers, pageProgDirection, isFixedLayout) {
+	getPageNumbersForTwoUp: function(twoUp, displayedPageNumbers, pageProgDirection, isFixedLayout, firstPageOffset) {
 
 		var displayed = displayedPageNumbers;
 		var newPages = [];
@@ -195,15 +207,31 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 		// A single reflowable page is currently displayed; find two pages to display
 		else if (!isFixedLayout) {
 
-			if (displayed[0] % 2 === 1) {
-				
-				newPages[0] = displayed[0];
-				newPages[1] = displayed[0] + 1;
+			if (firstPageOffset) {
+
+				if (displayed[0] % 2 === 1) {
+					
+					newPages[0] = displayed[0] - 1;
+					newPages[1] = displayed[0];
+				}
+				else {
+					
+					newPages[0] = displayed[0];
+					newPages[1] = displayed[0] + 1;
+				}				
 			}
 			else {
-				
-				newPages[0] = displayed[0] - 1;
-				newPages[1] = displayed[0];
+
+				if (displayed[0] % 2 === 1) {
+					
+					newPages[0] = displayed[0];
+					newPages[1] = displayed[0] + 1;
+				}
+				else {
+					
+					newPages[0] = displayed[0] - 1;
+					newPages[1] = displayed[0];
+				}
 			}
 		}
 		// A single fixed layout page is displayed
