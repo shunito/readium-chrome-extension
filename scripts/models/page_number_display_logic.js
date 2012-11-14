@@ -181,6 +181,8 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 		// Two pages are currently displayed; find the single page number to display
 		if (twoUp) {
 
+			// Rationale: I think this check is a bit of a hack, for the case in which a set of pages is [0, 1]. Pages are
+			//   1-indexed, so the "0" in the 0 index position of the array is not valid.
 			if (displayed[0] === 0) {
 				
 				newPages[0] = 1;
