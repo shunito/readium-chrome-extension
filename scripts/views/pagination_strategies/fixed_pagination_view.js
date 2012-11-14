@@ -2,9 +2,9 @@
 
 Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
-	/* ------------------------------------------------------------------------------------ */
+	// ------------------------------------------------------------------------------------ //
 	//  "PUBLIC" METHODS (THE API)                                                          //
-	/* ------------------------------------------------------------------------------------ */
+	// ------------------------------------------------------------------------------------ //
 
 	initialize: function(options) {
 
@@ -105,6 +105,75 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		this.model.off("change:meta_size", this.setUpMode);		
 	},
 
+	// Description: Handles clicks of anchor tags by navigating to
+	// the proper location in the epub spine, or opening
+	// a new window for external links
+	linkClickHandler: function(e) {
+		e.preventDefault();
+
+		var href;
+
+		// Check for both href and xlink:href attribute and get value
+		if (e.currentTarget.attributes["xlink:href"]) {
+
+			href = e.currentTarget.attributes["xlink:href"].value;
+		}
+		else {
+
+			href = e.currentTarget.attributes["href"].value;
+		}
+
+		// Resolve the relative path for the resource
+		href = this.resolveRelativeURI(href);
+
+		if (href.match(/^http(s)?:/)) {
+			window.open(href);
+		} 
+		else {
+			this.model.goToHref(href);
+		}
+	},
+
+	// Rationale: For the purpose of looking up EPUB resources in the package document manifest, Readium expects that 
+	//   all relative links be specified as relative to the package document URI (or absolute references). However, it is 
+	//   valid XHTML for a link to another resource in the EPUB to be specfied relative to the current document's
+	//   path, rather than to the package document. As such, URIs passed to Readium must be either absolute references or 
+	//   relative to the package document. This method resolves URIs to conform to this condition. 
+	resolveRelativeURI: function (rel_uri) {
+
+		var sourceDocManifestHref;
+		var sourceDocName;
+		var pageSrc;
+
+		// Get the name of the click source document
+		sourceDocManifestHref = this.model.getCurrentSection().get("href");
+		indexOfFilenameStart = sourceDocManifestHref.lastIndexOf('/') + 1;
+		sourceDocName = sourceDocManifestHref.substr(indexOfFilenameStart, rel_uri.length);
+
+		// Iterate through list of FXL pages. Look for the one that is visible and has the name
+		$(".fixed-page-wrap").each(function () {
+
+			var $currPage = $('.content-sandbox', this);
+
+			// Get the name of the content document in the page iframe
+			var currPageSrc = $currPage.attr("src");
+			var pageDocNameStart = currPageSrc.lastIndexOf('/') + 1;
+			var pageDocName = currPageSrc.substr(pageDocNameStart, currPageSrc.length);
+
+			if (pageDocName === sourceDocName) {
+				pageSrc = currPageSrc;
+				return false;
+			}
+		});
+
+		var relativeURI = new URI(rel_uri);
+
+		// Get URI for resource currently loaded in the view's iframe
+		var iframeDocURI = new URI(pageSrc);
+
+		return relativeURI.resolve(iframeDocURI).toString();
+	},
+
 	spinePositionChangeHandler: function () {
 
 		var pageNumber = this.model.get("spine_position") + 1;
@@ -121,6 +190,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
 		view.on("iframe_loaded", function() {
 			this.iframeLoadCallback({srcElement: view.iframe()});
+			that.applyKeydownHandler($(view.iframe()));
 		}, this);
 
 		var content = spineItem.getPageView().render().el;
@@ -189,6 +259,22 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		var size = this.model.get("font_size") / 10;
 		$('#readium-content-container').css("font-size", size + "em");
 		this.showCurrentPages();
+	},
+
+	applyKeydownHandler : function ($pageViewContainer) {
+
+		var that = this;
+
+		$pageViewContainer.contents().keydown(function (e) {
+
+			if (e.which == 39) {
+				that.model.paginator.v.pages.goRight();
+			}
+							
+			if (e.which == 37) {
+				that.model.paginator.v.pages.goLeft();
+			}
+		});
 	}
 });
 

@@ -2,11 +2,22 @@ body {
 	margin: 0; 
 	padding: 0;
 	position: absolute;
-	top: 52px;
+	top: 0px;
 	bottom: 0px;
 	overflow: hidden;
 	width: 100%;
 }
+
+#below-navbar {
+	margin: 0; 
+	padding: 0;
+	position: absolute;
+	top: 52px;
+	bottom: 0px;
+	overflow: hidden;
+	width: 100%;	
+}
+
 
 #next-page-button {
 	right: 0;

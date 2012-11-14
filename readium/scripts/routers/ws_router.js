@@ -1,2 +1,0 @@
-Readium.Routers.ViewerRouter=Backbone.Router.extend({routes:{"viewer.html?book=:key":"openBook","*splat":"splat_handler"},openBook:function(b){var a=_.find(window.ReadiumLibraryData,function(a){return a.key===b});a?(window._epub=new Readium.Models.EPUB(a),window._epubController=new Readium.Models.EPUBController(_.extend({epub:window._epub},a)),window._applicationView=new Readium.Views.ViewerApplicationView({model:window._epubController}),window._applicationView.render()):alert("The book you requested does not exist")},
-splat_handler:function(b){console.log(b)}});

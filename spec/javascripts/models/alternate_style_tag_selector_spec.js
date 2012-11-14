@@ -1,4 +1,4 @@
-describe("alternate_style_tag_selector", function() {
+describe("Readium.Models.AlternateStyleTagSelector", function() {
 
 	var getEPubContentDom = function () {
 		
@@ -20,7 +20,7 @@ describe("alternate_style_tag_selector", function() {
 		return epubDom;
 	};
 
-	describe("alternate style tag selection", function () {
+	describe("style tag selection", function () {
 
 		it ("ignores commented out style elements", function () {
 
@@ -40,7 +40,7 @@ describe("alternate_style_tag_selector", function() {
 			expect($('link[title="day"]', testEPubDom)[0].disabled).toEqual(false);
 		});
 
-		it ("correctly activates an alternate style sheet with a single tag", function () {
+		it ("activates an alternate style sheet with a single tag", function () {
 
 			var testEPubDom = getEPubContentDom();
 
@@ -58,7 +58,7 @@ describe("alternate_style_tag_selector", function() {
 			expect($('link[title="day"]', testEPubDom)[0].disabled).toEqual(false);
 		});
 
-		it ("correctly activates an alternate style set with a single tag", function () {
+		it ("activates an alternate style set with a single tag", function () {
 
 			var testEPubDom = getEPubContentDom();
 
@@ -94,7 +94,7 @@ describe("alternate_style_tag_selector", function() {
 			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(false);
 		});
 
-		it ("correctly activates a style set if only alternate style sets are provided, using a subset of tags", function () {
+		it ("activates a style set if only alternate style sets are provided, using a subset of tags", function () {
 
 			var testEPubDom = getEPubContentDom();
 
@@ -130,7 +130,7 @@ describe("alternate_style_tag_selector", function() {
 			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
 		});
 
-		it ("correctly activates a style set if only alternate style sets are provided, with multiple tags in the class attribute", function () {
+		it ("activates a style set if only alternate style sets are provided, with multiple tags in the class attribute", function () {
 
 			var testEPubDom = getEPubContentDom();
 
@@ -166,7 +166,7 @@ describe("alternate_style_tag_selector", function() {
 			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(false);
 		});
 
-		it ("correctly activates style sets, in an arbitrary order, with a single tag", function () {
+		it ("activates style sets, in an arbitrary order, with a single tag", function () {
 
 			var testEPubDom = getEPubContentDom();
 
@@ -202,7 +202,7 @@ describe("alternate_style_tag_selector", function() {
 			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(false);
 		});
 
-		it ("correctly activates style sets with multiple tags in the class attribute", function () {
+		it ("activates style sets with multiple tags in the class attribute", function () {
 
 			var testEPubDom = getEPubContentDom();
 
@@ -238,7 +238,7 @@ describe("alternate_style_tag_selector", function() {
 			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
 		});
 
-		it ("correctly chooses among a preferred and alterate style set tagged the same way", function () {
+		it ("chooses among a preferred and alterate style set tagged the same way", function () {
 
 			var testEPubDom = getEPubContentDom();
 
@@ -274,7 +274,7 @@ describe("alternate_style_tag_selector", function() {
 			expect($($('link[title="Horizontal Night"]', testEPubDom)[1])[0].disabled).toEqual(true);
 		});
 
-		it ("correctly activates style sets with a subset of multiple tags", function () {
+		it ("activates style sets with a subset of multiple tags", function () {
 
 			var testEPubDom = getEPubContentDom();
 
@@ -459,9 +459,9 @@ describe("alternate_style_tag_selector", function() {
 		});
 	});
 
-	describe("activation of the correct style sheets", function () {
+	describe("activation of style sheets", function () {
 
-		it ("activates the correct style set when the style sheets are grouped", function() {
+		it ("selects when the style sheets are grouped", function() {
 
 			var testEPubDom = getEPubContentDom();
 
@@ -493,7 +493,7 @@ describe("alternate_style_tag_selector", function() {
 			expect($($bookStyleSheets[5])[0].disabled).toEqual(true);
 		});
 
-		it ("activates the correct style set when the style sheets are in an arbitrary order", function () {
+		it ("selects when the style sheets are in an arbitrary order", function () {
 
 			var testEPubDom = getEPubContentDom();
 
@@ -528,7 +528,7 @@ describe("alternate_style_tag_selector", function() {
 
 	describe("saving original stylesheet attributes", function() {
 
-		it ("saves the original style sheet attribute values the first time", function () {
+		it ("saves the first time", function () {
 
 			var testEPubDom = getEPubContentDom();
 
@@ -595,7 +595,7 @@ describe("alternate_style_tag_selector", function() {
 		$('head', testEPubDom)[0].appendChild($(styles)[6]);
 		$('head', testEPubDom)[0].appendChild($(styles)[7]);
 
-		it ("finds the correct style set based on tags", function() {
+		it ("finds the style set based on tags", function() {
 
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			var $bookStyleSheets = $("link[rel*='stylesheet']", testEPubDom);
@@ -604,7 +604,7 @@ describe("alternate_style_tag_selector", function() {
 			expect(selectedStyle).toEqual("Vertical Day");
 		});
 
-		it ("finds the correct style set based on tag subset", function() {
+		it ("finds the style set based on tag subset", function() {
 
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			var $bookStyleSheets = $("link[rel*='stylesheet']", testEPubDom);
@@ -613,7 +613,7 @@ describe("alternate_style_tag_selector", function() {
 			expect(selectedStyle).toEqual("Horizontal Day");
 		});
 
-		it ("finds the correct style set from a set of rel='stylesheet alternate' style sets", function() {
+		it ("finds the style set from a set of rel='stylesheet alternate' style sets", function() {
 
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			var $bookStyleSheets = $("link[rel*='stylesheet']", testEPubDom);
@@ -631,7 +631,7 @@ describe("alternate_style_tag_selector", function() {
 			expect(selectedStyle).toEqual(null);
 		});
 
-		it ("returns the correct style set even if extra tags are specified", function() {
+		it ("returns the style set even if extra tags are specified", function() {
 
 			selector = new Readium.Models.AlternateStyleTagSelector;
 			var $bookStyleSheets = $("link[rel*='stylesheet']", testEPubDom);
@@ -737,7 +737,7 @@ describe("alternate_style_tag_selector", function() {
 
 	describe("alternate tag mutual exclusion", function () {
 
-		it ('does not incorrectly remove tags within a style set', function () {
+		it ('does not remove tags within a style set', function () {
 
 			var testEPubDom = getEPubContentDom();
 

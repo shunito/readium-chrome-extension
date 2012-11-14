@@ -9,9 +9,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	// Description: All strategies are linked to the same dom element
 	el: "#readium-book-view-el",
 
-	/* ------------------------------------------------------------------------------------ */
+	// ------------------------------------------------------------------------------------ //
 	//  "PUBLIC" METHODS (THE API)                                                          //
-	/* ------------------------------------------------------------------------------------ */
+	// ------------------------------------------------------------------------------------ //
 
 	initialize: function(options) {
 		this.zoomer = options.zoomer;
@@ -97,24 +97,9 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	destruct: function() {
 		this.pages.off("change:current_page", this.showCurrentPages);
 		this.model.off("change:font_size", this.setFontSize);
-		this.model.off("change:hash_fragment", this.goToHashFragment);
         this.mediaOverlayController.off("change:mo_text_id", this.highlightText);
         this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying);
 		this.resetEl();
-	},
-
-	// Description: Handles clicks of anchor tags by navigating to
-	// the proper location in the epub spine, or opening
-	// a new window for external links
-	linkClickHandler: function(e) {
-		e.preventDefault();
-
-		var href = e.srcElement.attributes["href"].value;
-		if(href.match(/^http(s)?:/)) {
-			chrome.tabs.create({"url": href});
-		} else {
-			this.model.goToHref(href);
-		}
 	},
 
 	getBindings: function() {

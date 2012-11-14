@@ -6,6 +6,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	// ------------------------------------------------------------------------------------ //
 
 	initialize: function(options) {
+
+		var that = this;
+
 		// call the super ctor
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this, options);
 		this.page_template = Handlebars.templates.reflowing_template;
@@ -29,11 +32,10 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.on("change:two_up", this.setUpMode, this);
 		this.model.on("change:two_up", this.adjustIframeColumns, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
-        this.model.on("change:hash_fragment", this.goToHashFragment, this);
-        
+		this.model.on("save_position", this.savePosition, this);
 	},
 
-	render: function(goToLastPage) {
+	render: function(goToLastPage, hashFragmentId) {
 		var that = this;
 		var json = this.model.getCurrentSection().toJSON();
 
@@ -42,53 +44,56 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.$('#container').html( this.page_template(json) );
 		
 		this.$('#readium-flowing-content').on("load", function(e) {
-// Important: Firefox doesn't recognize e.srcElement, so this needs to be checked for whenever it's required.
-if (!e.srcElement) e.srcElement = this;
+			// Important: Firefox doesn't recognize e.srcElement, so this needs to be checked for whenever it's required.
+			if (!e.srcElement) e.srcElement = this;
 
+			var lastPageElementId = that.injectCFIElements();
 			that.adjustIframeColumns();
 			that.iframeLoadCallback(e);
 			that.setFontSize();
 			that.injectTheme();
 			that.setNumPages();
+			that.applyKeydownHandler();
 
-			if(goToLastPage) {
-				that.pages.goToLastPage();
+			// Rationale: The assumption here is that if a hash fragment is specified, it is the result of Readium 
+			//   following a clicked linked, either an internal link, or a link from the table of contents. The intention
+			//   to follow a link should supersede restoring the last-page position, as this should only be done for the 
+			//   case where Readium is re-opening the book, from the library view. 
+			if (hashFragmentId) {
+
+				that.goToHashFragment(hashFragmentId);
+			}
+			else if (lastPageElementId) {
+
+				that.goToHashFragment(lastPageElementId);
 			}
 			else {
-				that.pages.goToPage(1);
-			}		
+
+				if (goToLastPage) {
+
+					that.pages.goToLastPage();
+				}
+				else {
+
+					that.pages.goToPage(1);
+				}		
+			}
 		});
 		
 		return [this.model.get("spine_position")];
 	},
 
     findVisiblePageElements: function() {
-        var elmsWithId = $(this.getBody()).find("[id]");
+
+        var $elements = $(this.getBody()).find("[id]");
         var doc = $("#readium-flowing-content").contents()[0].documentElement;
         var doc_top = 0;
         var doc_left = 0;
         var doc_right = doc_left + $(doc).width();
         var doc_bottom = doc_top + $(doc).height();
         
-        var visibleElms = this.filterElementsByPosition(elmsWithId, doc_top, doc_bottom, doc_left, doc_right);
+        var visibleElms = this.filterElementsByPosition($elements, doc_top, doc_bottom, doc_left, doc_right);
             
-        return visibleElms;
-    },
-    
-    // returns all the elements in the set that are inside the box
-    // separated this function from the one above in order to debug it
-    filterElementsByPosition: function(elements, documentTop, documentBottom, documentLeft, documentRight) {
-        var visibleElms = elements.filter(function(idx) {
-            var elm_top = $(this).offset().top;
-            var elm_left = $(this).offset().left;
-            var elm_right = elm_left + $(this).width();
-            var elm_bottom = elm_top + $(this).height();
-            
-            var is_ok_x = elm_left >= documentLeft && elm_right <= documentRight;
-            var is_ok_y = elm_top >= documentTop && elm_bottom <= documentBottom;
-            
-            return is_ok_x && is_ok_y;
-        });  
         return visibleElms;
     },
     
@@ -112,6 +117,34 @@ if (!e.srcElement) e.srcElement = this;
 		);
 	},
     
+	// Description: navigate to a url hash fragment by calculating the page of
+	//   the corresponding elem and setting the page number on `this.model`
+	//   as precondition the hash fragment should identify an element in the
+	//   section rendered by this view
+	goToHashFragment: function(hashFragmentId) {
+
+		// this method is triggered in response to 
+		var fragment = hashFragmentId;
+		if(fragment) {
+			var el = $("#" + fragment, this.getBody())[0];
+
+			if(!el) {
+				// couldn't find the el. just give up
+                return;
+			}
+
+			// we get more precise results if we look at the first children
+			while (el.children.length > 0) {
+				el = el.children[0];
+			}
+
+			var page = this.getElemPageNumber(el);
+            if (page > 0) {
+                this.pages.goToPage(page);	
+			}
+		}
+		// else false alarm no work to do
+	},
 
 	// ------------------------------------------------------------------------------------ //
 	//  "PRIVATE" HELPERS                                                                   //
@@ -133,6 +166,191 @@ if (!e.srcElement) e.srcElement = this;
 		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
 	},
 
+	// TODO: Extend this to be correct for right-to-left pagination
+	findVisibleTextNode: function () {
+
+        var documentLeft = 0;
+        var documentRight;
+        var columnGap;
+        var columnWidth;
+        var doc;
+        var $elements;
+        var $firstVisibleTextNode;
+
+		// Rationale: The intention here is to get a list of all the text nodes in the document, after which we'll
+		//   reduce this to the subset of text nodes that is visible on the page. We'll then select one text node
+		//   for which we can create a character offset CFI. This CFI will then refer to a "last position" in the 
+		//   EPUB, which can be used if the reader re-opens the EPUB.
+		// REFACTORING CANDIDATE: The "audiError" check is a total hack to solve a problem for a particular epub. This 
+		//   issue needs to be addressed.
+		$elements = $("body", this.getBody()).find(":not(iframe)").contents().filter(function () {
+			if (this.nodeType === 3 && !$(this).parent().hasClass("audiError")) {
+				return true;
+			} else {
+				return false;
+			}
+		});
+
+        doc = $("#readium-flowing-content").contents()[0].documentElement;
+
+        if (this.model.get("two_up")) {
+        	columnGap = parseInt($(doc).css("-webkit-column-gap").replace("px",""));
+        	columnWidth = parseInt($(doc).css("-webkit-column-width").replace("px",""));
+        	documentRight = documentLeft + columnGap + (columnWidth * 2);
+        } 
+        else {
+        	documentRight = documentLeft + $(doc).width();
+        }
+
+        // Find the first visible text node 
+        $.each($elements, function() {
+
+        	var POSITION_ERROR_MARGIN = 5;
+        	var $textNodeParent = $(this).parent();
+        	var elementLeft = $textNodeParent.position().left;
+        	var elementRight = elementLeft + $textNodeParent.width();
+        	var nodeText;
+
+        	// Correct for minor right and left position errors
+        	elementLeft = Math.abs(elementLeft) < POSITION_ERROR_MARGIN ? 0 : elementLeft;
+        	elementRight = Math.abs(elementRight - documentRight) < POSITION_ERROR_MARGIN ? documentRight : elementRight;
+
+        	// Heuristic to find a text node with actual text
+        	nodeText = this.nodeValue.replace(/\n/g, "");
+        	nodeText = nodeText.replace(/ /g, "");
+
+        	if (elementLeft <= documentRight 
+        		&& elementRight >= documentLeft
+        		&& nodeText.length > 10) { // 10 is so the text node is actually a text node with writing
+
+        		$firstVisibleTextNode = $(this);
+
+        		// Break the loop
+        		return false;
+        	}
+        });
+
+        return $firstVisibleTextNode;
+	},
+
+	// Currently for left-to-right pagination only
+	findVisibleCharacterOffset : function($textNode) {
+
+		var $parentNode;
+		var elementTop;
+		var elementBottom;
+		var POSITION_ERROR_MARGIN = 5;
+		var $document;
+		var documentTop;
+		var documentBottom;
+		var percentOfTextOffPage;
+		var characterOffset;
+
+		// Get parent
+		$parentNode = $textNode.parent();
+
+		// get document
+		$document = $($("#readium-flowing-content").contents()[0].documentElement);
+
+		// Find percentage of visible node on page
+		documentTop = $document.position().top;
+		documentBottom = documentTop + $document.height();
+
+		elementTop = $parentNode.offset().top;
+		elementBottom = elementTop + $parentNode.height();
+
+		// Element overlaps top
+		if (elementTop < documentTop) {
+
+			percentOfTextOffPage = Math.abs(elementTop - documentTop) / $parentNode.height();
+			characterOffsetByPercent = Math.ceil(percentOfTextOffPage * $textNode[0].length);
+			characterOffset = Math.ceil(0.5 * ($textNode[0].length - characterOffsetByPercent)) + characterOffsetByPercent;
+		}
+		else if (elementTop >= documentTop && elementTop <= documentBottom) {
+			characterOffset = 1;
+		}
+		else if (elementTop < documentBottom) {
+			characterOffset = 1;
+		}
+
+		return characterOffset;
+	},
+
+	// returns all the elements in the set that are inside the box
+    // separated this function from the one above in order to debug it
+    filterElementsByPosition: function($elements, documentTop, documentBottom, documentLeft, documentRight) {
+        
+        var $visibleElms = $elements.filter(function(idx) {
+            var elm_top = $(this).offset().top;
+            var elm_left = $(this).offset().left;
+            var elm_right = elm_left + $(this).width();
+            var elm_bottom = elm_top + $(this).height();
+            
+            var is_ok_x = elm_left >= documentLeft && elm_right <= documentRight;
+            var is_ok_y = elm_top >= documentTop && elm_bottom <= documentBottom;
+            
+            return is_ok_x && is_ok_y;
+        });  
+
+        return $visibleElms;
+    },
+
+	// Description: Handles clicks of anchor tags by navigating to
+	//   the proper location in the epub spine, or opening
+	//   a new window for external links
+	linkClickHandler: function (e) {
+		e.preventDefault();
+
+		var href;
+
+		// Check for both href and xlink:href attribute and get value
+		if (e.currentTarget.attributes["xlink:href"]) {
+			href = e.currentTarget.attributes["xlink:href"].value;
+		}
+		else {
+			href = e.currentTarget.attributes["href"].value;
+		}
+
+		// Resolve the relative path for the requested resource.
+		href = this.resolveRelativeURI(href);
+		if (href.match(/^http(s)?:/)) {
+			window.open(href);
+		} 
+		else {
+			this.model.goToHref(href);
+		}
+	},
+
+	// Rationale: For the purpose of looking up EPUB resources in the package document manifest, Readium expects that 
+	//   all relative links be specified as relative to the package document URI (or absolute references). However, it is 
+	//   valid XHTML for a link to another resource in the EPUB to be specfied relative to the current document's
+	//   path, rather than to the package document. As such, URIs passed to Readium must be either absolute references or 
+	//   relative to the package document. This method resolves URIs to conform to this condition. 
+	resolveRelativeURI: function (rel_uri) {
+		var relativeURI = new URI(rel_uri);
+
+		// Get URI for resource currently loaded in the view's iframe
+		var iframeDocURI = new URI($("#readium-flowing-content").attr("src"));
+
+		return relativeURI.resolve(iframeDocURI).toString();
+	},
+
+	applyKeydownHandler : function () {
+
+		var that = this;
+
+		this.$("#readium-flowing-content").contents().keydown(function (e) {
+
+			if (e.which == 39) {
+				that.model.paginator.v.pages.goRight();
+			}
+							
+			if (e.which == 37) {
+				that.model.paginator.v.pages.goLeft();
+			}
+		});
+	},
+
 	// REFACTORING CANDIDATE: I think this is actually part of the public interface
 	goToPage: function(page) {
         // check to make sure we're not already on that page
@@ -148,35 +366,6 @@ if (!e.srcElement) e.srcElement = this;
                 // when we change the page, we have to tell MO to update its position
                 this.mediaOverlayController.reflowPageChanged();
         }
-	},
-
-	// Description: navigate to a url hash fragment by calculating the page of
-	//   the corresponding elem and setting the page number on `this.model`
-	//   as precondition the hash fragment should identify an element in the
-	//   section rendered by this view
-	goToHashFragment: function() {
-
-		// this method is triggered in response to 
-		var fragment = this.model.get("hash_fragment");
-		if(fragment) {
-			var el = $("#" + fragment, this.getBody())[0];
-
-			if(!el) {
-				// couldn't find the el. just give up
-                return;
-			}
-
-			// we get more precise results if we look at the first children
-			while (el.children.length > 0) {
-				el = el.children[0];
-			}
-
-			var page = this.getElemPageNumber(el);
-            if (page > 0) {
-                this.pages.goToPage(page);	
-			}
-		}
-		// else false alarm no work to do
 	},
 
 	setFontSize: function() {
@@ -221,6 +410,132 @@ if (!e.srcElement) e.srcElement = this;
 		return css;
 	},
 
+	injectCFIElements : function () {
+
+		var that = this;
+		var contentDocument;
+		var epubCFIs;
+		var lastPageElementId;
+
+		// Get the content document (assumes a reflowable publication)
+		contentDocument = $("#readium-flowing-content").contents()[0];
+
+		// TODO: Could check to make sure the document returned from the iframe has the same name as the 
+		//   content document specified by the href returned by the CFI.
+
+		// Inject elements for all the CFIs that reference this content document
+		epubCFIs = this.model.get("epubCFIs");
+		_.each(epubCFIs, function (cfi, key) {
+
+			if (cfi.contentDocSpinePos === that.model.get("spine_position")) {
+
+				try {
+					
+					EPUBcfi.Interpreter.injectElement(
+						key, 
+						contentDocument, 
+						cfi.payload,
+						["cfi-marker", "audiError"],
+	  					[],
+	  					["MathJax_Message"]);
+
+					if (cfi.type === "last-page") {
+						lastPageElementId = $(cfi.payload).attr("id");
+					}
+				} 
+				catch (e) {
+
+					console.log("Could not inject CFI");
+				}
+			}
+		});
+
+		// This will be undefined unless there is a "last-page" element injected into the page
+		return lastPageElementId;
+	},
+
+	// Save position in epub
+	savePosition : function () {
+
+		var $visibleTextNode;
+		var existingCFI;
+		var lastPageMarkerExists = false;
+		var characterOffset;
+		var contentDocumentIdref;
+		var packageDocument;
+		var generatedCFI;
+
+		// Get first visible element with a text node 
+		$visibleTextNode = this.findVisibleTextNode();
+
+		// Check if a last page marker already exists on this page
+		try {
+			$.each($visibleTextNode.parent().contents(), function () {
+
+				if ($(this).hasClass("last-page")) {
+					lastPageMarkerExists = true;
+					existingCFI = $(this).attr("data-last-page-cfi");
+
+					// Break out of loop
+					return false;
+				}
+			});
+		}
+		catch (e) {
+
+			console.log("Could not generate CFI for non-text node as first visible element on page");
+
+			// No need to execute the rest of the save position method if the first visible element is not a text node
+			return;
+		}
+
+		// Re-add the CFI for the marker on this page and shortcut the method
+		// REFACTORING CANDIDATE: This shortcut makes this method confusing, it needs to be refactored for simplicity
+		if (lastPageMarkerExists) {
+
+			this.model.addLastPageCFI(existingCFI, this.model.get("spine_position"));
+			this.model.save();
+			return; 
+		}
+
+		characterOffset = this.findVisibleCharacterOffset($visibleTextNode);
+
+		// Get the content document idref
+		contentDocumentIdref = this.model.getCurrentSection().get("idref");
+
+		// Get the package document
+		// REFACTORING CANDIDATE: This is a temporary approach for retrieving a document representation of the 
+		//   package document. Probably best that the package model be able to return this representation of itself.
+        $.ajax({
+
+            type: "GET",
+            url: this.model.epub.get("root_url"),
+            dataType: "xml",
+            async: false,
+            success: function (response) {
+
+                packageDocument = response;
+            }
+        });
+
+		// Save the position marker
+		generatedCFI = EPUBcfi.Generator.generateCharacterOffsetCFI(
+			$visibleTextNode[0], 
+			characterOffset, 
+			contentDocumentIdref, 
+			packageDocument, 
+			["cfi-marker", "audiError"], 
+			[], 
+			["MathJax_Message"]);
+
+		this.model.addLastPageCFI(
+			generatedCFI, 
+			this.model.get("spine_position"));
+
+		// Save the last page marker been added
+		this.model.save();
+	},
+
 	adjustIframeColumns: function() {
 		var prop_dir = this.offset_dir;
 		var $frame = this.$('#readium-flowing-content');
@@ -235,7 +550,6 @@ if (!e.srcElement) e.srcElement = this;
 		else {
 			this.page_width = this.frame_width;
 		}
-		
 
 		// it is important for us to make sure there is no padding or
 		// margin on the <html> elem, or it will mess with our column code
@@ -339,7 +653,24 @@ if (!e.srcElement) e.srcElement = this;
 
     getElemPageNumber: function(elem) {
 		
+		var $elem;
+		var elemWasInvisible = false;
 		var rects, shift;
+		var elemRectWidth;
+
+		// Rationale: Elements with an epub:type="pagebreak" attribute value are likely to be set as 
+		//   display:none, as they indicate the end of a page in the corresponding physical version of a book. We need 
+		//   the position of these elements to get the reflowable page number to set in the viewer. Therefore, 
+		//   we check if the element has this epub:type value, set it visible, find its location and then set it to 
+		//   display:none again. 
+		// REFACTORING CANDIDATE: We might want to do this for any element with display:none. 
+		$elem = $(elem);
+		if ($elem.attr("epub:type") === "pagebreak" && !$elem.is(":visible")) {
+
+			elemWasInvisible = true;
+			$elem.show();
+		}
+
 		rects = elem.getClientRects();
 		if(!rects || rects.length < 1) {
 			// if there were no rects the elem had display none
@@ -347,10 +678,25 @@ if (!e.srcElement) e.srcElement = this;
 		}
 
 		shift = rects[0][this.offset_dir];
+
+		// calculate to the center of the elem
+		// Rationale: The -1 or +1 adjustment is to account for the case in which the target element for which the shift offset
+		//   is calculated is at the edge of a page and has 0 width. In this case, if a minor arbitrary adjustment is not applied, 
+		//   the calculated page number will be off by 1.   
+		elemRectWidth = rects[0].left - rects[0].right;
+		if (this.offset_dir === "right" && elemRectWidth === 0) {
+			shift -= 1;
+		}
+		else if (this.offset_dir === "left" && elemRectWidth === 0) {
+			shift += 1;
+		} // Rationale: There shouldn't be any other case here. The explict second (if else) condition is for clarity.
+		shift += Math.abs(elemRectWidth);
 		
-		// calculate to the center of the elem (the edge will cause off by one errors)
-		shift += Math.abs(rects[0].left - rects[0].right);
-		
+        // Re-hide the element if it was original set as display:none
+        if (elemWasInvisible) {
+            $elem.hide();
+        }
+
 		// `clientRects` are relative to the top left corner of the frame, but
 		// for right to left we actually need to measure relative to right edge
 		// of the frame
@@ -381,11 +727,15 @@ if (!e.srcElement) e.srcElement = this;
 		this.hideContent();
 		setTimeout(function() {
 			that.goToPage(that.pages.get("current_page")[0]);
+			that.model.paginator.v.savePosition();
 		}, 150);
 	},
 
 	windowSizeChangeHandler: function() {
 		this.adjustIframeColumns();
+		
+		// Make sure we return to the correct position in the epub (This also requires clearing the hash fragment) on resize.
+		this.goToHashFragment(this.model.get("hash_fragment"));
 	},
     
 	marginCallback: function() {

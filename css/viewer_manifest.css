@@ -1,19 +1,3 @@
-/**
- * Within this file all sass variables to the Readium Project are defined
- */
-/**
- * Dependent on the location of the calling html file (e. g. viewer.html) the 
- * file hirarchy may be broken and images are out of range. Also relative 
- * paths may be preferred to absolute ones. All this can be done with this 
- * preceding path. As images start from document root with the naming of 
- * their folder, the path in the path variable should end with a "/".
- * 
- * Affected sass files:
- *   readium_paginator
- *   toc
- *   viewer_settings_modal
- * 
- */
 .clearfix {
   *zoom: 1; }
   .clearfix:before, .clearfix:after {
@@ -315,7 +299,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#e6e6e6));
   background-image: -webkit-linear-gradient(top, white, #e6e6e6);
   background-image: -o-linear-gradient(top, white, #e6e6e6);
-  background-image: linear, compact(top, white, #e6e6e6, false, false, false, false, false, false, false, false);
+  background-image: linear, top, white, #e6e6e6;
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(white)', endColorstr='ie-hex-str(#e6e6e6)', GradientType=0);
   border-color: #e6e6e6 #e6e6e6 #bfbfbf;
@@ -418,7 +402,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0055cc));
   background-image: -webkit-linear-gradient(top, #0088cc, #0055cc);
   background-image: -o-linear-gradient(top, #0088cc, #0055cc);
-  background-image: linear, compact(top, #0088cc, #0055cc, false, false, false, false, false, false, false, false);
+  background-image: linear, top, #0088cc, #0055cc;
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#0088cc)', endColorstr='ie-hex-str(#0055cc)', GradientType=0);
   border-color: #0055cc #0055cc #003580;
@@ -438,7 +422,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fbb450), to(#f89406));
   background-image: -webkit-linear-gradient(top, #fbb450, #f89406);
   background-image: -o-linear-gradient(top, #fbb450, #f89406);
-  background-image: linear, compact(top, #fbb450, #f89406, false, false, false, false, false, false, false, false);
+  background-image: linear, top, #fbb450, #f89406;
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#fbb450)', endColorstr='ie-hex-str(#f89406)', GradientType=0);
   border-color: #f89406 #f89406 #ad6704;
@@ -458,7 +442,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ee5f5b), to(#bd362f));
   background-image: -webkit-linear-gradient(top, #ee5f5b, #bd362f);
   background-image: -o-linear-gradient(top, #ee5f5b, #bd362f);
-  background-image: linear, compact(top, #ee5f5b, #bd362f, false, false, false, false, false, false, false, false);
+  background-image: linear, top, #ee5f5b, #bd362f;
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#ee5f5b)', endColorstr='ie-hex-str(#bd362f)', GradientType=0);
   border-color: #bd362f #bd362f #802420;
@@ -478,7 +462,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#62c462), to(#51a351));
   background-image: -webkit-linear-gradient(top, #62c462, #51a351);
   background-image: -o-linear-gradient(top, #62c462, #51a351);
-  background-image: linear, compact(top, #62c462, #51a351, false, false, false, false, false, false, false, false);
+  background-image: linear, top, #62c462, #51a351;
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#62c462)', endColorstr='ie-hex-str(#51a351)', GradientType=0);
   border-color: #51a351 #51a351 #387038;
@@ -498,7 +482,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#5bc0de), to(#2f96b4));
   background-image: -webkit-linear-gradient(top, #5bc0de, #2f96b4);
   background-image: -o-linear-gradient(top, #5bc0de, #2f96b4);
-  background-image: linear, compact(top, #5bc0de, #2f96b4, false, false, false, false, false, false, false, false);
+  background-image: linear, top, #5bc0de, #2f96b4;
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#5bc0de)', endColorstr='ie-hex-str(#2f96b4)', GradientType=0);
   border-color: #2f96b4 #2f96b4 #1f6377;
@@ -518,7 +502,7 @@ button.close {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#555555), to(#222222));
   background-image: -webkit-linear-gradient(top, #555555, #222222);
   background-image: -o-linear-gradient(top, #555555, #222222);
-  background-image: linear, compact(top, #555555, #222222, false, false, false, false, false, false, false, false);
+  background-image: linear, top, #555555, #222222;
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#555555)', endColorstr='ie-hex-str(#222222)', GradientType=0);
   border-color: #222222 #222222 black;
@@ -833,7 +817,7 @@ button.btn, input[type="submit"].btn {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#333333), to(#222222));
   background-image: -webkit-linear-gradient(top, #333333, #222222);
   background-image: -o-linear-gradient(top, #333333, #222222);
-  background-image: linear, compact(top, #333333, #222222, false, false, false, false, false, false, false, false);
+  background-image: linear, top, #333333, #222222;
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#333333)', endColorstr='ie-hex-str(#222222)', GradientType=0);
   -webkit-border-radius: 4px;
@@ -1021,7 +1005,7 @@ button.btn, input[type="submit"].btn {
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#333333), to(#222222));
   background-image: -webkit-linear-gradient(top, #333333, #222222);
   background-image: -o-linear-gradient(top, #333333, #222222);
-  background-image: linear, compact(top, #333333, #222222, false, false, false, false, false, false, false, false);
+  background-image: linear, top, #333333, #222222;
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#333333)', endColorstr='ie-hex-str(#222222)', GradientType=0);
   border-color: #222222 #222222 black;
@@ -1231,6 +1215,9 @@ html {
 #toolbar-el {
   height: 52px; }
 
+.navbar ul.nav.pull-right {
+  padding-left: 0;
+  margin-left: 0; }
 .navbar .nav > li > a {
   padding: 5px 0; }
 .navbar li {
@@ -1253,10 +1240,43 @@ html {
   width: 142px;
   height: 36px; }
 
+#logo-replace {
+  height: 36px;
+  width: 142px;
+  background-image: url("/images/top_bar/readium_logo.png");
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 0; }
+
+@media (max-width: 500px) {
+  #logo-replace {
+    height: 48px;
+    width: 48px;
+    background-image: url("/images/main_icon/medium.png"); }
+
+  .navbar .brand {
+    padding: 2px; } }
+#toolbar-title {
+  text-align: center;
+  color: #999;
+  font-weight: normal;
+  font-size: 1.0em;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  margin: 18px 0;
+  display: none; }
+
+.parchment-theme #toolbar-title {
+  color: #876C67; }
+
 #show-toolbar-button {
   padding: 8px;
   margin-right: 7px;
-  display: none; }
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 0; }
 
 #add-book-li {
   margin-right: 22px; }
@@ -1311,12 +1331,12 @@ span.setting-button:hover {
 
 #settings {
   background-color: #353f5e;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, compact(#353f5e, #000011, false, false, false, false, false, false, false, false)));
-  background-image: -webkit-linear-gradient(top, compact(#353f5e, #000011, false, false, false, false, false, false, false, false));
-  background-image: -moz-linear-gradient(top, compact(#353f5e, #000011, false, false, false, false, false, false, false, false));
-  background-image: -ms-linear-gradient(top, compact(#353f5e, #000011, false, false, false, false, false, false, false, false));
-  background-image: -o-linear-gradient(top, compact(#353f5e, #000011, false, false, false, false, false, false, false, false));
-  background-image: linear-gradient(top, compact(#353f5e, #000011, false, false, false, false, false, false, false, false)); }
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #353f5e), color-stop(100%, #000011));
+  background-image: -webkit-linear-gradient(top, #353f5e, #000011);
+  background-image: -moz-linear-gradient(top, #353f5e, #000011);
+  background-image: -ms-linear-gradient(top, #353f5e, #000011);
+  background-image: -o-linear-gradient(top, #353f5e, #000011);
+  background-image: linear-gradient(top, #353f5e, #000011); }
 
 #settings {
   opacity: 0.9;
@@ -1333,6 +1353,15 @@ span.setting-button:hover {
   opacity: 0.9; }
 
 body {
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  overflow: hidden;
+  width: 100%; }
+
+#below-navbar {
   margin: 0;
   padding: 0;
   position: absolute;
@@ -1466,12 +1495,12 @@ body {
   text-align: center;
   padding: 30px;
   background-color: #cccccc;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, compact(#cccccc, white, false, false, false, false, false, false, false, false)));
-  background-image: -webkit-linear-gradient(top, compact(#cccccc, white, false, false, false, false, false, false, false, false));
-  background-image: -moz-linear-gradient(top, compact(#cccccc, white, false, false, false, false, false, false, false, false));
-  background-image: -ms-linear-gradient(top, compact(#cccccc, white, false, false, false, false, false, false, false, false));
-  background-image: -o-linear-gradient(top, compact(#cccccc, white, false, false, false, false, false, false, false, false));
-  background-image: linear-gradient(top, compact(#cccccc, white, false, false, false, false, false, false, false, false)); }
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #cccccc), color-stop(100%, white));
+  background-image: -webkit-linear-gradient(top, #cccccc, white);
+  background-image: -moz-linear-gradient(top, #cccccc, white);
+  background-image: -ms-linear-gradient(top, #cccccc, white);
+  background-image: -o-linear-gradient(top, #cccccc, white);
+  background-image: linear-gradient(top, #cccccc, white); }
   #readium-info #version-info, #readium-info .green, #readium-info .modal-detail.green {
     color: #6FA64D; }
   #readium-info p {
@@ -1506,12 +1535,12 @@ body {
   width: 352px;
   margin: -326px 0 0 -176px;
   background-color: white;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, compact(white, #cccccc, false, false, false, false, false, false, false, false)));
-  background-image: -webkit-linear-gradient(top, compact(white, #cccccc, false, false, false, false, false, false, false, false));
-  background-image: -moz-linear-gradient(top, compact(white, #cccccc, false, false, false, false, false, false, false, false));
-  background-image: -ms-linear-gradient(top, compact(white, #cccccc, false, false, false, false, false, false, false, false));
-  background-image: -o-linear-gradient(top, compact(white, #cccccc, false, false, false, false, false, false, false, false));
-  background-image: linear-gradient(top, compact(white, #cccccc, false, false, false, false, false, false, false, false));
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #cccccc));
+  background-image: -webkit-linear-gradient(top, white, #cccccc);
+  background-image: -moz-linear-gradient(top, white, #cccccc);
+  background-image: -ms-linear-gradient(top, white, #cccccc);
+  background-image: -o-linear-gradient(top, white, #cccccc);
+  background-image: linear-gradient(top, white, #cccccc);
   line-height: 1em; }
   #viewer-settings-modal .clickable {
     -webkit-user-select: none;
@@ -1621,12 +1650,12 @@ body {
     background-color: #000;
     padding: 5px 10px;
     background-color: #444444;
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, compact(#444444, #222222, false, false, false, false, false, false, false, false)));
-    background-image: -webkit-linear-gradient(top, compact(#444444, #222222, false, false, false, false, false, false, false, false));
-    background-image: -moz-linear-gradient(top, compact(#444444, #222222, false, false, false, false, false, false, false, false));
-    background-image: -ms-linear-gradient(top, compact(#444444, #222222, false, false, false, false, false, false, false, false));
-    background-image: -o-linear-gradient(top, compact(#444444, #222222, false, false, false, false, false, false, false, false));
-    background-image: linear-gradient(top, compact(#444444, #222222, false, false, false, false, false, false, false, false)); }
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #444444), color-stop(100%, #222222));
+    background-image: -webkit-linear-gradient(top, #444444, #222222);
+    background-image: -moz-linear-gradient(top, #444444, #222222);
+    background-image: -ms-linear-gradient(top, #444444, #222222);
+    background-image: -o-linear-gradient(top, #444444, #222222);
+    background-image: linear-gradient(top, #444444, #222222); }
     #viewer-settings-modal #settings-form-footer button {
       width: 135px;
       margin: 5px;
@@ -1637,12 +1666,12 @@ body {
   position: absolute;
   width: 30%;
   background-color: #eeeeee;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, compact(#eeeeee, #dddddd, false, false, false, false, false, false, false, false)));
-  background-image: -webkit-linear-gradient(top, compact(#eeeeee, #dddddd, false, false, false, false, false, false, false, false));
-  background-image: -moz-linear-gradient(top, compact(#eeeeee, #dddddd, false, false, false, false, false, false, false, false));
-  background-image: -ms-linear-gradient(top, compact(#eeeeee, #dddddd, false, false, false, false, false, false, false, false));
-  background-image: -o-linear-gradient(top, compact(#eeeeee, #dddddd, false, false, false, false, false, false, false, false));
-  background-image: linear-gradient(top, compact(#eeeeee, #dddddd, false, false, false, false, false, false, false, false));
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeeeee), color-stop(100%, #dddddd));
+  background-image: -webkit-linear-gradient(top, #eeeeee, #dddddd);
+  background-image: -moz-linear-gradient(top, #eeeeee, #dddddd);
+  background-image: -ms-linear-gradient(top, #eeeeee, #dddddd);
+  background-image: -o-linear-gradient(top, #eeeeee, #dddddd);
+  background-image: linear-gradient(top, #eeeeee, #dddddd);
   top: 0;
   z-index: 999;
   bottom: 0;
@@ -1699,6 +1728,10 @@ body {
 .show-readium-toc #prev-page-button {
   left: 30%; }
 
+#s2id_page-list-select {
+  margin: 20px;
+  width: 200px; }
+
 .default-theme {
   background-color: white;
   color: black; }
@@ -1739,6 +1772,498 @@ body {
     .night-theme #readium-content-container.mo-playing .current-mo-content {
       color: white; }
 
+/*
+Version: 3.2 Timestamp: Mon Sep 10 10:38:04 PDT 2012
+*/
+.select2-container {
+  position: relative;
+  display: inline-block;
+  /* inline-block for ie7 */
+  zoom: 1;
+  *display: inline;
+  vertical-align: top; }
+
+.select2-container,
+.select2-drop,
+.select2-search,
+.select2-search input {
+  /*
+    Force border-box so that % widths fit the parent
+    container without overlap because of margin/padding.
+
+    More Info : http://www.quirksmode.org/css/box.html
+  */
+  -moz-box-sizing: border-box;
+  /* firefox */
+  -ms-box-sizing: border-box;
+  /* ie */
+  -webkit-box-sizing: border-box;
+  /* webkit */
+  -khtml-box-sizing: border-box;
+  /* konqueror */
+  box-sizing: border-box;
+  /* css3 */ }
+
+.select2-container .select2-choice {
+  background-color: #fff;
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eeeeee), color-stop(0.5, white));
+  background-image: -webkit-linear-gradient(center bottom, #eeeeee 0%, white 50%);
+  background-image: -moz-linear-gradient(center bottom, #eeeeee 0%, white 50%);
+  background-image: -o-linear-gradient(bottom, #eeeeee 0%, white 50%);
+  background-image: -ms-linear-gradient(top, #eeeeee 0%, white 50%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#eeeeee', endColorstr = '#ffffff', GradientType = 0);
+  background-image: linear, top, #eeeeee 0%, white 50%;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid #aaa;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  height: 26px;
+  line-height: 26px;
+  padding: 0 0 0 8px;
+  color: #444;
+  text-decoration: none; }
+
+.select2-container.select2-drop-above .select2-choice {
+  border-bottom-color: #aaa;
+  -webkit-border-radius: 0px 0px 4px 4px;
+  -moz-border-radius: 0px 0px 4px 4px;
+  border-radius: 0px 0px 4px 4px;
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eeeeee), color-stop(0.9, white));
+  background-image: -webkit-linear-gradient(center bottom, #eeeeee 0%, white 90%);
+  background-image: -moz-linear-gradient(center bottom, #eeeeee 0%, white 90%);
+  background-image: -o-linear-gradient(bottom, #eeeeee 0%, white 90%);
+  background-image: -ms-linear-gradient(top, #eeeeee 0%, white 90%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#ffffff',GradientType=0 );
+  background-image: linear, top, #eeeeee 0%, white 90%; }
+
+.select2-container .select2-choice span {
+  margin-right: 26px;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  text-overflow: ellipsis; }
+
+.select2-container .select2-choice abbr {
+  display: block;
+  position: absolute;
+  right: 26px;
+  top: 8px;
+  width: 12px;
+  height: 12px;
+  font-size: 1px;
+  background: url("../../images/select2/select2.png") right top no-repeat;
+  cursor: pointer;
+  text-decoration: none;
+  border: 0;
+  outline: 0; }
+
+.select2-container .select2-choice abbr:hover {
+  background-position: right -11px;
+  cursor: pointer; }
+
+.select2-drop {
+  background: #fff;
+  color: #000;
+  border: 1px solid #aaa;
+  border-top: 0;
+  position: absolute;
+  top: 100%;
+  -webkit-box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15);
+  -o-box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  width: 100%;
+  margin-top: -1px;
+  -webkit-border-radius: 0 0 4px 4px;
+  -moz-border-radius: 0 0 4px 4px;
+  border-radius: 0 0 4px 4px; }
+
+.select2-drop.select2-drop-above {
+  -webkit-border-radius: 4px 4px 0px 0px;
+  -moz-border-radius: 4px 4px 0px 0px;
+  border-radius: 4px 4px 0px 0px;
+  margin-top: 1px;
+  border-top: 1px solid #aaa;
+  border-bottom: 0;
+  -webkit-box-shadow: 0 -4px 5px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0 -4px 5px rgba(0, 0, 0, 0.15);
+  -o-box-shadow: 0 -4px 5px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 -4px 5px rgba(0, 0, 0, 0.15); }
+
+.select2-container .select2-choice div {
+  -webkit-border-radius: 0 4px 4px 0;
+  -moz-border-radius: 0 4px 4px 0;
+  border-radius: 0 4px 4px 0;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  background: #ccc;
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #cccccc), color-stop(0.6, #eeeeee));
+  background-image: -webkit-linear-gradient(center bottom, #cccccc 0%, #eeeeee 60%);
+  background-image: -moz-linear-gradient(center bottom, #cccccc 0%, #eeeeee 60%);
+  background-image: -o-linear-gradient(bottom, #cccccc 0%, #eeeeee 60%);
+  background-image: -ms-linear-gradient(top, #cccccc 0%, #eeeeee 60%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#cccccc', endColorstr = '#eeeeee', GradientType = 0);
+  background-image: linear, top, #cccccc 0%, #eeeeee 60%;
+  border-left: 1px solid #aaa;
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: block;
+  height: 100%;
+  width: 18px; }
+
+.select2-container .select2-choice div b {
+  background: url("../../images/select2/select2.png") no-repeat 0 1px;
+  display: block;
+  width: 100%;
+  height: 100%; }
+
+.select2-search {
+  display: inline-block;
+  white-space: nowrap;
+  z-index: 10000;
+  min-height: 26px;
+  width: 100%;
+  margin: 0;
+  padding-left: 4px;
+  padding-right: 4px; }
+
+.select2-search-hidden {
+  display: block;
+  position: absolute;
+  left: -10000px; }
+
+.select2-search input {
+  background: white url("../../images/select2/select2.png") no-repeat 100% -22px;
+  background: url("../../images/select2/select2.png") no-repeat 100% -22px, -webkit-gradient(linear, left bottom, left top, color-stop(0.85, white), color-stop(0.99, #eeeeee));
+  background: url("../../images/select2/select2.png") no-repeat 100% -22px, -webkit-linear-gradient(center bottom, white 85%, #eeeeee 99%);
+  background: url("../../images/select2/select2.png") no-repeat 100% -22px, -moz-linear-gradient(center bottom, white 85%, #eeeeee 99%);
+  background: url("../../images/select2/select2.png") no-repeat 100% -22px, -o-linear-gradient(bottom, white 85%, #eeeeee 99%);
+  background: url("../../images/select2/select2.png") no-repeat 100% -22px, -ms-linear-gradient(top, white 85%, #eeeeee 99%);
+  background: url("../../images/select2/select2.png") no-repeat 100% -22px, linear, top, white 85%, #eeeeee 99%;
+  padding: 4px 20px 4px 5px;
+  outline: 0;
+  border: 1px solid #aaa;
+  font-family: sans-serif;
+  font-size: 1em;
+  width: 100%;
+  margin: 0;
+  height: auto !important;
+  min-height: 26px;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0; }
+
+.select2-drop.select2-drop-above .select2-search input {
+  margin-top: 4px; }
+
+.select2-search input.select2-active {
+  background: white url("../../images/select2/spinner.gif") no-repeat 100%;
+  background: url("../../images/select2/spinner.gif") no-repeat 100%, -webkit-gradient(linear, left bottom, left top, color-stop(0.85, white), color-stop(0.99, #eeeeee));
+  background: url("../../images/select2/spinner.gif") no-repeat 100%, -webkit-linear-gradient(center bottom, white 85%, #eeeeee 99%);
+  background: url("../../images/select2/spinner.gif") no-repeat 100%, -moz-linear-gradient(center bottom, white 85%, #eeeeee 99%);
+  background: url("../../images/select2/spinner.gif") no-repeat 100%, -o-linear-gradient(bottom, white 85%, #eeeeee 99%);
+  background: url("../../images/select2/spinner.gif") no-repeat 100%, -ms-linear-gradient(top, white 85%, #eeeeee 99%);
+  background: url("../../images/select2/spinner.gif") no-repeat 100%, linear, top, white 85%, #eeeeee 99%; }
+
+.select2-container-active .select2-choice,
+.select2-container-active .select2-choices {
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  border: 1px solid #5897fb;
+  outline: none; }
+
+.select2-dropdown-open .select2-choice {
+  border: 1px solid #aaa;
+  border-bottom-color: transparent;
+  -webkit-box-shadow: 0 1px 0 #fff inset;
+  -moz-box-shadow: 0 1px 0 #fff inset;
+  -o-box-shadow: 0 1px 0 #fff inset;
+  box-shadow: 0 1px 0 #fff inset;
+  background-color: #eee;
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, white), color-stop(0.5, #eeeeee));
+  background-image: -webkit-linear-gradient(center bottom, white 0%, #eeeeee 50%);
+  background-image: -moz-linear-gradient(center bottom, white 0%, #eeeeee 50%);
+  background-image: -o-linear-gradient(bottom, white 0%, #eeeeee 50%);
+  background-image: -ms-linear-gradient(top, white 0%, #eeeeee 50%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#eeeeee',GradientType=0 );
+  background-image: linear, top, white 0%, #eeeeee 50%;
+  -webkit-border-bottom-left-radius: 0;
+  -webkit-border-bottom-right-radius: 0;
+  -moz-border-radius-bottomleft: 0;
+  -moz-border-radius-bottomright: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0; }
+
+.select2-dropdown-open .select2-choice div {
+  background: transparent;
+  border-left: none; }
+
+.select2-dropdown-open .select2-choice div b {
+  background-position: -18px 1px; }
+
+/* results */
+.select2-results {
+  margin: 4px 4px 4px 0;
+  padding: 0 0 0 4px;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 200px; }
+
+.select2-results ul.select2-result-sub {
+  margin: 0 0 0 0; }
+
+.select2-results ul.select2-result-sub > li .select2-result-label {
+  padding-left: 20px; }
+
+.select2-results ul.select2-result-sub ul.select2-result-sub > li .select2-result-label {
+  padding-left: 40px; }
+
+.select2-results ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub > li .select2-result-label {
+  padding-left: 60px; }
+
+.select2-results ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub > li .select2-result-label {
+  padding-left: 80px; }
+
+.select2-results ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub > li .select2-result-label {
+  padding-left: 100px; }
+
+.select2-results ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub > li .select2-result-label {
+  padding-left: 110px; }
+
+.select2-results ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub > li .select2-result-label {
+  padding-left: 120px; }
+
+.select2-results li {
+  list-style: none;
+  display: list-item; }
+
+.select2-results li.select2-result-with-children > .select2-result-label {
+  font-weight: bold; }
+
+.select2-results .select2-result-label {
+  padding: 3px 7px 4px;
+  margin: 0;
+  cursor: pointer; }
+
+.select2-results .select2-highlighted {
+  background: #3875d7;
+  color: #fff; }
+
+.select2-results li em {
+  background: #feffde;
+  font-style: normal; }
+
+.select2-results .select2-highlighted em {
+  background: transparent; }
+
+.select2-results .select2-no-results,
+.select2-results .select2-searching,
+.select2-results .select2-selection-limit {
+  background: #f4f4f4;
+  display: list-item; }
+
+/*
+disabled look for already selected choices in the results dropdown
+.select2-results .select2-disabled.select2-highlighted {
+    color: #666;
+    background: #f4f4f4;
+    display: list-item;
+    cursor: default;
+}
+.select2-results .select2-disabled {
+  background: #f4f4f4;
+  display: list-item;
+  cursor: default;
+}
+*/
+.select2-results .select2-disabled {
+  display: none; }
+
+.select2-more-results.select2-active {
+  background: #f4f4f4 url("../../images/select2/spinner.gif") no-repeat 100%; }
+
+.select2-more-results {
+  background: #f4f4f4;
+  display: list-item; }
+
+/* disabled styles */
+.select2-container.select2-container-disabled .select2-choice {
+  background-color: #f4f4f4;
+  background-image: none;
+  border: 1px solid #ddd;
+  cursor: default; }
+
+.select2-container.select2-container-disabled .select2-choice div {
+  background-color: #f4f4f4;
+  background-image: none;
+  border-left: 0; }
+
+/* multiselect */
+.select2-container-multi .select2-choices {
+  background-color: #fff;
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #eeeeee), color-stop(15%, white));
+  background-image: -webkit-linear-gradient(top, #eeeeee 1%, white 15%);
+  background-image: -moz-linear-gradient(top, #eeeeee 1%, white 15%);
+  background-image: -o-linear-gradient(top, #eeeeee 1%, white 15%);
+  background-image: -ms-linear-gradient(top, #eeeeee 1%, white 15%);
+  background-image: linear, top, #eeeeee 1%, white 15%;
+  border: 1px solid #aaa;
+  margin: 0;
+  padding: 0;
+  cursor: text;
+  overflow: hidden;
+  height: auto !important;
+  height: 1%;
+  position: relative; }
+
+.select2-container-multi .select2-choices {
+  min-height: 26px; }
+
+.select2-container-multi.select2-container-active .select2-choices {
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  border: 1px solid #5897fb;
+  outline: none; }
+
+.select2-container-multi .select2-choices li {
+  float: left;
+  list-style: none; }
+
+.select2-container-multi .select2-choices .select2-search-field {
+  white-space: nowrap;
+  margin: 0;
+  padding: 0; }
+
+.select2-container-multi .select2-choices .select2-search-field input {
+  color: #666;
+  background: transparent !important;
+  font-family: sans-serif;
+  font-size: 100%;
+  height: 15px;
+  padding: 5px;
+  margin: 1px 0;
+  outline: 0;
+  border: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none; }
+
+.select2-container-multi .select2-choices .select2-search-field input.select2-active {
+  background: white url("../../images/select2/spinner.gif") no-repeat 100% !important; }
+
+.select2-default {
+  color: #999 !important; }
+
+.select2-container-multi .select2-choices .select2-search-choice {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  background-color: #e4e4e4;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f4f4f4', endColorstr='#eeeeee', GradientType=0 );
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(20%, #f4f4f4), color-stop(50%, #f0f0f0), color-stop(52%, #e8e8e8), color-stop(100%, #eeeeee));
+  background-image: -webkit-linear-gradient(top, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eeeeee 100%);
+  background-image: -moz-linear-gradient(top, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eeeeee 100%);
+  background-image: -o-linear-gradient(top, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eeeeee 100%);
+  background-image: -ms-linear-gradient(top, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eeeeee 100%);
+  background-image: linear, top, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eeeeee 100%;
+  -webkit-box-shadow: 0 0 2px white inset, 0 1px 0 rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: 0 0 2px white inset, 0 1px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 2px white inset, 0 1px 0 rgba(0, 0, 0, 0.05);
+  color: #333;
+  border: 1px solid #aaaaaa;
+  line-height: 13px;
+  padding: 3px 5px 3px 18px;
+  margin: 3px 0 3px 5px;
+  position: relative;
+  cursor: default; }
+
+.select2-container-multi .select2-choices .select2-search-choice span {
+  cursor: default; }
+
+.select2-container-multi .select2-choices .select2-search-choice-focus {
+  background: #d4d4d4; }
+
+.select2-search-choice-close {
+  display: block;
+  position: absolute;
+  right: 3px;
+  top: 4px;
+  width: 12px;
+  height: 13px;
+  font-size: 1px;
+  background: url("../../images/select2/select2.png") right top no-repeat;
+  outline: none; }
+
+.select2-container-multi .select2-search-choice-close {
+  left: 3px; }
+
+.select2-container-multi .select2-choices .select2-search-choice .select2-search-choice-close:hover {
+  background-position: right -11px; }
+
+.select2-container-multi .select2-choices .select2-search-choice-focus .select2-search-choice-close {
+  background-position: right -11px; }
+
+/* disabled styles */
+.select2-container-multi.select2-container-disabled .select2-choices {
+  background-color: #f4f4f4;
+  background-image: none;
+  border: 1px solid #ddd;
+  cursor: default; }
+
+.select2-container-multi.select2-container-disabled .select2-choices .select2-search-choice {
+  background-image: none;
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  padding: 3px 5px 3px 5px; }
+
+.select2-container-multi.select2-container-disabled .select2-choices .select2-search-choice .select2-search-choice-close {
+  display: none; }
+
+/* end multiselect */
+.select2-result-selectable .select2-match,
+.select2-result-unselectable .select2-result-selectable .select2-match {
+  text-decoration: underline; }
+
+.select2-result-unselectable .select2-match {
+  text-decoration: none; }
+
+.select2-offscreen {
+  position: absolute;
+  left: -10000px; }
+
+/* Retina-ize icons */
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5) {
+  .select2-search input, .select2-search-choice-close, .select2-container .select2-choice abbr, .select2-container .select2-choice div b {
+    background-image: url(../../images/select2/select2x2.png) !important;
+    background-repeat: no-repeat !important;
+    background-size: 60px 40px !important; }
+
+  .select2-search input {
+    background-position: 100% -21px !important; } }
 /* Necessary for screen reader users. Must not include display:none or visibility:hidden */
 .offscreenText {
   position: absolute;

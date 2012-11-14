@@ -10,10 +10,7 @@
 //   that Backbone attributes (getting/setting) and the backbone attribute event model (events fired on attribute changes) should 
 //   the primary ways of interacting with this model.
 
-// REFACTORING CANDIDATE: hash_fragment now has two responsibilities with media overlays included in the source: To act as a broadcast
-//   attribute that triggers the view to go to a particular hash_fragment, as well as to do something for media overlays. It would
-//   probably make sense for the first reason to have a function make a direct call through the pagination strategy selector. 
-// Update (Marisa 20120814): right now it looks like hash_fragment is only monitored by the view, not MO.
+// REFACTORING CANDIDATE: Need to think about the purpose and implementation of the hash_fragment attribute
 
 Readium.Models.EPUBController = Backbone.Model.extend({
 
@@ -81,7 +78,8 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 	save: function(attrs, options) {
 		// TODO: this should be done properly with a backbone sync
 		var ops = {
-			success: function() {}
+			success: function() {
+			}
 		}
 		_.extend(ops,options);
 		var that = this;
@@ -104,7 +102,8 @@ Readium.Models.EPUBController = Backbone.Model.extend({
     	"toc_visible": false,
     	"rendered_spine_items": [],
     	"current_theme": "default-theme",
-    	"current_margin": 3
+    	"current_margin": 3,
+    	"epubCFIs" : {}
   	},
 
   	// Description: serialize this models state to `JSON` so that it can
@@ -118,7 +117,8 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 			"current_margin": this.get("current_margin"),
 			"two_up": this.get("two_up"),
 			"font_size": this.get("font_size"),
-			"key": this.get("key")
+			"key": this.get("key"),
+			"epubCFIs" : this.get("epubCFIs")
 		};
 	},
 
@@ -147,7 +147,10 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 	//    the backbone event broadcast.
 	// Arguments (
 	//   href (URL): The url and hash fragment that indicates the position in the epub to set as
-	//   the epub's current position.
+	//   the epub's current position. This argument either has to be the absolute path of the resource in 
+	//   the filesystem, or the path of the resource RELATIVE to the package document.
+	//   When a URI is resolved by the package document model, it assumes that any relative path for a resource is
+	//   relative to the package document.
 	// )
 	goToHref: function(href) {
 		// URL's with hash fragments require special treatment, so
@@ -155,17 +158,20 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		// of the url:
 		var splitUrl = href.match(/([^#]*)(?:#(.*))?/);
 
-		// handle the base url first:
-		if(splitUrl[1]) {
-			var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
-			this.setSpinePos(spine_pos);
-		}
+		// Check if the hash contained a CFI reference
+		if (splitUrl[2] && splitUrl[2].match(/epubcfi/)) {
 
-		// now try to handle the fragment if there was one,
-		if(splitUrl[2]) {
-			// just set observable property to broadcast event
-			// to anyone who cares
-			this.set({hash_fragment: splitUrl[2]});
+			this.handleCFIReference(splitUrl[2]);
+		}
+		// The href is a standard hash fragment
+		else {
+
+			// REFACTORING CANDIDATE: Move this into its own "private" method
+			if(splitUrl[1]) {
+				var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
+				this.setSpinePos(spine_pos, false, true, splitUrl[2]);
+				this.set("hash_fragment", splitUrl[2]);
+			}
 		}
 	},
 
@@ -203,6 +209,44 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 	//  "PRIVATE" HELPERS                                                                   //
 	// ------------------------------------------------------------------------------------ //
 
+	handleCFIReference : function (CFI) {
+
+		var packageDocument;
+		var hrefOfFirstContentDoc;
+		var spinePos;
+		var elementId;
+
+		// REFACTORING CANDIDATE: This is a temporary approach for retrieving a document representation of the 
+		//   package document. Probably best that the package model be able to return this representation of itself.
+        $.ajax({
+
+            type: "GET",
+            url: this.epub.get("root_url"),
+            dataType: "xml",
+            async: false,
+            success: function (response) {
+
+                packageDocument = response;
+            }
+        });
+
+		// get the href of the first content document
+		hrefOfFirstContentDoc = EPUBcfi.Interpreter.getContentDocHref(CFI, packageDocument);
+
+		// get the spine position of the content document and add the cfi to the current list, set the spine position
+		spinePos = this.packageDocument.spineIndexFromHref(hrefOfFirstContentDoc);
+
+		// Generate an element id from the CFI
+		// REFACTORING CANDIDATE: There is no need for this to be a cryptographic hash function. It was chosen 
+		//   because the Crypto library was already part of Readium. All that is required here is a unique id
+		//   for injected elements. 
+		var elementId = Crypto.SHA1(CFI);
+
+		this.addCFIwithPayload(CFI, spinePos, "<span id='" + elementId + "' class='cfi_marker' data-cfi='" + CFI + "'></span>");
+		this.setSpinePos(spinePos, false, true, elementId);
+		this.set("hash_fragment", elementId);
+	},
+
 	restorePosition: function() {
 		var pos = Readium.Utils.getCookie(this.epub.get("key"));
 		return parseInt(pos, 10) || this.packageDocument.getNextLinearSpinePostition();
@@ -228,32 +272,42 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 	
 	// goes the next linear section in the spine. Non-linear sections should be
 	// skipped as per [the spec](http://idpf.org/epub/30/spec/epub30-publications.html#sec-itemref-elem)
+	// REFACTORING CANDIDATE: I think this is a public method and should be moved to the public section
 	goToNextSection: function() {
 
 		var cp = this.get("spine_position");
 		var pos = this.packageDocument.getNextLinearSpinePostition(cp);
 		if(pos > -1) {
-			this.setSpinePos(pos, false);	
+			this.setSpinePos(pos, false, false);
 		}
-		
 	},
 	
 	// goes the previous linear section in the spine. Non-linear sections should be
 	// skipped as per [the spec](http://idpf.org/epub/30/spec/epub30-publications.html#sec-itemref-elem)
+	// REFACTORING CANDIDATE: I think this is a public method and should be moved to the public section
 	goToPrevSection: function() {
 		var cp = this.get("spine_position");
 		var pos = this.packageDocument.getPrevLinearSpinePostition(cp);
 		if(pos > -1) {
-			this.setSpinePos(pos, true);	
+			this.setSpinePos(pos, true, false);
 		}
 	},
 
 	// Description: Sets the current spine position for the epub, checking if the spine
-	//   item is already rendered.
+	//   item is already rendered. 
 	// Arguments (
 	//	 pos (integer): The index of the spine element to set as the current spine position
+	//   goToLastPageOfSection (boolean): Set the viewer to the last page of the spine item (content document/svg)
+	//     that will be loaded.
+	//   reRenderSpinePos (boolean): Force the spine item to be re-rendered, regardless of whether it is the 
+	//     currently set spine item.
+	//   goToHashFragmentId: Set the view position to the element with the specified id. This parameter 
+	//     overrides the behaviour of "goToLastPageOfSection"
 	//	)
-	setSpinePos: function(pos, goToLastPageOfSection) {
+	// REFACTORING CANDIDATE: The abstraction here is getting sloppy, as goToHashFragmentId overrides goToLastPageOfSection
+	//   and generally, the behaviour of this method is not entirely clear from its name. Perhaps a simple renaming of the
+	//   method would suffice? Additionally, the internal impementation could be reviewed to tightened up (comments below).
+	setSpinePos: function(pos, goToLastPageOfSection, reRenderSpinePos, goToHashFragmentId) {
 
 		// check for invalid spine position
 		if (pos < 0 || pos >= this.packageDocument.spineLength()) {
@@ -263,22 +317,39 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 		var spineItems = this.get("rendered_spine_items");
 		var spinePosIsRendered = spineItems.indexOf(pos) >=0 ? true : false;
+		var renderedItems;
 
 		// REFACTORING CANDIDATE: There is a somewhat hidden dependency here between the paginator
-		//   and the setting of the spine_position. The paginator re-renders based on the currently
-		//   set spine_position on this model; the paginator has a reference to this model, which is 
-		//   how it accesses the new spine_position. This would be clearer if the spine_position to set were passed 
-		//   explicitly to the paginator. 
+		//   and the setting of the spine_position. The pagination strategy selector re-renders based on the currently
+		//   set spine_position on this model. The pagination strategy selector has a reference to this model, which is 
+		//   how it accesses the new spine_position, through the "getCurrentSection" method. 
+		//   This would be clearer if the spine_position to set were passed explicitly to the paginator. 
 		this.set("spine_position", pos);
 
 		// REFACTORING CANDIDATE: This event should only be triggered for fixed layout sections
 		this.trigger("FXL_goToPage");
 
-		// Render the new spine position if it is not already rendered. 
+		// Render the new spine position if it is not already rendered. Otherwise, check if a re-render should
+		// be forced (in case a new CFI has to be injected, for example). 
 		if (!spinePosIsRendered) {
 
-			var renderedItems = this.paginator.renderSpineItems(goToLastPageOfSection);
+			renderedItems = this.paginator.renderSpineItems(goToLastPageOfSection, goToHashFragmentId);
 			this.set("rendered_spine_items", renderedItems);
+		}
+		else {
+
+			if (reRenderSpinePos) {
+
+				this.removeLastPageCFI();
+				renderedItems = this.paginator.renderSpineItems(goToLastPageOfSection, goToHashFragmentId);
+				this.set("rendered_spine_items", renderedItems);				
+			}
+			else {
+
+				if (!this.isFixedLayout() && goToHashFragmentId) {
+					this.paginator.v.goToHashFragment(goToHashFragmentId);
+				}
+			}
 		}
 	},
 
@@ -295,5 +366,48 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 			});
 		}
 		this.meta_section.on("change:meta_height", this.setMetaSize, this);
+	},
+
+	// REFACTORING CANDIDATE: The methods related to maintaining a hash of cfi information and payloads
+	//   will likely be refactored into its own backbone object.
+	addCFIwithPayload : function (CFI, spinePosition, htmlPayload, bodyType) {
+
+		var cfiPayload = { contentDocSpinePos : spinePosition, payload : htmlPayload, type : bodyType };
+		this.get("epubCFIs")[CFI] = cfiPayload;
+	},
+
+	addLastPageCFI : function (CFI, spinePosition) {
+
+		// Create last page marker
+		var elementId = Crypto.SHA1(CFI);
+		var marker = "<span id='" + elementId + "' data-last-page-cfi='" + CFI + "' class='cfi-marker last-page'></span>";
+
+		// Create payload
+		var cfiPayload = { contentDocSpinePos : spinePosition, payload : marker, type : "last-page" };
+
+		// Check if a last page marker already exists
+		var CFIPayloads = this.get("epubCFIs");
+
+		// Check every CFI payload for a "last-page" type, in case more than one exists
+		$.each(CFIPayloads, function (currCFI, payloadObject) {
+
+			if (this.type === "last-page") {
+				delete CFIPayloads[currCFI]
+			}
+		});
+
+		// Add the new last page marker
+		this.get("epubCFIs")[CFI] = cfiPayload;	
+	},
+
+	removeLastPageCFI : function () {
+
+		var activeCFIs = this.get("epubCFIs");
+		$.each(activeCFIs, function (currCFI, payloadObject) {
+
+			if (this.type === "last-page") {
+				delete activeCFIs[currCFI];
+			}
+		});
 	}
 });

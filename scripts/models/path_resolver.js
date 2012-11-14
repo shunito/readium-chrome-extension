@@ -1,7 +1,6 @@
 // seems like this is now fixed in chromium so soon it will no longer be necessary, YAY!
 // get rid of webkit prefix
 window.resolveLocalFileSystemURL = window.resolveLocalFileSystemURL || window.webkitResolveLocalFileSystemURL;
-window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
 
 window.g_uid_hashed = null;
 
@@ -43,6 +42,7 @@ PathResolver.prototype.resolve = function(relativePath) {
 };
 
 var domToString = function(dom) {
+
 	var x = new XMLSerializer();
 	return x.serializeToString(dom);
 };
@@ -50,7 +50,7 @@ var domToString = function(dom) {
 var fixCssLinks = function(content, resolver) {
 
 	// fix import statements to  (unconditionally) have url(...) wrapper
-        content = content.replace(/@import\s+(?:url\()*(.+?)(?:\))*\s*;/g, "@import url\($1\);");
+    content = content.replace(/@import\s+(?:url\()*(.+?)(?:\))*\s*;/g, "@import url\($1\);");
 
 	var beginning = /url\s*\(\s*['"]*\s*/
 	var end = /['"]*\s*\)/
@@ -59,10 +59,10 @@ var fixCssLinks = function(content, resolver) {
 		frag = frag.replace(end, '');
 		return "url('" + resolver.resolve(frag) + "')";
 	});
-
 };
 
 var fixXhtmlLinks = function(content, resolver) {
+
 	var $obj; var path; 
 	var parser = new window.DOMParser();
 	var dom = parser.parseFromString(content, 'text/xml');
@@ -76,7 +76,6 @@ var fixXhtmlLinks = function(content, resolver) {
 			$obj.attr(attrName, path);
 		});
 	}
-
 
 	correctionHelper('src');
 	correctionHelper('href');
@@ -96,11 +95,12 @@ var fixXhtmlLinks = function(content, resolver) {
 						head_content;
 		head.innerHTML = head_content;
 	}
+
 	return domToString(dom);
-	
 };
 
 var fixFonts = function(content, resolver) {
+
       if ((content.indexOf("OTTO") == 0)|| (content.indexOf("wOFF") == 0)) {
 		return content;
       }
@@ -135,6 +135,7 @@ var getBinaryFileFixingStrategy = function(fileEntryUrl, uid) {
 }
 
 var getLinkFixingStrategy = function(fileEntryUrl) {
+
 	if (fileEntryUrl.substr(-4) === ".css" ) {
 		return fixCssLinks;
 	}
@@ -147,7 +148,6 @@ var getLinkFixingStrategy = function(fileEntryUrl) {
 		// for now, I think i may need a different strategy for this
 		return fixXhtmlLinks;
 	}
-	
 
 	return null;
 };
@@ -155,6 +155,7 @@ var getLinkFixingStrategy = function(fileEntryUrl) {
 
 // this is the brains of the operation here
 var monkeyPatchUrls = function(fileEntryUrl, win, fail, uid) {
+
 	var entry;
 	var binFixingStrategy;
 	var resolver = new PathResolver(fileEntryUrl);
@@ -193,7 +194,6 @@ var monkeyPatchUrls = function(fileEntryUrl, win, fail, uid) {
 		entry = fileEntry;
 		readEntry(entry, fixLinks, fail);
 	});
-	
 };
 
 
@@ -218,7 +218,6 @@ var writeEntry = function(fileEntry, content, win, fail) {
 	Readium.FileSystemApi(function(fs) {
 		fs.writeFile(fileEntry.fullPath, content, win, fail);
 	});
-
 };
 
 var readBinEntry = function(fileEntry, win, fail) {
@@ -231,14 +230,9 @@ var readBinEntry = function(fileEntry, win, fail) {
        };
        reader.readAsBinaryString(file);
     }, fail);
-
 };
 
-
-
-
 var writeBinEntry = function(fileEntry, content, win, fail) {
-	
 	
 	fileEntry.createWriter(function(fileWriter) {
 
@@ -249,14 +243,12 @@ var writeBinEntry = function(fileEntry, content, win, fail) {
 		fileWriter.onerror = function(e) {
 			fail(e);
 		};
-                var i = content.length;
-		var bb = new BlobBuilder();
+        
+        var i = content.length;
 		var ba = string2ArrayBuffer(content);
 		var k = ba.length;
-		bb.append(ba);
-		var blobObj = bb.getBlob('image/jpeg');
-		var j = blobObj.size;
-		fileWriter.write( blobObj );
+        var blob = new Blob([ba], {type: 'image/jpeg'});
+		fileWriter.write( blob );
 
 	}, fail);
 };

@@ -13,7 +13,9 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 
 	defaults: {
 		"active_mo" : null, // the currently-playing media overlay; null if nothing is being played
-        "mo_text_id": null // the current MO text fragment identifier
+        "mo_text_id": null, // the current MO text fragment identifier
+        "rate": 1.0, // the playback rate
+        "volume": 1.0 // the volume
 	},
 
 	// ------------------------------------------------------------------------------------ //
@@ -35,6 +37,9 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         // media overlay playback starts here, if not null
         this.moTargetNode = null;
         
+        // for mute/unmute
+        this.savedVolume = 0;
+        
         // readium pages object
         this.pages = null;
         // readium view
@@ -43,7 +48,10 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 		this.epubController = this.get("epubController");
 		
         // trigger media overlay position updates
-        this.epubController.on("change:spine_position", this.handleSpineChanged, this);        
+        this.epubController.on("change:spine_position", this.handleSpineChanged, this);   
+        
+        this.on("change:rate", this.rateChanged, this);
+        this.on("change:volume", this.volumeChanged, this);     
 	},
     
     // each time there is a new pagination view created, it must call setPages
@@ -69,7 +77,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         this.set("active_mo", this.mo);
         this.mo.on("change:current_text_src", this.handleMoTextSrc, this);
 		this.mo.on("change:is_document_done", this.handleMoDocumentDone, this);
-            
+        
         var target = this.moTargetNode;
         this.moTargetNode = null;
             
@@ -111,6 +119,33 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 			this.set("active_mo", null);             
 		}
 	},
+    
+    // toggles mute/unmute
+    mute: function() {
+        if (this.mo) {
+            // unmute
+            if (this.mo.getVolume() == 0) {
+                this.set("volume", this.savedVolume);
+            }
+            // mute
+            else {
+                this.savedVolume = this.mo.getVolume();
+                this.set("volume", 0);
+            }
+        }
+    },
+    
+    volumeChanged: function() {
+        if (this.mo) {
+            this.mo.setVolume(this.get("volume"));
+        }
+    },
+    
+    rateChanged: function() {
+        if (this.mo) {
+            this.mo.setRate(this.get("rate"));
+        }
+    },
     
     // called by the reflowable view when the page changes
     reflowPageChanged: function() {
@@ -205,6 +240,10 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             return;
         }
         
+        // keep the volume and rate consistent
+        this.mo.setVolume(this.get("volume"));
+        this.mo.setRate(this.get("rate"));
+        
         this.mo.reset();
         if (this.currentSection.isFixedLayout() && this.autoplayNextSpineItem) {
             this.autoplayNextSpineItem = false;
@@ -230,12 +269,9 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             var doc_href = this.currentSection.get("href");
             
 	        var node = null;
-            // TODO
-            console.log("\nVisible");
-	        for (var i = 0; i<pageElms.length; i++) {
+            for (var i = 0; i<pageElms.length; i++) {
 	            var id = $(pageElms[i]).attr("id");
-                console.log(id);
-	            var src = doc_href + "#" + id;
+                var src = doc_href + "#" + id;
 	            node = this.mo.findNodeByTextSrc(src);
 	            if (node) {
 	                break;

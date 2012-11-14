@@ -56,7 +56,7 @@ Readium.Views.LibraryItemView = Backbone.View.extend({
 
 	tagName: 'div',
 
-	className: "book-item clearfix",
+	className: "book-item",
 
 	initialize: function() {
 		this.template = Handlebars.templates.library_item_template;
@@ -97,7 +97,7 @@ Readium.Views.LibraryItemsView = Backbone.View.extend({
 
 	id: "library-items-container",
 
-	className: 'row-view clearfix',
+	className: 'row-view',
 
 	initialize: function() {
 		this.template = Handlebars.templates.library_items_template;

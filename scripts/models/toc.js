@@ -9,8 +9,31 @@ Readium.Models.Toc = Backbone.Model.extend({
 		this.book.on("change:toolbar_visible", this.setTocVis, this);
 	},
 
+	// Rationale: Readium expects that any hrefs to EPUB content are either absolute references or references to the content relative
+	//   to the EPUBs package document. Since any href passed to this method is specified as either absolute (in which case we 
+	//   don't need to worry) or as relative to the nav document (where the click was generated, as this is the toc), we need
+	//   to construct an absolute path from that.
 	handleLink: function(href) {
-		this.book.goToHref(href);
+
+		var TOCHref = this.book.packageDocument.getTocItem().get("href");
+
+		// If toc is in the same folder as the package document, use the href straight
+		if (TOCHref.indexOf("/") === -1) {
+
+			this.book.goToHref(href);	
+		}
+		// If the href target is in a child folder of the toc folder, create the relative URI
+		// If the href target is in a parent folder of the toc folder, this will fail, for now.
+		else {
+
+			var TOC_URI = new URI(TOCHref);
+			var targetHrefURI = new URI(href);
+
+			// Use the TOC path, relative to the package document to create an href for the target resource which will also be relative
+			//   to the package document (or absolute, if the href for the TOC was absolute).
+			href = targetHrefURI.resolve(TOC_URI).toString();
+			this.book.goToHref(href);
+		}
 	},
 
 	setVisibility: function() {
@@ -61,28 +84,68 @@ Readium.Models.NcxToc = Readium.Models.Toc.extend({
 		} ]
 	},
 
-	parse: function(xmlDom) {
-		var json;
-		if(typeof(xmlDom) === "string" ) {
+	// Rationale: This method does not use JATH to parse an NCX document, as JATH doesn't really support elements nested 
+	//   recursively, as is possibly the case for navPoint elements in an NCX document. 
+	parse: function (xmlDom) {
+		var ncxJson = {};
+
+		var $navMap;
+		var that = this;
+
+		if (typeof(xmlDom) === "string") {
 			var parser = new window.DOMParser;
       		xmlDom = parser.parseFromString(xmlDom, 'text/xml');
 		}
-		
-		Jath.resolver = function(prefix) {
-			if(prefix === "ncx") {
-				return "http://www.daisy.org/z3986/2005/ncx/";	
-			}
-			return "";
-		}
 
-		json = Jath.parse( this.jath_template, xmlDom);
-		return json;
+		// Get NCX TOC text title
+		ncxJson.title = $($("text", $("docTitle", xmlDom)[0])[0]).text();
+		
+		// For each navpoint, create navPoint objects recursively
+		ncxJson.navs = [];
+		$navMap = $("navMap", xmlDom);
+		$.each($navMap.children(), function() {
+
+			if ($(this).is("navPoint")) {
+
+				ncxJson.navs.push(that.createNavPointObject($(this)));
+			}
+		});
+
+		return ncxJson;
+	},
+
+	// Description: Creates an object that represents a NCX navPoint.   
+	// Rationale: Since navPoints can be nested within each other, this method creates each navPoint object recursively.
+	createNavPointObject : function ($navPoint) {
+
+		var jsonNavPoint = {};
+		var that = this;
+
+		// Each navPoint object has a content src, a label and 0 or more child navPoints
+		jsonNavPoint.navs = [];
+		$.each($navPoint.children(), function () {
+
+			$currElement = $(this);
+			if ($currElement.is("content")) {
+
+				jsonNavPoint.href = $currElement.attr("src");
+			}
+			else if ($currElement.is("navLabel")) {
+
+				jsonNavPoint.text = $($("text", $currElement)[0]).text();
+			}
+			else if ($currElement.is("navPoint")) {
+
+				jsonNavPoint.navs.push(that.createNavPointObject($currElement));
+			}
+		});
+
+		return jsonNavPoint;
 	},
 
 	TocView: function() {
 		return new Readium.Views.NcxTocView({model: this});
 	}
-
 });
 
 Readium.Models.XhtmlToc = Readium.Models.Toc.extend({
