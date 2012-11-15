@@ -169,7 +169,15 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 			// REFACTORING CANDIDATE: Move this into its own "private" method
 			if(splitUrl[1]) {
 				var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
-				this.setSpinePos(spine_pos, false, true, splitUrl[2]);
+
+				// Rationale: If media overlays are playing, they will cause 
+				if (this.get("media_overlay_controller").mo.get("has_started_playback")) {
+					this.setSpinePos(spine_pos, false, false, splitUrl[2]);
+				}
+				else {
+					this.setSpinePos(spine_pos, false, true, splitUrl[2]);	
+				}	
+
 				this.set("hash_fragment", splitUrl[2]);
 			}
 		}
