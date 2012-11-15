@@ -95,7 +95,6 @@ Readium.Views.OptionsView = Backbone.View.extend({
     	"change #font-size-input": 		"extractFontSize",
     	"click #one-up-option": 		"setOneUp",
 		"click #two-up-option": 		"setTwoUp"
-		}	
   	},
 
   	extractFontSize: function(e) {

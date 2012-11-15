@@ -17,7 +17,7 @@
 			<div class="navbar-inner" id="inner-top-bar">
 				<div class="container" style="width: 100%">
 					<a title="Readium Info" accesskey="i" class="brand" data-toggle="modal" href="#readium-info" id='bar-logo' role="button">
-						<h2 id="logo-replace" class="offscreenText">Readium</h2>
+						<h2 id="logo-replace">Readium</h2>
 					</a>
 
 					<ul class="nav pull-right">
@@ -43,7 +43,7 @@
 						</li>
 						<li class="divider-vertical"></li>
 						<li id="add-book-li">
-							<a title="Add a new ePUB" accesskey="a" href="#add-book-modal" data-toggle="modal" role="button">
+							<a title="Add a new ePUB" accesskey="a" href="#add-book-modal" id="add-book-btn" data-toggle="modal" role="button">
 								<img src="/images/top_bar/add_book.png" class="small" alt=""/>
 								<span class="offscreenText">Add a new ePUB</span>
 							</a>
@@ -69,10 +69,10 @@
 				</div>
 				<div>
 					<!-- UPDATE VERSION NUMBER -->
-					<h3 id="version-info">Version 0.5.5 Release Date 11.05.12</h3>
+					<h3 tabindex="-1" id="version-info">Version 0.5.5 Release Date 11.05.12</h3>
 				</div>
 				<p>
-					<span tabindex="-1" id="i18n_html_readium_tm_a_project">Readium<sup>TM</sup>, a project of the International Digital Publishing Forum (IDPF) and supporters, is an open source reference system and rendering engine for EPUB&reg; publications.  To learn more, visit the <a href="http://readium.org/">project homepage</a>. To date, the project development has been lead by <a href="http://evidentpoint.com/">Evident Point</a> and <a href="http://www.bluefirereader.com/">Bluefire Productions</a>. To contribute visit the <a href="https://github.com/readium/readium">github repository</a></span>
+					<span id="i18n_html_readium_tm_a_project">Readium<sup>TM</sup>, a project of the International Digital Publishing Forum (IDPF) and supporters, is an open source reference system and rendering engine for EPUB&reg; publications.  To learn more, visit the <a href="http://readium.org/">project homepage</a>. To date, the project development has been lead by <a href="http://evidentpoint.com/">Evident Point</a> and <a href="http://www.bluefirereader.com/">Bluefire Productions</a>. To contribute visit the <a href="https://github.com/readium/readium">github repository</a></span>
 				</p>
 				<div>
 					<img src="/images/info_modal/partner_logos.png" alt="Readium partners logo">
@@ -88,7 +88,7 @@
 					<a title="Close" class="close" data-dismiss="modal" role="button" aria-label="Close">
 						<span class="offscreenText">Close</span>&times;
 					</a>
-					<h2><span id="i18n_readium_options">Readium Options:</span></h2>
+					<h2 tabindex="-1" id="options-heading"><span id="i18n_readium_options">Readium Options:</span></h2>
 				</div>
 				
 				<div class="modal-body">
@@ -138,7 +138,7 @@
 	
 				<div class="modal-header">
 					<a class="close" data-dismiss="modal" role="button" aria-label="Close">&times;</a>
-					<h3><span id="i18n_add_book_to_readium_library">Add Book To Readium Library:</span></h3>
+					<h3 tabindex="-1" id="add-book-heading"><span id="i18n_add_book_to_readium_library">Add Book To Readium Library:</span></h3>
 				</div>
 
 				<div class="modal-body">

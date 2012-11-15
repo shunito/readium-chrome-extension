@@ -187,6 +187,16 @@ Readium.Views.ReadiumOptionsView = Backbone.View.extend({
 	initialize: function() {
 		this.model.on("change", this.render, this);
 		this.render();
+		$(this.el).on('shown', function(){
+			$('#options-heading').focus();
+			setTimeout( function() {
+				$('#options-btn').attr('aria-pressed', 'true');
+			}, 1);
+		}).on('hidden', function(){
+			setTimeout( function(){
+				$('#options-btn').attr('aria-pressed', 'false').focus();
+			}, 1);
+		});
 	},
 
 	render: function() {
@@ -222,6 +232,19 @@ Readium.Views.ReadiumOptionsView = Backbone.View.extend({
 
 Readium.Views.FilePickerView = Backbone.View.extend({
 	el:"#add-book-modal",
+
+	initialize: function() {
+		$(this.el).on('shown', function(){
+			$('#add-book-heading').focus();
+			setTimeout( function() {
+				$('#add-book-btn').attr('aria-pressed', 'true');
+			}, 1);
+		}).on('hidden', function(){
+			setTimeout( function(){
+				$('#add-book-btn').attr('aria-pressed', 'false').focus();
+			}, 1);
+		});
+	},
 
 	events: {
 		"change #files": "handleFileSelect",
