@@ -19,6 +19,10 @@ describe("Readium.Models.ReadiumPagination", function () {
                 var section = {
                     isFixedLayout: function () {
                         return false;
+                    },
+
+                    firstPageOffset : function () {
+                        return false;
                     }
                 };
 
@@ -132,6 +136,10 @@ describe("Readium.Models.ReadiumPagination", function () {
                 var section;
                 section = {
                     isFixedLayout: function () {
+                        return false;
+                    },
+
+                    firstPageOffset : function () {
                         return false;
                     }
                 };
@@ -247,7 +255,12 @@ describe("Readium.Models.ReadiumPagination", function () {
                 section = {
                     isFixedLayout: function () {
                         return false;
+                    },
+
+                    firstPageOffset : function () {
+                        return false;
                     }
+
                 };
 
                 this.pages.set({
@@ -374,6 +387,10 @@ describe("Readium.Models.ReadiumPagination", function () {
                 var section = {
                     isFixedLayout: function () {
                         return true;
+                    },
+
+                    firstPageOffset : function () {
+                        return false;
                     }
                 };
 
@@ -486,6 +503,10 @@ describe("Readium.Models.ReadiumPagination", function () {
                 section = {
                     isFixedLayout: function () {
                         return true;
+                    },
+
+                    firstPageOffset : function () {
+                        return false;
                     }
                 };
 
@@ -600,6 +621,10 @@ describe("Readium.Models.ReadiumPagination", function () {
                 section = {
                     isFixedLayout: function () {
                         return true;
+                    },
+
+                    firstPageOffset : function () {
+                        return false;
                     }
                 };
 
