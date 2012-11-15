@@ -25,20 +25,24 @@
           });
           return expect(epubController.packageDocument).toBeDefined();
         });
+
         it("calls fetch on the package document", function() {
-          var epubController, packDoc;
-          packDoc = new Readium.Models.PackageDocument({
-            book: {},
-            "file_path": "some/path"
-          });
-          spyOn(Readium.Models, "PackageDocument").andReturn(packDoc);
-          spyOn(packDoc, "fetch");
-          epubController = new Readium.Models.EPUBController({
-            "epub": this.epub
-          });
-          expect(Readium.Models.PackageDocument).toHaveBeenCalled();
-          return expect(packDoc.fetch).toHaveBeenCalled();
+          
+            var epub;
+            var epubController;
+            var packageDocument;
+
+            packageDocument = Factory.spy("package_document");
+            spyOn(Readium.Models, "PackageDocument").andReturn(packageDocument);            
+            epub = new Readium.Models.EPUB({"package_doc_path": "some/file/path"});
+
+            epubController = new Readium.Models.EPUBController({
+                "epub": epub
+            });
+            expect(Readium.Models.PackageDocument).toHaveBeenCalled();
+            return expect(packageDocument.fetch).toHaveBeenCalled();
         });
+
         return describe("sets up event handlers", function() {
           beforeEach(function() {
             this.epub = new Readium.Models.EPUB({
@@ -47,13 +51,6 @@
             return this.epubController = new Readium.Models.EPUBController({
               "epub": this.epub
             });
-          });
-          return it('savePosition and setMetaSize on change:spine_position', function() {
-            spyOn(this.epubController.savePosition, "apply");
-            spyOn(this.epubController.setMetaSize, "apply");
-            this.epubController.trigger("change:spine_position");
-            expect(this.epubController.savePosition.apply).toHaveBeenCalled();
-            return expect(this.epubController.setMetaSize.apply).toHaveBeenCalled();
           });
         });
       });
