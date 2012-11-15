@@ -735,14 +735,6 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
                     
                         expect(pageNums).toEqual([1]);
                     });
-
-                    it("gets 1 page number from 1 page in two up mode", function () {
-
-                        var pageNums = this.testGotoPageNums({twoUp : true, isFXL : false, pageProgDir : "ltr", firstPageOffset : false,
-                            current_pages : [1]});
-                    
-                        expect(pageNums).toEqual([1]);
-                    });
                 });
 
                 describe("RTL", function () {
@@ -759,14 +751,6 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
 
                         var pageNums = this.testGotoPageNums({twoUp : true, isFXL : false, pageProgDir : "rtl", firstPageOffset : false,
                             current_pages : [0, 1]});
-                    
-                        expect(pageNums).toEqual([1]);
-                    });
-
-                    it("gets 1 page number from 1 page in two up mode", function () {
-
-                        var pageNums = this.testGotoPageNums({twoUp : true, isFXL : false, pageProgDir : "rtl", firstPageOffset : false,
-                            current_pages : [1]});
                     
                         expect(pageNums).toEqual([1]);
                     });
