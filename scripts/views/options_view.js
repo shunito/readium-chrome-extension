@@ -38,7 +38,7 @@ Readium.Views.OptionsView = Backbone.View.extend({
 
 		$('#options-btn').attr('aria-pressed', 'false');
 		$('#viewer-settings-modal').on('shown', function(){
-			$('#options-heading').focus();
+			$('#setting-header-font-size').focus();
 			setTimeout( function() {
 				$('#options-btn').attr('aria-pressed', 'true');
 			}, 1);
