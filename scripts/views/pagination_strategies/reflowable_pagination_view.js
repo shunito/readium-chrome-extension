@@ -537,6 +537,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	adjustIframeColumns: function() {
 		var prop_dir = this.offset_dir;
 		var $frame = this.$('#readium-flowing-content');
+		var page;
 
 		this.setFrameSize();
 		this.frame_width = parseInt($frame.width(), 10);
@@ -553,8 +554,50 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// margin on the <html> elem, or it will mess with our column code
 		$(this.getBody()).css( this.getBodyColumnCss() );
 
+		// If the first page is offset, adjust the window to only show one page
+		if (this.model.get("two_up")) {
+			
+			var firstPageIsOffset = this.model.getCurrentSection().firstPageOffset();
+			var firstPageOffsetValue;
+
+			// Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
+			//   only the first page should be showing in that display
+			// REFACTORING CANDIDATE: This logic is similar to that in pageChangeHandler
+			var onFirstPage = 
+				this.pages.get("current_page")[0] === 0 &&
+			    this.pages.get("current_page")[1] === 1 
+			    ? true : false;
+
+			if (firstPageIsOffset && onFirstPage) {
+
+				if (this.model.epub.get("page_prog_dir") === "rtl") {
+
+					firstPageOffset = -(2 * (this.page_width + this.gap_width));
+					$frame.css("margin-left", firstPageOffset + "px");
+				}
+				// Left-to-right pagination
+				else {
+
+					firstPageOffset = this.page_width + (this.gap_width * 2);
+					$frame.css("margin-left", firstPageOffset + "px");
+				}
+
+				page = 1;
+
+			}
+			else {
+
+				$frame.css("margin-left", "0px");
+				page = this.pages.get("current_page")[0];
+			}
+		}
+		else {
+
+			$frame.css("margin-left", "0px");
+			page = this.pages.get("current_page")[0];
+		}
+
 		this.setNumPages();
-		var page = this.pages.get("current_page")[0] || 1;
 		this.goToPage(page);
 	},
 
@@ -724,8 +767,48 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         var that = this;
 		this.hideContent();
 		setTimeout(function() {
-			that.goToPage(that.pages.get("current_page")[0]);
-			that.model.paginator.v.savePosition();
+
+			var $reflowableIframe = that.$("#readium-flowing-content");
+			if (that.model.get("two_up")) {
+				// If the first page is offset, adjust the window to only show one page
+				var firstPageIsOffset = that.model.getCurrentSection().firstPageOffset();
+				var firstPageOffsetValue;
+
+				// Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
+				//   only the first page should be showing in that display
+				var onFirstPage = 
+					that.pages.get("current_page")[0] === 0 &&
+				    that.pages.get("current_page")[1] === 1 
+				    ? true : false;
+
+				if (firstPageIsOffset && onFirstPage) {
+
+					if (that.model.epub.get("page_prog_dir") === "rtl") {
+
+						firstPageOffset = -(2 * (that.page_width + that.gap_width));
+						$reflowableIframe.css("margin-left", firstPageOffset + "px");
+					}
+					// Left-to-right pagination
+					else {
+
+						firstPageOffset = that.page_width + (that.gap_width * 2);
+						$reflowableIframe.css("margin-left", firstPageOffset + "px");
+					}
+
+					that.goToPage(1);
+				}
+				else {
+
+					$reflowableIframe.css("margin-left", "0px");
+					that.goToPage(that.pages.get("current_page")[0]);
+				}
+			}
+			else {
+
+				$reflowableIframe.css("margin-left", "0px");
+				that.goToPage(that.pages.get("current_page")[0]);
+			}
+
 		}, 150);
 	},
 

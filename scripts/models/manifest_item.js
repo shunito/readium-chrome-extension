@@ -252,6 +252,40 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 		return this.collection.isBookFixedLayout();
 	},
 
+	// Description: Determines if the first page of the content document should be offset in a synthetic layout
+	firstPageOffset : function () {
+
+		// Get book properties
+		var notFixedLayout = !this.isFixedLayout();
+		var pageProgDirIsRTL = this.get("page_prog_dir") === "rtl" ? true : false;
+		var pageSpreadLeft = this.get("page_spread") === "left" ? true : false;
+		var pageSpreadRight = this.get("page_spread") === "right" ? true : false;
+
+		// Default to no page spread specified if they are both set on the spine item
+		if (pageSpreadRight && pageSpreadLeft) {
+			pageSpreadRight = false;
+			pageSpreadLeft = false;
+		}
+
+		if (notFixedLayout) {
+
+			if (pageProgDirIsRTL) {
+
+				if (pageSpreadLeft) {
+					return true;
+				}
+			}
+			else {
+
+				if (pageSpreadRight) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	},
+
 	// REFACTORING CANDIDATE: caching the the fixed layout views. I do not remember the reason that
 	// we are doing this. Possible that it is not necessary...
 	getPageView: function() {

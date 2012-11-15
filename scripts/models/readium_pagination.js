@@ -22,6 +22,7 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		
 		// if content reflows and the number of pages in the section changes
 		// we need to adjust the the current page
+		// Probably a memory leak here, should add a destructor
 		this.on("change:num_pages", this.adjustCurrentPage, this);
 	},
 
@@ -29,14 +30,14 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 	//   between a single page and side-by-side page views and vice versa.
 	toggleTwoUp: function() {
 
-		if (this.epubController.get("can_two_up")) {
+		if (this.epubController.epub.get("can_two_up")) {
 
-			// REFACTORING CANDIDATE: refactor page number display logic to this model
 			var newPages = this.pageNumberDisplayLogic.getPageNumbersForTwoUp (
 				this.epubController.get("two_up"), 
 				this.get("current_page"),
 				this.epubController.epub.get("page_prog_dir"),
-				this.epubController.getCurrentSection().isFixedLayout()
+				this.epubController.getCurrentSection().isFixedLayout(),
+				this.epubController.getCurrentSection().firstPageOffset()
 				);
 
 			this.set({current_page: newPages});
@@ -78,7 +79,8 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 							gotoPageNumber,
 							this.epubController.get("two_up"),
 							this.epubController.getCurrentSection().isFixedLayout(),
-							this.epubController.epub.get("page_prog_dir")
+							this.epubController.epub.get("page_prog_dir"),
+							this.epubController.getCurrentSection().firstPageOffset()
 							);
 		this.set("current_page", pagesToGoto);
 	},
@@ -192,8 +194,8 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 	adjustCurrentPage: function() {
 		var cp = this.get("current_page");
 		var num = this.get("num_pages");
-		var two_up = this.epubController.get("two_up");
-		if(cp[cp.length - 1] > num) {
+
+		if (cp[cp.length - 1] > num) {
 			this.goToLastPage();
 		}
 	},	

@@ -189,7 +189,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 		}
 	},
 
-	// Info: "Section" actually refers to a spine item
+	// Note: "Section" actually refers to a spine item
 	getCurrentSection: function(offset) {
 		if(!offset) {
 			offset = 0;
