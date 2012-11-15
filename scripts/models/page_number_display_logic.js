@@ -32,11 +32,24 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 				if (pageProgDirection === "rtl") {
 
 					if (this.displayedPageIsLeft(gotoPageNumber)) {
-						return [gotoPageNumber - 1, gotoPageNumber];
+
+						if (this.displayedPageIsRight(gotoPageNumber - 1)) {
+							return [gotoPageNumber - 1, gotoPageNumber];
+						}
+						else {
+							return [gotoPageNumber];
+						}
 					}
 					else if (this.displayedPageIsRight(gotoPageNumber)) {
-						return [gotoPageNumber, gotoPageNumber + 1];
+
+						if (this.displayedPageIsLeft(gotoPageNumber + 1)) {
+							return [gotoPageNumber, gotoPageNumber + 1];	
+						}
+						else {
+							return [gotoPageNumber];
+						}
 					}
+					// A center page
 					else {
 						return [gotoPageNumber];
 					}
@@ -45,11 +58,24 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 				else {
 
 					if (this.displayedPageIsLeft(gotoPageNumber)) {
-						return [gotoPageNumber, gotoPageNumber + 1];
+
+						if (this.displayedPageIsRight(gotoPageNumber + 1)) {
+							return [gotoPageNumber, gotoPageNumber + 1];
+						}
+						else {
+							return [gotoPageNumber];
+						}
 					}
 					else if (this.displayedPageIsRight(gotoPageNumber)) {
-						return [gotoPageNumber - 1, gotoPageNumber];
+
+						if (this.displayedPageIsLeft(gotoPageNumber - 1)) {
+							return [gotoPageNumber - 1, gotoPageNumber];
+						}
+						else {
+							return [gotoPageNumber];
+						}
 					}
+					// A center page
 					else {
 						return [gotoPageNumber];
 					}
