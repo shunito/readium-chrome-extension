@@ -770,16 +770,6 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
                     
                         expect(pageNums).toEqual([1]);
                     });
-
-                    it("gets 1 page number; 1 page in two up mode (exclusive left/center/right)", function () {
-
-                        // Page left/right shouldn't matter
-
-                        var pageNums = this.testGotoPageNums({twoUp : true, isFXL : true, pageProgDir : "ltr", firstPageOffset : false,
-                            current_pages : [2]});
-                    
-                        expect(pageNums).toEqual([2]);
-                    });
                 });
 
                 describe("RTL", function () {
@@ -792,16 +782,6 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
                             current_pages : [1, 2]});
                     
                         expect(pageNums).toEqual([1]);
-                    });
-
-                    it("gets 1 page number; 1 page in two up mode (exclusive left/center/right)", function () {
-
-                        // Page left/right shouldn't matter
-
-                        var pageNums = this.testGotoPageNums({twoUp : true, isFXL : true, pageProgDir : "rtl", firstPageOffset : false,
-                            current_pages : [2]});
-                    
-                        expect(pageNums).toEqual([2]);
                     });
                 });
             });
@@ -862,12 +842,10 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
                         expect(pageNums).toEqual([1, 2]);
                     });
 
-                    it("gets 2 page numbers; start p is right, p+1 is right", function () {
+                    it("gets 1 page number; start p is right, p+1 is right", function () {
 
                         spyOn(this.pageNumSelector, "displayedPageIsRight").andCallFake(function (pageNum) {
-                            return pageNum === 1 ? true : false; });
-                        spyOn(this.pageNumSelector, "displayedPageIsRight").andCallFake(function (pageNum) {
-                            return pageNum === 2 ? true : false; });
+                            return pageNum === 1 || pageNum === 2 ? true : false; });
 
                         var pageNums = this.testGotoPageNums({twoUp : false, isFXL : true, pageProgDir : "rtl", firstPageOffset : false,
                             current_pages : [1]});
@@ -875,7 +853,7 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
                         expect(pageNums).toEqual([1]);
                     });
 
-                    it("gets 2 page numbers; start p is right, p+1 is center", function () {
+                    it("gets 1 page number; start p is right, p+1 is center", function () {
 
                         spyOn(this.pageNumSelector, "displayedPageIsRight").andCallFake(function (pageNum) {
                             return pageNum === 1 ? true : false; });
@@ -901,12 +879,10 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
                         expect(pageNums).toEqual([1, 2]);
                     });
 
-                    it("gets 2 page numbers; start p is left, p-1 is left", function () {
+                    it("gets 1 page number; start p is left, p-1 is left", function () {
 
                         spyOn(this.pageNumSelector, "displayedPageIsLeft").andCallFake(function (pageNum) {
-                            return pageNum === 1 ? true : false; });
-                        spyOn(this.pageNumSelector, "displayedPageIsLeft").andCallFake(function (pageNum) {
-                            return pageNum === 2 ? true : false; });
+                            return pageNum === 1 || pageNum === 2? true : false; });
 
                         var pageNums = this.testGotoPageNums({twoUp : false, isFXL : true, pageProgDir : "rtl", firstPageOffset : false,
                             current_pages : [2]});
@@ -914,7 +890,7 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
                         expect(pageNums).toEqual([2]);
                     });
 
-                    it("gets 2 page numbers; start p is left, p-1 is center", function () {
+                    it("gets 1 page number; start p is left, p-1 is center", function () {
 
                         spyOn(this.pageNumSelector, "displayedPageIsCenter").andCallFake(function (pageNum) {
                             return pageNum === 1 ? true : false; });
@@ -927,7 +903,7 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
                         expect(pageNums).toEqual([2]);
                     });
 
-                    it("gets 2 page numbers; start p is center", function () {
+                    it("gets 1 page number; start p is center", function () {
 
                         spyOn(this.pageNumSelector, "displayedPageIsLeft").andCallFake(function (pageNum) {
                             return pageNum === 1 ? true : false; });
@@ -958,12 +934,10 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
                         expect(pageNums).toEqual([1, 2]);
                     });
 
-                    it("gets 2 page numbers; start p left, p+1 is left", function () {
+                    it("gets 1 page number; start p left, p+1 is left", function () {
 
                         spyOn(this.pageNumSelector, "displayedPageIsLeft").andCallFake(function (pageNum) {
-                            return pageNum === 1 ? true : false; });
-                        spyOn(this.pageNumSelector, "displayedPageIsLeft").andCallFake(function (pageNum) {
-                            return pageNum === 2 ? true : false; });
+                            return pageNum === 1 || pageNum === 2 ? true : false; });
 
                         var pageNums = this.testGotoPageNums({twoUp : false, isFXL : true, pageProgDir : "ltr", firstPageOffset : false,
                             current_pages : [1]});
@@ -971,7 +945,7 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
                         expect(pageNums).toEqual([1]);
                     });
 
-                    it("gets 2 page numbers; start p left, p+1 is center", function () {
+                    it("gets 1 page number; start p left, p+1 is center", function () {
 
                         spyOn(this.pageNumSelector, "displayedPageIsLeft").andCallFake(function (pageNum) {
                             return pageNum === 1 ? true : false; });
@@ -997,12 +971,10 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
                         expect(pageNums).toEqual([1, 2]);
                     });
 
-                    it("gets 2 page numbers; start p right, p-1 is right", function () {
+                    it("gets 1 page number; start p right, p-1 is right", function () {
 
                         spyOn(this.pageNumSelector, "displayedPageIsRight").andCallFake(function (pageNum) {
-                            return pageNum === 1 ? true : false; });
-                        spyOn(this.pageNumSelector, "displayedPageIsRight").andCallFake(function (pageNum) {
-                            return pageNum === 2 ? true : false; });
+                            return pageNum === 1 || pageNum === 2 ? true : false; });
 
                         var pageNums = this.testGotoPageNums({twoUp : false, isFXL : true, pageProgDir : "ltr", firstPageOffset : false,
                             current_pages : [2]});
@@ -1010,7 +982,7 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
                         expect(pageNums).toEqual([2]);
                     });
 
-                    it("gets 2 page numbers; start p right, p-1 is center", function () {
+                    it("gets 1 page number; start p right, p-1 is center", function () {
 
                         spyOn(this.pageNumSelector, "displayedPageIsCenter").andCallFake(function (pageNum) {
                             return pageNum === 1 ? true : false; });
@@ -1023,7 +995,7 @@ describe("Readium.Models.PageNumberDisplayLogic", function () {
                         expect(pageNums).toEqual([2]);
                     });
 
-                    it("gets 2 page numbers; start p center", function () {
+                    it("gets 1 page number; start p center", function () {
 
                         spyOn(this.pageNumSelector, "displayedPageIsLeft").andCallFake(function (pageNum) {
                             return pageNum === 1 ? true : false; });

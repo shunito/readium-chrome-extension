@@ -241,34 +241,71 @@ Readium.Models.PageNumberDisplayLogic = Backbone.Model.extend({
 			// page progression is right-to-left
 			if (pageProgDirection === "rtl") {
 
+				// and the previous one is right, then display both, otherwise, just display one
 				if (this.displayedPageIsLeft(displayed[0])) {
 					
-					newPages[0] = displayed[0] - 1;
-					newPages[1] = displayed[0];
+					if (this.displayedPageIsRight(displayed[0] - 1)) {
+
+						newPages[0] = displayed[0] - 1;
+						newPages[1] = displayed[0];
+					}
+					else {
+
+						newPages[0] = displayed[0];
+					}
 				}
+				// if the next page is left, display both, otherwise, just display one
 				else if (this.displayedPageIsRight(displayed[0])) {
 					
-					newPages[0] = displayed[0];
-					newPages[1] = displayed[0] + 1;
-				}
+					if (this.displayedPageIsLeft(displayed[0] + 1)) {
+						
+						newPages[0] = displayed[0];
+						newPages[1] = displayed[0] + 1;
+					}
+					else {
 
-				// TODO: Handle center pages
+						newPages[0] = displayed[0];
+					}
+				}
+				// It is a center page
+				else {
+
+					newPages[0] = displayed[0];
+				}
 			}
 			// page progression is left-to-right
 			else {
 
+				// If next page is a right page, display both, otherwise just display this one
 				if (this.displayedPageIsLeft(displayed[0])) {
 					
-					newPages[0] = displayed[0];
-					newPages[1] = displayed[0] + 1;
+					if (this.displayedPageIsRight(displayed[0] + 1)) {
+						
+						newPages[0] = displayed[0];
+						newPages[1] = displayed[0] + 1;
+					}
+					else {
+
+						newPages[0] = displayed[0];
+					}
 				}
 				else if (this.displayedPageIsRight(displayed[0])) {
 					
-					newPages[0] = displayed[0] - 1;
-					newPages[1] = displayed[0];
-				}
+					if (this.displayedPageIsLeft(displayed[0] - 1)) {
+						
+						newPages[0] = displayed[0] - 1;
+						newPages[1] = displayed[0];
+					}
+					else {
 
-				// TODO: Handle center pages
+						newPages[0] = displayed[0];
+					}
+				}
+				// It is a center page
+				else {
+
+					newPages[0] = displayed[0];
+				}
 			}
 		}
 
