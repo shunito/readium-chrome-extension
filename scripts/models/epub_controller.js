@@ -171,7 +171,9 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 				var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
 
 				// Rationale: If media overlays are playing, they will cause 
-				if (this.get("media_overlay_controller").mo.get("has_started_playback")) {
+				if (this.get("media_overlay_controller").mo &&
+					this.get("media_overlay_controller").mo.get("has_started_playback")) {
+					
 					this.setSpinePos(spine_pos, false, false, splitUrl[2]);
 				}
 				else {
