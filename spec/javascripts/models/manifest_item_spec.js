@@ -33,7 +33,7 @@ describe("Readium.Models.ManifestItem", function() {
             expect(this.man_item.isImage()).toBeFalsy();
         });
 
-        it("is not an image if it is xhmlt", function() {
+        it("is not an image if it is xhtml", function() {
           
             this.man_item.set("media_type", "application/xhtml+xml");
             expect(this.man_item.isImage()).toBeFalsy();
