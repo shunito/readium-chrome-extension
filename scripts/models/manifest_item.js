@@ -160,10 +160,14 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 	// 	left_page: 		render on the left side
 	//	right_page: 	render on the right side
 	//	center_page: 	always center the page horizontally
+	// REFACTORING CANDIDATE: This method is too long. 
 	getPageSpreadClass: function() {
 		var book = this.collection.packageDocument.get("book");
 		var spine_index = this.get("spine_index");
 		var pageSpreadProperty;
+		var spineItems = this.collection;
+		var numPagesBetween;
+		var lastSpecifiedPageSpread;
 
 		if(book.get("apple_fixed")) {
 			// the logic for apple fixed layout is a little different:
@@ -212,25 +216,53 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 					return "right_page";
 				}
 				else {
-
 					return "center_page";
 				}
 			}
-			// If the page spread property is not set, use a even/odd page index heuristic that depends on the 
-			// page progression order:
-			//   - Even-numbered pages on the right for rtl text
-			//   - Odd-numbered pages on the left for ltr text
+			// If the page spread property is not set, we must iterate back through the EPUB's spine items to find 
+			//   the last spine item with a page-spread value set. We can use that value, whether there are an even or odd
+			//   number of pages between this spine item and the "last" one, and the page progression direction of the EPUB
+			//   to determine the appropriate page spread value for this spine item. 
+			// REFACTORING CANDIDATE: WAY too much nesting here. This should be moved to it's own method, at the least.
 			else {
 
-				// Check for right-to-left page progression direction
-				if (this.get("page_prog_dir") === "rtl") {
+				// If this is the first spine item, assign left or right based on page progression direction
+				if (spine_index === 0) {
 
-					return (spine_index % 2 === 0 ? "right_page" : "left_page");
+					return book.get("page_prog_dir") === "rtl" ? "right_page" : "left_page";
 				}
-				// Text is left-to-right
 				else {
 
-					return (spine_index % 2 === 0 ? "left_page" : "right_page");
+					// Find last spine item with page-spread value and use it to determine the appropriate value for 
+					//   this spine item.
+					for (var currSpineIndex = spine_index - 1; currSpineIndex >= 0; currSpineIndex--) {
+
+						// REFACTORING CANDIDATE: This would be clearer if the currSpineIndex === 0 case was 
+						//   handled seperately. 
+						if (currSpineIndex === 0 || spineItems.at(currSpineIndex).get("page_spread")) {
+
+							// Handles the case where currSpineIndex === 0 and a page-spread value has not been specified
+							lastSpecifiedPageSpread = 
+								spineItems.at(currSpineIndex).get("page_spread") ? spineItems.at(currSpineIndex).get("page_spread") : 
+								book.get("page_prog_dir") === "rtl" ? "right" : "left";
+
+							numPagesBetween = spine_index - currSpineIndex;
+
+							if (numPagesBetween % 2 === 0) {
+
+								return lastSpecifiedPageSpread === "left" ? "left_page" : 
+									lastSpecifiedPageSpread === "right" ? "right_page" :
+									book.get("page_prog_dir") === "rtl" ? "left_page" : "right_page";
+							}
+							// Odd number of pages between current and last spine item with a specified page-spread value
+							else {
+
+								return lastSpecifiedPageSpread === "left" ? "right_page" :
+									lastSpecifiedPageSpread === "right" ? "left_page" :
+									book.get("page_prog_dir") === "rtl" ? "right_page" : "left_page";
+							}
+						}
+					}
 				}
 			}
 		}

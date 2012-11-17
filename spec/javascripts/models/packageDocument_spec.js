@@ -11,17 +11,17 @@ describe('PackageDocument', function() {
             });
         });
 
-    it('exists in the namespace', function() {
-        
-        expect(Readium.Models.PackageDocument).toBeDefined();
-    });
-      
-    it('subscribes to spine position changed events', function() {
-        
-        spyOn(this.packageDocument.onSpinePosChanged, "apply");
-        this.packageDocument.trigger("change:spine_position");
-        expect(this.packageDocument.onSpinePosChanged.apply).toHaveBeenCalled();
-    });
+        it('exists in the namespace', function() {
+            
+            expect(Readium.Models.PackageDocument).toBeDefined();
+        });
+          
+        it('subscribes to spine position changed events', function() {
+            
+            spyOn(this.packageDocument.onSpinePosChanged, "apply");
+            this.packageDocument.trigger("change:spine_position");
+            expect(this.packageDocument.onSpinePosChanged.apply).toHaveBeenCalled();
+        });
 
     describe("parsing the xml", function() {
         
@@ -57,5 +57,11 @@ describe('PackageDocument', function() {
             
             expect(typeof this.json.manifest).toEqual("object");
         });
+    });
+
+    describe("public methods", function () {
+
+        it("assigns page-spread properties to ")
+
     });
 });
