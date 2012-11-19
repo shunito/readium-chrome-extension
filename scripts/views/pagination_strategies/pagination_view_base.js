@@ -40,6 +40,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
         this.injectLinkHandler(e.srcElement);
         var trigs = this.parseTriggers(e.srcElement.contentDocument);
 		this.applyTriggers(e.srcElement.contentDocument, trigs);
+		$(e.srcElement).attr('title', Acc.page + ' - ' + Acc.title);
         this.mediaOverlayController.pagesLoaded();
 	},
 	

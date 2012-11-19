@@ -24,6 +24,7 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		// we need to adjust the the current page
 		// Probably a memory leak here, should add a destructor
 		this.on("change:num_pages", this.adjustCurrentPage, this);
+
 	},
 
 	// Description: This method determines which page numbers to display when switching
@@ -198,6 +199,9 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		if (cp[cp.length - 1] > num) {
 			this.goToLastPage();
 		}
+
+Acc.page = '#' + cp;
+
 	},	
 
 	// REFACTORING CANDIDATE: this is strange in that it does not seem to account for 

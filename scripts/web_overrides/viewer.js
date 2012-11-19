@@ -5,7 +5,7 @@ Readium.Views.ViewerApplicationView = Backbone.View.extend({
 
 	initialize: function() {
 		this.model.on("change:full_screen", this.toggleFullscreen, this);
-		
+
 		// the book's pages
 		this.paginator = this.model.CreatePaginator();
 		this.paginator.on("toggle_ui", this.toggleUI, this);

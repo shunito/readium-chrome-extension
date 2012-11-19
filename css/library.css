@@ -10,9 +10,6 @@ html {
 * {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
 
-.offscreenText {
-  display: none; }
-
 .clearfix {
   *zoom: 1; }
   .clearfix:before, .clearfix:after {
@@ -2612,3 +2609,16 @@ img.details-cover-image {
 
 #progress-container h5 {
   color: #999; }
+
+/* Necessary for screen reader users. Must not include display:none or visibility:hidden */
+.offscreenText {
+  position: absolute;
+  clip: rect(1px 1px 1px 1px);
+  /* IE6, IE7 */
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 0;
+  border: 0;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  z-index: -1000; }

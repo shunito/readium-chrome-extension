@@ -2,355 +2,245 @@
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
 templates['binding_template'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
-  var foundHelper, self=this;
+  
 
 
   return "<iframe scrolling=\"no\" \n		frameborder=\"0\" \n		marginwidth=\"0\" \n		marginheight=\"0\" \n		width=\"100%\" \n		height=\"100%\" \n		class='binding-sandbox'>\n</iframe>";});
 templates['extracting_item_template'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
-  var buffer = "", stack1, foundHelper, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, foundHelper, functionType="function", escapeExpression=this.escapeExpression;
 
 
   buffer += "<h5>";
   foundHelper = helpers.log_message;
-  stack1 = foundHelper || depth0.log_message;
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "log_message", { hash: {} }); }
+  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
+  else { stack1 = depth0.log_message; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
   buffer += escapeExpression(stack1) + "</h5>\n<div class=\"progress progress-striped progress-success active \">	\n		<div role=\"status\" aria-live=\"assertive\" aria-relevant=\"all\" class=\"bar\" style=\"width: ";
   foundHelper = helpers.progress;
-  stack1 = foundHelper || depth0.progress;
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "progress", { hash: {} }); }
+  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
+  else { stack1 = depth0.progress; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
   buffer += escapeExpression(stack1) + "%;\"></div>\n</div>";
   return buffer;});
 templates['fixed_page_template'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
-  var buffer = "", stack1, foundHelper, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, foundHelper, functionType="function", escapeExpression=this.escapeExpression;
 
 
   buffer += "<div class=\"fixed-page-margin\">\n	<iframe scrolling=\"no\" \n			frameborder=\"0\" \n			marginwidth=\"0\" \n			marginheight=\"0\" \n			width=\"";
   foundHelper = helpers.width;
-  stack1 = foundHelper || depth0.width;
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "width", { hash: {} }); }
+  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
+  else { stack1 = depth0.width; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
   buffer += escapeExpression(stack1) + "px\" \n			height=\"";
   foundHelper = helpers.height;
-  stack1 = foundHelper || depth0.height;
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "height", { hash: {} }); }
+  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
+  else { stack1 = depth0.height; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
   buffer += escapeExpression(stack1) + "px\" \n			src=\"";
   foundHelper = helpers.uri;
-  stack1 = foundHelper || depth0.uri;
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "uri", { hash: {} }); }
+  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
+  else { stack1 = depth0.uri; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
+  buffer += escapeExpression(stack1) + "\"\n			title=\"";
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.title;
+  stack1 = typeof stack1 === functionType ? stack1() : stack1;
   buffer += escapeExpression(stack1) + "\"\n			class='content-sandbox'>\n	</iframe>\n</div>";
   return buffer;});
 templates['image_page_template'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
-  var buffer = "", stack1, foundHelper, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, foundHelper, functionType="function", escapeExpression=this.escapeExpression;
 
 
   buffer += "<div class=\"fixed-page-margin\">\n	<img src=\"";
   foundHelper = helpers.uri;
-  stack1 = foundHelper || depth0.uri;
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "uri", { hash: {} }); }
-  buffer += escapeExpression(stack1) + "\" >\n</div>";
+  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
+  else { stack1 = depth0.uri; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
+  buffer += escapeExpression(stack1) + "\" alt=\"\" />\n</div>";
   return buffer;});
 templates['library_item_template'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
-  var buffer = "", stack1, stack2, foundHelper, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, foundHelper, functionType="function", escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing;
 
 
   buffer += "<div class='info-wrap'>\n	<div class='caption book-info'>\n		<h2 class='green info-item title'>";
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.title);
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "data.title", { hash: {} }); }
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.title;
+  stack1 = typeof stack1 === functionType ? stack1() : stack1;
   buffer += escapeExpression(stack1) + "</h2>\n		<div class='info-item author'>";
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.author);
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.author;
   foundHelper = helpers.orUnknown;
-  stack2 = foundHelper || depth0.orUnknown;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "orUnknown", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, stack1, {hash:{}}) : helperMissing.call(depth0, "orUnknown", stack1, {hash:{}});
   buffer += escapeExpression(stack1) + "</div>\n		<div class='info-item epub-version'>ePUB ";
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.epub_version);
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.epub_version;
   foundHelper = helpers.orUnknown;
-  stack2 = foundHelper || depth0.orUnknown;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "orUnknown", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
-  buffer += escapeExpression(stack1) + "</div>\n		\n	</div>\n	\n	<img class='cover-image read' src='";
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.cover_href);
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "data.cover_href", { hash: {} }); }
+  stack1 = foundHelper ? foundHelper.call(depth0, stack1, {hash:{}}) : helperMissing.call(depth0, "orUnknown", stack1, {hash:{}});
+  buffer += escapeExpression(stack1) + "</div>		\n	</div>\n	\n	<img class='cover-image read' src='";
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.cover_href;
+  stack1 = typeof stack1 === functionType ? stack1() : stack1;
   buffer += escapeExpression(stack1) + "' width='150' height='220' alt='Open ePUB ";
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.title);
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "data.title", { hash: {} }); }
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.title;
+  stack1 = typeof stack1 === functionType ? stack1() : stack1;
   buffer += escapeExpression(stack1) + "'>\n	\n	<a href=\"#details-modal-";
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.key);
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "data.key", { hash: {} }); }
-  buffer += escapeExpression(stack1) + "\" class=\"info-icon\" data-toggle=\"modal\" role=\"button\">\n		<img class='info-icon pull-right' src='/images/library/info-icon.png' height=\"39px\" width=\"39px\" alt='";
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.title);
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "data.title", { hash: {} }); }
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.key;
+  stack1 = typeof stack1 === functionType ? stack1() : stack1;
+  buffer += escapeExpression(stack1) + "\" class=\"info-icon\" aria-pressed=\"true\" data-toggle=\"modal\" role=\"button\">\n		<img class='info-icon pull-right' src='/images/library/info-icon.png' height=\"39px\" width=\"39px\" alt='";
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.title;
+  stack1 = typeof stack1 === functionType ? stack1() : stack1;
   buffer += escapeExpression(stack1) + " information'>\n	</a>\n</div>\n\n<div class=\"caption buttons\">\n	<a href=\"#todo\" class=\"btn read\" data-book='";
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.key);
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "data.key", { hash: {} }); }
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.key;
+  stack1 = typeof stack1 === functionType ? stack1() : stack1;
   buffer += escapeExpression(stack1) + "' role='button'>";
-  stack1 = "i18n_read";
   foundHelper = helpers.fetchInzMessage;
-  stack2 = foundHelper || depth0.fetchInzMessage;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "fetchInzMessage", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, "i18n_read", {hash:{}}) : helperMissing.call(depth0, "fetchInzMessage", "i18n_read", {hash:{}});
   buffer += escapeExpression(stack1) + "</a>\n	<a href=\"#details-modal-";
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.key);
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "data.key", { hash: {} }); }
-  buffer += escapeExpression(stack1) + "\" class=\"btn details\" data-toggle=\"modal\" role=\"button\">\n		";
-  stack1 = "i18n_details";
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.key;
+  stack1 = typeof stack1 === functionType ? stack1() : stack1;
+  buffer += escapeExpression(stack1) + "\" aria-pressed=\"true\" class=\"btn details\" data-toggle=\"modal\" role=\"button\">\n		";
   foundHelper = helpers.fetchInzMessage;
-  stack2 = foundHelper || depth0.fetchInzMessage;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "fetchInzMessage", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, "i18n_details", {hash:{}}) : helperMissing.call(depth0, "fetchInzMessage", "i18n_details", {hash:{}});
   buffer += escapeExpression(stack1) + "\n	</a>\n</div>\n\n<div id='details-modal-";
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.key);
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "data.key", { hash: {} }); }
-  buffer += escapeExpression(stack1) + "' class='modal fade details-modal'>\n	<div class=\"pull-left modal-cover-wrap\">\n		<img class='details-cover-image' src='";
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.cover_href);
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "data.cover_href", { hash: {} }); }
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.key;
+  stack1 = typeof stack1 === functionType ? stack1() : stack1;
+  buffer += escapeExpression(stack1) + "' class='modal fade details-modal'>\n<div class=\"offscreenText\"> Details Start </div>\n	<div class=\"pull-left modal-cover-wrap\">\n		<img class='details-cover-image' src='";
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.cover_href;
+  stack1 = typeof stack1 === functionType ? stack1() : stack1;
   buffer += escapeExpression(stack1) + "' width='150' height='220' alt='ePUB cover'>\n		<div class=\"caption modal-buttons\">\n			<a href=\"#\" class=\"btn read\" data-book='<%= data.key %>' role='button'>";
-  stack1 = "i18n_read";
   foundHelper = helpers.fetchInzMessage;
-  stack2 = foundHelper || depth0.fetchInzMessage;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "fetchInzMessage", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, "i18n_read", {hash:{}}) : helperMissing.call(depth0, "fetchInzMessage", "i18n_read", {hash:{}});
   buffer += escapeExpression(stack1) + "</a>\n			<a class=\"btn btn-danger delete pull-right\" role='button'>";
-  stack1 = "i18n_delete";
   foundHelper = helpers.fetchInzMessage;
-  stack2 = foundHelper || depth0.fetchInzMessage;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "fetchInzMessage", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, "i18n_delete", {hash:{}}) : helperMissing.call(depth0, "fetchInzMessage", "i18n_delete", {hash:{}});
   buffer += escapeExpression(stack1) + "</a>\n		</div>\n	</div>\n	<div class='caption modal-book-info'>\n		<h3 class='green modal-title'>";
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.title);
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "data.title", { hash: {} }); }
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.title;
+  stack1 = typeof stack1 === functionType ? stack1() : stack1;
   buffer += escapeExpression(stack1) + "</h3>\n		<div class='modal-detail gap'>";
-  stack1 = "i18n_author";
   foundHelper = helpers.fetchInzMessage;
-  stack2 = foundHelper || depth0.fetchInzMessage;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "fetchInzMessage", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, "i18n_author", {hash:{}}) : helperMissing.call(depth0, "fetchInzMessage", "i18n_author", {hash:{}});
   buffer += escapeExpression(stack1);
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.author);
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.author;
   foundHelper = helpers.orUnknown;
-  stack2 = foundHelper || depth0.orUnknown;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "orUnknown", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, stack1, {hash:{}}) : helperMissing.call(depth0, "orUnknown", stack1, {hash:{}});
   buffer += escapeExpression(stack1) + "</div>\n		<div class='modal-detail'>";
-  stack1 = "i18n_publisher";
   foundHelper = helpers.fetchInzMessage;
-  stack2 = foundHelper || depth0.fetchInzMessage;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "fetchInzMessage", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, "i18n_publisher", {hash:{}}) : helperMissing.call(depth0, "fetchInzMessage", "i18n_publisher", {hash:{}});
   buffer += escapeExpression(stack1);
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.publisher);
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.publisher;
   foundHelper = helpers.orUnknown;
-  stack2 = foundHelper || depth0.orUnknown;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "orUnknown", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, stack1, {hash:{}}) : helperMissing.call(depth0, "orUnknown", stack1, {hash:{}});
   buffer += escapeExpression(stack1) + "</div>\n		<div class='modal-detail'>";
-  stack1 = "i18n_pub_date";
   foundHelper = helpers.fetchInzMessage;
-  stack2 = foundHelper || depth0.fetchInzMessage;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "fetchInzMessage", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, "i18n_pub_date", {hash:{}}) : helperMissing.call(depth0, "fetchInzMessage", "i18n_pub_date", {hash:{}});
   buffer += escapeExpression(stack1);
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.pubdate);
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.pubdate;
   foundHelper = helpers.orUnknown;
-  stack2 = foundHelper || depth0.orUnknown;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "orUnknown", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, stack1, {hash:{}}) : helperMissing.call(depth0, "orUnknown", stack1, {hash:{}});
   buffer += escapeExpression(stack1) + "</div>\n		<div class='modal-detail'>";
-  stack1 = "i18n_modified_date";
   foundHelper = helpers.fetchInzMessage;
-  stack2 = foundHelper || depth0.fetchInzMessage;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "fetchInzMessage", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, "i18n_modified_date", {hash:{}}) : helperMissing.call(depth0, "fetchInzMessage", "i18n_modified_date", {hash:{}});
   buffer += escapeExpression(stack1);
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.modified_date);
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.modified_date;
   foundHelper = helpers.orUnknown;
-  stack2 = foundHelper || depth0.orUnknown;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "orUnknown", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, stack1, {hash:{}}) : helperMissing.call(depth0, "orUnknown", stack1, {hash:{}});
   buffer += escapeExpression(stack1) + "</div>\n		<div class='modal-detail gap'>";
-  stack1 = "i18n_id";
   foundHelper = helpers.fetchInzMessage;
-  stack2 = foundHelper || depth0.fetchInzMessage;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "fetchInzMessage", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, "i18n_id", {hash:{}}) : helperMissing.call(depth0, "fetchInzMessage", "i18n_id", {hash:{}});
   buffer += escapeExpression(stack1);
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.id);
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.id;
   foundHelper = helpers.orUnknown;
-  stack2 = foundHelper || depth0.orUnknown;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "orUnknown", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, stack1, {hash:{}}) : helperMissing.call(depth0, "orUnknown", stack1, {hash:{}});
   buffer += escapeExpression(stack1) + "</div>\n		<div class='modal-detail green'>";
-  stack1 = "i18n_epub_version";
   foundHelper = helpers.fetchInzMessage;
-  stack2 = foundHelper || depth0.fetchInzMessage;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "fetchInzMessage", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, "i18n_epub_version", {hash:{}}) : helperMissing.call(depth0, "fetchInzMessage", "i18n_epub_version", {hash:{}});
   buffer += escapeExpression(stack1);
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.epub_version);
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.epub_version;
   foundHelper = helpers.orUnknown;
-  stack2 = foundHelper || depth0.orUnknown;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "orUnknown", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, stack1, {hash:{}}) : helperMissing.call(depth0, "orUnknown", stack1, {hash:{}});
   buffer += escapeExpression(stack1) + "</div>\n		<div class='modal-detail'>";
-  stack1 = "i18n_created_at";
   foundHelper = helpers.fetchInzMessage;
-  stack2 = foundHelper || depth0.fetchInzMessage;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "fetchInzMessage", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, "i18n_created_at", {hash:{}}) : helperMissing.call(depth0, "fetchInzMessage", "i18n_created_at", {hash:{}});
   buffer += escapeExpression(stack1);
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.created_at);
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.created_at;
   foundHelper = helpers.orUnknown;
-  stack2 = foundHelper || depth0.orUnknown;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "orUnknown", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, stack1, {hash:{}}) : helperMissing.call(depth0, "orUnknown", stack1, {hash:{}});
   buffer += escapeExpression(stack1) + "</div>\n	</div>\n	<div class='modal-detail source'>\n	<span class='green' style=\"padding-right: 10px\">";
-  stack1 = "i18n_source";
   foundHelper = helpers.fetchInzMessage;
-  stack2 = foundHelper || depth0.fetchInzMessage;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "fetchInzMessage", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
+  stack1 = foundHelper ? foundHelper.call(depth0, "i18n_source", {hash:{}}) : helperMissing.call(depth0, "fetchInzMessage", "i18n_source", {hash:{}});
   buffer += escapeExpression(stack1) + "</span>\n		";
-  foundHelper = helpers.data;
-  stack1 = foundHelper || depth0.data;
-  stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.src_url);
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.src_url;
   foundHelper = helpers.orUnknown;
-  stack2 = foundHelper || depth0.orUnknown;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "orUnknown", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
-  buffer += escapeExpression(stack1) + "\n	</div>\n</div>			";
+  stack1 = foundHelper ? foundHelper.call(depth0, stack1, {hash:{}}) : helperMissing.call(depth0, "orUnknown", stack1, {hash:{}});
+  buffer += escapeExpression(stack1) + "\n	</div>\n<div class=\"offscreenText\"> Details End </div>\n</div>			";
   return buffer;});
 templates['library_items_template'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
-  var buffer = "", stack1, stack2, foundHelper, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, foundHelper, helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
 
 
   buffer += "<div id='empty-message'>\n	<p id='empty-message-text' class='green'>\n		";
-  stack1 = "i18n_add_items";
   foundHelper = helpers.fetchInzMessage;
-  stack2 = foundHelper || depth0.fetchInzMessage;
-  if(typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, { hash: {} }); }
-  else if(stack2=== undef) { stack1 = helperMissing.call(depth0, "fetchInzMessage", stack1, { hash: {} }); }
-  else { stack1 = stack2; }
-  buffer += escapeExpression(stack1) + "\n	</p>\n	<img id='empty-arrow' src='/images/library/empty_library_arrow.png' alt='' />\n</div>";
+  stack1 = foundHelper ? foundHelper.call(depth0, "i18n_add_items", {hash:{}}) : helperMissing.call(depth0, "fetchInzMessage", "i18n_add_items", {hash:{}});
+  buffer += escapeExpression(stack1) + "\n	</p>\n	<img id='empty-arrow' src='/images/library/empty_library_arrow.png' alt='Try adding an ePUB' />\n</div>";
   return buffer;});
 templates['ncx_nav_template'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
-  var buffer = "", stack1, foundHelper, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, foundHelper, functionType="function", escapeExpression=this.escapeExpression;
 
 
   buffer += "<li class=\"nav-elem\">\n	<a href=\"";
   foundHelper = helpers.href;
-  stack1 = foundHelper || depth0.href;
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "href", { hash: {} }); }
+  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
+  else { stack1 = depth0.href; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
   buffer += escapeExpression(stack1) + "\">";
   foundHelper = helpers.text;
-  stack1 = foundHelper || depth0.text;
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "text", { hash: {} }); }
+  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
+  else { stack1 = depth0.text; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
   buffer += escapeExpression(stack1) + "</a>\n</li>";
   return buffer;});
 templates['reflowing_template'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
-  var buffer = "", stack1, foundHelper, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, foundHelper, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  buffer += "<div id=\"flowing-wrapper\">\n	<iframe scrolling=\"no\" \n			frameborder=\"0\" \n			marginwidth=\"0\" \n			marginheight=\"0\" \n			width=\"50%\" \n			height=\"100%\" \n			src=\"";
+  buffer += "<div id=\"flowing-wrapper\">\n	<iframe scrolling=\"no\" \n			frameborder=\"0\" \n			marginwidth=\"0\" \n			marginheight=\"0\" \n			width=\"50%\" \n			height=\"100%\" \n			title=\"";
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.title;
+  stack1 = typeof stack1 === functionType ? stack1() : stack1;
+  buffer += escapeExpression(stack1) + "\"\n			src=\"";
   foundHelper = helpers.uri;
-  stack1 = foundHelper || depth0.uri;
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "uri", { hash: {} }); }
+  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
+  else { stack1 = depth0.uri; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
   buffer += escapeExpression(stack1) + "\"\n			id=\"readium-flowing-content\">\n	</iframe>\n</div>";
   return buffer;});
 templates['scrolling_page_template'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers;
-  var buffer = "", stack1, foundHelper, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, foundHelper, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  buffer += "<div id=\"scrolling-content\" class=\"scrolling-page-wrap\">\n	<div class=\"scrolling-page-margin\">\n\n		<iframe scrolling=\"yes\" \n				frameborder=\"0\" \n				marginwidth=\"0\" \n				marginheight=\"0\" \n				width=\"100%\" \n				height=\"100%\" \n				src=\"";
+  buffer += "<div id=\"scrolling-content\" class=\"scrolling-page-wrap\">\n	<div class=\"scrolling-page-margin\">\n\n		<iframe scrolling=\"yes\" \n				frameborder=\"0\" \n				marginwidth=\"0\" \n				marginheight=\"0\" \n				width=\"100%\" \n				height=\"100%\" \n				title=\"";
+  stack1 = depth0.data;
+  stack1 = stack1 == null || stack1 === false ? stack1 : stack1.title;
+  stack1 = typeof stack1 === functionType ? stack1() : stack1;
+  buffer += escapeExpression(stack1) + "\"\n				src=\"";
   foundHelper = helpers.uri;
-  stack1 = foundHelper || depth0.uri;
-  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "uri", { hash: {} }); }
+  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
+  else { stack1 = depth0.uri; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
   buffer += escapeExpression(stack1) + "\"\n				class='content-sandbox'>\n		</iframe>\n	</div>\n</div>";
   return buffer;});
 })();

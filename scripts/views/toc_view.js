@@ -51,7 +51,7 @@ Readium.Views.NcxTocView = Readium.Views.TocViewBase.extend({
 		// Construct html for the navPoints in the document		
 		ol = this.addNavPointElements(this.model.get("navs"));
 
-		this.$('#toc-body').html("<h2>" + (this.model.get("title") || "Contents") + "</h2>")
+		this.$('#toc-body').html("<h2 tabindex='-1'>" + (this.model.get("title") || "Contents") + "</h2>")
 		this.$('#toc-body').append(ol);
 		this.$('#toc-body').append("<div id='toc-end-spacer'>");
 		return this;

@@ -30,6 +30,7 @@ Readium.Views.LibraryItemView = Backbone.View.extend({
 	initialize: function() {
 		_.bindAll(this, "render");	
 		this.template = Handlebars.templates.library_item_template;
+Acc.detailed.push('#details-modal-' + this.model.get('key'));
 	},
 
 	render: function() {
@@ -151,6 +152,16 @@ Readium.Views.ReadiumOptionsView = Backbone.View.extend({
 	initialize: function() {
 		this.model.on("change", this.render, this);
 		this.render();
+		$(this.el).on('shown', function(){
+			$('#options-heading').focus();
+			setTimeout( function() {
+				$('#options-btn').attr('aria-pressed', 'true');
+			}, 1);
+		}).on('hidden', function(){
+			setTimeout( function(){
+				$('#options-btn').attr('aria-pressed', 'false').focus();
+			}, 1);
+		});
 	},
 
 	render: function() {
