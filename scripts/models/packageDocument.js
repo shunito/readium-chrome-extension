@@ -171,7 +171,12 @@ Readium.Models.PackageDocument = Backbone.Model.extend({
 		var manifest = this.get("manifest");
 		var spine_id = this.get("metadata").ncx;
 		var item = manifest.find(function(item){ 
-			return item.get("properties") === "nav" 
+			if (item.get("properties").indexOf("nav") !== -1) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		});
 
 		if( item ) {
