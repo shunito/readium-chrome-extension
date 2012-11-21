@@ -217,13 +217,13 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         	elementLeft = Math.abs(elementLeft) < POSITION_ERROR_MARGIN ? 0 : elementLeft;
         	elementRight = Math.abs(elementRight - documentRight) < POSITION_ERROR_MARGIN ? documentRight : elementRight;
 
-        	// Heuristic to find a text node with actual text
+        	// Heuristics to find a text node with actual text
         	nodeText = this.nodeValue.replace(/\n/g, "");
         	nodeText = nodeText.replace(/ /g, "");
 
         	if (elementLeft <= documentRight 
         		&& elementRight >= documentLeft
-        		&& nodeText.length > 10) { // 10 is so the text node is actually a text node with writing
+        		&& nodeText.length > 10) { // 10 is so the text node is actually a text node with writing - probably
 
         		$firstVisibleTextNode = $(this);
 
@@ -249,10 +249,10 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var percentOfTextOffPage;
 		var characterOffset;
 
-		// Get parent
+		// Get parent; text nodes do not have visibility properties.
 		$parentNode = $textNode.parent();
 
-		// get document
+		// Get document
 		$document = $($("#readium-flowing-content").contents()[0].documentElement);
 
 		// Find percentage of visible node on page
@@ -262,16 +262,18 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		elementTop = $parentNode.offset().top;
 		elementBottom = elementTop + $parentNode.height();
 
-		// Element overlaps top
+		// Element overlaps top of the page
 		if (elementTop < documentTop) {
 
 			percentOfTextOffPage = Math.abs(elementTop - documentTop) / $parentNode.height();
 			characterOffsetByPercent = Math.ceil(percentOfTextOffPage * $textNode[0].length);
 			characterOffset = Math.ceil(0.5 * ($textNode[0].length - characterOffsetByPercent)) + characterOffsetByPercent;
 		}
+		// Element is full on the page
 		else if (elementTop >= documentTop && elementTop <= documentBottom) {
 			characterOffset = 1;
 		}
+		// Element overlaps bottom of the page
 		else if (elementTop < documentBottom) {
 			characterOffset = 1;
 		}
@@ -501,7 +503,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			return;
 		}
 
-		// Re-add the CFI for the marker on this page and shortcut the method
+		// Re-add the CFI for the marker on this page
 		// REFACTORING CANDIDATE: This shortcut makes this method confusing, it needs to be refactored for simplicity
 		if (lastPageMarkerExists) {
 
@@ -598,7 +600,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 				}
 
 				page = 1;
-
 			}
 			else {
 
