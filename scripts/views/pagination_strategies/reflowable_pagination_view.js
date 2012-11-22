@@ -84,6 +84,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Layout math
+	// Used: MediaOverlayController
     findVisiblePageElements: function() {
 
         var $elements = $(this.getBody()).find("[id]");
@@ -99,6 +100,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
     },
     
     // override
+    // Used: PaginationViewBase
 	indicateMoIsPlaying: function () {
 		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
 		moHelper.renderReflowableMoPlaying(
@@ -109,6 +111,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
     // override
+    // Used: PaginationViewBase
 	highlightText: function () {
 		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
 		moHelper.renderReflowableMoFragHighlight(
@@ -122,6 +125,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	//   the corresponding elem and setting the page number on `this.model`
 	//   as precondition the hash fragment should identify an element in the
 	//   section rendered by this view
+	// Used: epubController, reflowablePagination
 	goToHashFragment: function(hashFragmentId) {
 
 		// this method is triggered in response to 
@@ -169,6 +173,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	// TODO: Extend this to be correct for right-to-left pagination
 	// Mostly layout math
+	// Used: this
 	findVisibleTextNode: function () {
 
         var documentLeft = 0;
@@ -237,6 +242,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	// Currently for left-to-right pagination only
 	// Layout math
+	// Used: this
 	findVisibleCharacterOffset : function($textNode) {
 
 		var $parentNode;
@@ -283,6 +289,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	// returns all the elements in the set that are inside the box
 	// Layout math
+	// Used: this
     filterElementsByPosition: function($elements, documentTop, documentBottom, documentLeft, documentRight) {
         
         var $visibleElms = $elements.filter(function(idx) {
@@ -304,6 +311,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	//   the proper location in the epub spine, or opening
 	//   a new window for external links
 	// Stays here
+	// Used: PaginationViewBase
 	linkClickHandler: function (e) {
 		e.preventDefault();
 
@@ -333,6 +341,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	//   path, rather than to the package document. As such, URIs passed to Readium must be either absolute references or 
 	//   relative to the package document. This method resolves URIs to conform to this condition. 
 	// Stays here
+	// Used: this
 	resolveRelativeURI: function (rel_uri) {
 		var relativeURI = new URI(rel_uri);
 
@@ -343,6 +352,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Stays here
+	// Used: this
 	applyKeydownHandler : function () {
 
 		var that = this;
@@ -361,6 +371,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	// REFACTORING CANDIDATE: I think this is actually part of the public interface
 	// Move some of this to layout math
+	// Used: this
 	goToPage: function(page) {
         // check to make sure we're not already on that page
         if (this.model.get("current_page") != undefined && this.model.get("current_page").indexOf(page) != -1) {
@@ -378,6 +389,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Stays here
+	// Used: PaginationViewBase
 	setFontSize: function() {
 		var size = this.model.get("font_size") / 10;
 		$(this.getBody()).css("font-size", size + "em");
@@ -390,6 +402,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	// Description: we are using experimental styles so we need to 
 	//   use modernizr to generate prefixes
 	// Stays here
+	// Used: this
 	stashModernizrPrefixedProps: function() {
 		var cssIfy = function(str) {
 			return str.replace(/([A-Z])/g, function(str,m1){ 
@@ -409,6 +422,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Might be some layout logic
+	// Used: this
 	getBodyColumnCss: function() {
 		var css = {};
 		css[this.cssColumAxis] = "horizontal";
@@ -423,6 +437,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Layout logic
+	// Used: this
 	injectCFIElements : function () {
 
 		var that = this;
@@ -469,6 +484,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	// Save position in epub
 	// Refactor this, probably stays here
+	// Used: this
 	savePosition : function () {
 
 		var $visibleTextNode;
@@ -551,6 +567,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Layout logic
+	// Used: this
 	adjustIframeColumns: function() {
 		var prop_dir = this.offset_dir;
 		var $frame = this.$('#readium-flowing-content');
@@ -621,19 +638,23 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	// Description: helper method to get the a reference to the documentElement
 	// of the document in this strategy's iFrame.
 	// TODO: this is a bad name for this function
+	// Used: this, MediaOverlayViewHelper
 	getBody: function() {
 		return this.$('#readium-flowing-content').contents()[0].documentElement;
 	},
 
+	// Used: this
 	hideContent: function() {
 		$("#flowing-wrapper").css("opacity", "0");
 	},
 
+	// Used: this
 	showContent: function() {
 		$("#flowing-wrapper").css("opacity", "1");
 	},
 
 	// Layout logic 
+	// Used: this
 	calcPageOffset: function(page_num) {
 		return (page_num - 1) * (this.page_width + this.gap_width);
 	},
@@ -642,6 +663,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	// thus we cannot use relative size for the iframe and must set abs 
 	// pixel size
 	// Layout logic
+	// Used: this
 	setFrameSize: function() {
 		var width = this.getFrameWidth().toString() + "px";
 		var height = this.getFrameHeight().toString() + "px";
@@ -653,6 +675,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Layout logic
+	// Used: this
 	getFrameWidth: function() {
 		var width;
 		var margin = this.model.get("current_margin");
@@ -676,6 +699,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Layout logic
+	// Used: this
 	getFrameHeight: function() {
 		return $('#flowing-wrapper').height();
 	},
@@ -683,6 +707,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	// Description: calculate the number of pages in the current section,
 	//   based on section length : page size ratio
 	// Layout logic
+	// Used: this
 	calcNumPages: function() {
 
 		var body, offset, width, num;
@@ -714,6 +739,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Layout math
+	// Used: this, MediaOverlayController
     getElemPageNumber: function(elem) {
 		
 		var $elem;
@@ -775,6 +801,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 	// REFACTORING CANDIDATE: This might be part of the public interface
 	// Layout math
+	// Used: this, mediaOverlayController
 	getElemPageNumberById: function(elemId) {
         var doc = $("#readium-flowing-content").contents()[0].documentElement;
         var elem = $(doc).find("#" + elemId);
@@ -787,6 +814,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
     },
 
     // Stays here although it needs to be refactored
+    // Used: this
 	pageChangeHandler: function() {
         var that = this;
 		this.hideContent();
@@ -839,6 +867,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Stays here 
+	// Used: this
 	windowSizeChangeHandler: function() {
 		this.adjustIframeColumns();
 		
@@ -847,6 +876,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
     
     // Stays here
+    // Used: this
 	marginCallback: function() {
 		this.adjustIframeColumns();
 	},
@@ -887,6 +917,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Layout logic
+	// Used: this
 	injectTheme: function() {
 		var theme = this.model.get("current_theme");
 		if(theme === "default") theme = "default-theme";
@@ -907,6 +938,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// Layout logic
+	// Used: this
 	setNumPages: function() {
 		var num = this.calcNumPages();
 		this.pages.set("num_pages", num);

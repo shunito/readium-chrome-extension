@@ -31,6 +31,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.bindingTemplate = Handlebars.templates.binding_template;
 	},
 
+	// Used: reflowable, fixed, scrolling
     iframeLoadCallback: function(e) {
 		
 		this.applyBindings( $(e.srcElement).contents() );
@@ -45,7 +46,8 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	},
 	
     // Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
-    //   only the day-night alternate tags are available as an option. 
+    //   only the day-night alternate tags are available as an option.  
+    // Used: Reflowable
 	activateEPubStyle: function(bookDom) {
 
 	    var selector;
@@ -68,6 +70,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	// REFACTORING CANDIDATE: This method could use a better name. The purpose of this method is to make one or two 
 	//   pages of an epub visible. "setUpMode" seems non-specific. 
 	// Description: Changes the html to make either 1 or 2 pages visible in their iframes
+	// Used: fixed, reflowable
 	setUpMode: function() {
 		var two_up = this.model.get("two_up");
 		this.$el.toggleClass("two-up", two_up);
@@ -76,6 +79,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 	// Description: Iterates through the list of rendered pages and displays those that 
 	//   should be visible in the viewer.
+	// Used: this, fixed
 	showCurrentPages: function() {
 		var that = this;
 		var two_up = this.model.get("two_up");
@@ -102,6 +106,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		this.resetEl();
 	},
 
+	// Used: this
 	getBindings: function() {
 		var packDoc = this.model.epub.getPackageDocument();
 		var bindings = packDoc.get('bindings');
@@ -113,6 +118,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		})
 	},
 
+	// Used: this
 	applyBindings: function(dom) {
 		var that = this;
 		var bindings = this.getBindings();
@@ -134,6 +140,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
 	},
 
+	// Used: this
 	applyTriggers: function(dom, triggers) {
 		for(var i = 0 ; i < triggers.length; i++) {
 			triggers[i].subscribe(dom);
@@ -142,6 +149,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 	// Description: For reflowable content we only add what is in the body tag.
 	// Lots of times the triggers are in the head of the dom
+	// Used: this
 	parseTriggers: function(dom) {
 		var triggers = [];
 		$('trigger', dom).each(function() {
@@ -155,6 +163,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 
 	// Description: Parse the epub "switch" tags and hide
 	// cases that are not supported
+	// Used: this
 	applySwitches: function(dom) {
 
 		// helper method, returns true if a given case node
@@ -196,6 +205,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		})
 	},
 
+	// Used: this
 	addSwipeHandlers: function(dom) {
 		var that = this;
 		$(dom).on("swipeleft", function(e) {
@@ -211,6 +221,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	},
 
 	// inject mathML parsing code into an iframe
+	// Used: this
     injectMathJax: function (iframe) {
     	var doc, script, head;
 		doc = iframe.contentDocument;
@@ -225,6 +236,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 		}
     },
 
+    // Used: this
     injectLinkHandler: function(iframe) {
     	var that = this;
     	$('a', iframe.contentDocument).click(function(e) {
@@ -232,6 +244,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
     	});
     },
 
+    // Used: this
     resetEl: function() {
     	$('body').removeClass("apple-fixed-layout");
     	$("#readium-book-view-el").attr("style", "");

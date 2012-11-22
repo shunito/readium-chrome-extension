@@ -45,7 +45,7 @@ Readium.Models.PaginationStrategySelector = Backbone.Model.extend({
 		// A scrolling epub
 		else if (this.shouldScroll()) {
 
-				this.v = new Readium.Views.ScrollingPaginationView({model: book, zoomer: this.zoomer});
+			this.v = new Readium.Views.ScrollingPaginationView({model: book, zoomer: this.zoomer});
 		}
 		// A reflowable epub
 		else {
