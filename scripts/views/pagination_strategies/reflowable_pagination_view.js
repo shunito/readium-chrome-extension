@@ -41,7 +41,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
         this.mediaOverlayController.on("change:active_mo", this.indicateMoIsPlaying, this);
 		this.model.on("change:toc_visible", this.windowSizeChangeHandler, this);
 		this.model.on("repagination_event", this.windowSizeChangeHandler, this);
-		this.model.on("change:current_theme", this.injectTheme, this);
+		this.model.on("change:current_theme", this.injectThemeHandler, this);
 		this.model.on("change:two_up", this.handleSetUpMode, this);
 		this.model.on("change:two_up", this.adjustIframeColumns, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
@@ -51,6 +51,11 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	handleSetUpMode : function () {
 
 		this.reflowableLayout.setUpMode(this.el, this.model.get("two_up"));
+	},
+
+	injectThemeHandler : function () {
+
+		this.reflowableLayout.injectTheme(this.model.get("current_theme"), this.getBody());
 	},
 
 	render: function(goToLastPage, hashFragmentId) {
@@ -78,7 +83,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 				that );
 			that.mediaOverlayController.pagesLoaded();
 			that.setFontSize();
-			that.injectTheme();
+			that.reflowableLayout.injectTheme(that.model.get("current_theme"), that.getBody());
 			that.pages.set("num_pages", that.reflowableLayout.calcNumPages(that.getBody(), that.model.get("two_up")));
 			that.applyKeydownHandler();
 
@@ -878,63 +883,5 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
     // Used: this
 	marginCallback: function() {
 		this.adjustIframeColumns();
-	},
-
-	// Rationale: sadly this is just a reprint of what is already in the
-	//   themes stylesheet. It isn't very DRY but the implementation is
-	//   cleaner this way
-	themes: {
-		"default-theme": {
-			"background-color": "white",
-			"color": "black",
-			"mo-color": "#777"
-		},
-
-		"vancouver-theme": {
-			"background-color": "#DDD",
-			"color": "#576b96",
-			"mo-color": "#777"
-		},
-
-		"ballard-theme": {
-			"background-color": "#576b96",
-			"color": "#DDD",
-			"mo-color": "#888"
-		},
-
-		"parchment-theme": {
-			"background-color": "#f7f1cf",
-			"color": "#774c27",
-			"mo-color": "#eebb22"
-		},
-
-		"night-theme": {
-			"background-color": "#141414",
-			"color": "white",
-			"mo-color": "#666"
-		}
-	},
-
-	// Layout logic
-	// Used: this
-	injectTheme: function() {
-		var theme = this.model.get("current_theme");
-		if(theme === "default") theme = "default-theme";
-		$(this.getBody()).css({
-			"color": this.themes[theme]["color"],
-			"background-color": this.themes[theme]["background-color"]
-		});
-		
-		// stop flicker due to application for alternate style sheets
-		// just set content to be invisible
-		$("#flowing-wrapper").css("visibility", "hidden");
-		this.reflowableLayout.activateEPubStyle(this.getBody(), this.model.get("current_theme"));
-
-		// wait for new stylesheets to parse before setting back to visible
-		setTimeout(function() {
-			$("#flowing-wrapper").css("visibility", "visible");	
-		}, 100);
-	},
-
-	
+	}
 });
