@@ -1,5 +1,7 @@
 
-Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend({
+Readium.Views.ReflowablePaginationView = Backbone.View.extend({
+
+	el: "#readium-book-view-el",
 
 	// ------------------------------------------------------------------------------------ //
 	//  "PUBLIC" METHODS (THE API)                                                          //
@@ -8,9 +10,16 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	initialize: function(options) {
 
 		var that = this;
+		this.reflowableLayout = new Readium.Views.ReflowableLayout();
 
-		// call the super ctor
-		Readium.Views.PaginationViewBase.prototype.initialize.call(this, options);
+		// --- START from base
+		this.zoomer = options.zoomer;
+        this.pages = new Readium.Models.ReadiumPagination({model : this.model});
+        this.mediaOverlayController = this.model.get("media_overlay_controller");
+        this.mediaOverlayController.setPages(this.pages);
+        this.mediaOverlayController.setView(this);
+
+        this.bindingTemplate = Handlebars.templates.binding_template;
 		this.page_template = Handlebars.templates.reflowing_template;
 
 		// make sure we have proper vendor prefixed props for when we need them
@@ -25,14 +34,23 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			this.offset_dir = "left";
 		}
 
+		this.model.on("change:font_size", this.setFontSize, this);
+		this.model.on("change:two_up", this.pages.toggleTwoUp, this.pages);
 		this.pages.on("change:current_page", this.pageChangeHandler, this);
+		this.mediaOverlayController.on("change:mo_text_id", this.highlightText, this);
+        this.mediaOverlayController.on("change:active_mo", this.indicateMoIsPlaying, this);
 		this.model.on("change:toc_visible", this.windowSizeChangeHandler, this);
 		this.model.on("repagination_event", this.windowSizeChangeHandler, this);
 		this.model.on("change:current_theme", this.injectTheme, this);
-		this.model.on("change:two_up", this.setUpMode, this);
+		this.model.on("change:two_up", this.handleSetUpMode, this);
 		this.model.on("change:two_up", this.adjustIframeColumns, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
 		this.model.on("save_position", this.savePosition, this);
+	},
+
+	handleSetUpMode : function () {
+
+		this.reflowableLayout.setUpMode(this.el, this.model.get("two_up"));
 	},
 
 	render: function(goToLastPage, hashFragmentId) {
@@ -40,7 +58,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		var json = this.model.getCurrentSection().toJSON();
 
 		// make everything invisible to prevent flicker
-		this.setUpMode();
+		this.reflowableLayout.setUpMode(this.el, this.model.get("two_up"));
 		this.$('#container').html( this.page_template(json) );
 		
 		this.$('#readium-flowing-content').on("load", function(e) {
@@ -49,7 +67,16 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 			var lastPageElementId = that.injectCFIElements();
 			that.adjustIframeColumns();
-			that.iframeLoadCallback(e);
+			that.reflowableLayout.iframeLoadCallback(
+				e, 
+				this, 
+				that.model.epub.getPackageDocument(),
+				that.bindingTemplate,
+				that.pages.goLeft,
+				that.pages.goRight,
+				that.linkClickHandler,
+				that );
+			that.mediaOverlayController.pagesLoaded();
 			that.setFontSize();
 			that.injectTheme();
 			that.setNumPages();
@@ -167,8 +194,17 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.model.off("change:two_up", this.setUpMode);
 		this.model.off("change:two_up", this.adjustIframeColumns);
 		this.model.off("change:current_margin", this.marginCallback);
+		
 		// call the super destructor
-		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
+		//Readium.Views.PaginationViewBase.prototype.destruct.call(this);
+
+		// START - from base
+		this.pages.off("change:current_page", this.showCurrentPages);
+        this.model.off("change:font_size", this.setFontSize);
+        this.mediaOverlayController.off("change:mo_text_id", this.highlightText);
+        this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying);
+        this.reflowableLayout.resetEl(document, this, this.zoomer);
+        // END - From base
 	},
 
 	// TODO: Extend this to be correct for right-to-left pagination
@@ -929,7 +965,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// stop flicker due to application for alternate style sheets
 		// just set content to be invisible
 		$("#flowing-wrapper").css("visibility", "hidden");
-		this.activateEPubStyle(this.getBody());
+		this.reflowableLayout.activateEPubStyle(this.getBody(), this.model.get("current_theme"));
 
 		// wait for new stylesheets to parse before setting back to visible
 		setTimeout(function() {
