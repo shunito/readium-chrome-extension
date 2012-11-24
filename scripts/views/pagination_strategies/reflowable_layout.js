@@ -120,14 +120,25 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         return this.calcNumPages(body, isTwoUp);
     },
 
-    // setFontSize: function() {
-    //     var size = this.model.get("font_size") / 10;
-    //     $(this.getBody()).css("font-size", size + "em");
+    // Description: we are using experimental styles so we need to 
+    //   use modernizr to generate prefixes
+    stashModernizrPrefixedProps: function(view) {
+        var cssIfy = function(str) {
+            return str.replace(/([A-Z])/g, function(str,m1){ 
+                return '-' + m1.toLowerCase(); 
+            }).replace(/^ms-/,'-ms-');
+        };
 
-    //     // the content size has changed so recalc the number of 
-    //     // pages
-    //     this.pages.set("num_pages", this.reflowableLayout.calcNumPages(this.getBody(), this.model.get("two_up")));
-    // },
+        // ask modernizr for the vendor prefixed version
+        view.columAxis =  Modernizr.prefixed('columnAxis') || 'columnAxis';
+        view.columGap =  Modernizr.prefixed('columnGap') || 'columnGap';
+        view.columWidth =  Modernizr.prefixed('columnWidth') || 'columnWidth';
+
+        // we are interested in the css prefixed version
+        view.cssColumAxis =  cssIfy(view.columAxis);
+        view.cssColumGap =  cssIfy(view.columGap);
+        view.cssColumWidth =  cssIfy(view.columWidth);
+    },
 
     // Description: calculate the number of pages in the current section,
     //   based on section length : page size ratio

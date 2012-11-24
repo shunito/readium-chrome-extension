@@ -23,7 +23,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.page_template = Handlebars.templates.reflowing_template;
 
 		// make sure we have proper vendor prefixed props for when we need them
-		this.stashModernizrPrefixedProps();
+		this.reflowableLayout.stashModernizrPrefixedProps(this);
 
 		// if this book does right to left pagination we need to set the
 		// offset on the right
@@ -428,28 +428,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
                 // when we change the page, we have to tell MO to update its position
                 this.mediaOverlayController.reflowPageChanged();
         }
-	},
-
-	// Description: we are using experimental styles so we need to 
-	//   use modernizr to generate prefixes
-	// Move this to layout logic
-	// Used: this
-	stashModernizrPrefixedProps: function() {
-		var cssIfy = function(str) {
-			return str.replace(/([A-Z])/g, function(str,m1){ 
-				return '-' + m1.toLowerCase(); 
-			}).replace(/^ms-/,'-ms-');
-		};
-
-		// ask modernizr for the vendor prefixed version
-		this.columAxis =  Modernizr.prefixed('columnAxis') || 'columnAxis';
-		this.columGap =  Modernizr.prefixed('columnGap') || 'columnGap';
-		this.columWidth =  Modernizr.prefixed('columnWidth') || 'columnWidth';
-
-		// we are interested in the css prefixed version
-		this.cssColumAxis =  cssIfy(this.columAxis);
-		this.cssColumGap =  cssIfy(this.columGap);
-		this.cssColumWidth =  cssIfy(this.columWidth);
 	},
 
 	// Might be some layout logic
