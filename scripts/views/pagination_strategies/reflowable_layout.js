@@ -54,6 +54,38 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
     //  "PRIVATE" HELPERS                                                                   //
     // ------------------------------------------------------------------------------------ //
 
+    // Description: calculate the number of pages in the current section,
+    //   based on section length : page size ratio
+    calcNumPages: function(iframe, isTwoUp) {
+
+        var body, offset, width, num;
+        
+        // get a reference to the dom body
+        body = iframe;
+
+        // cache the current offset 
+        offset = body.style[this.offset_dir];
+
+        // set the offset to 0 so that all overflow is part of
+        // the scroll width
+        body.style[this.offset_dir] = "0px";
+
+        // grab the scrollwidth => total content width
+        width = iframe.scrollWidth;
+
+        // reset the offset to its original value
+        body.style[this.offset_dir] = offset;
+
+        // perform calculation and return result...
+        num = Math.floor( (width + this.gap_width) / (this.gap_width + this.page_width) );
+
+        // in two up mode, always set to an even number of pages
+        if( num % 2 === 0 && isTwoUp) {
+            //num += 1;
+        }
+        return num;
+    },
+
     getBindings: function(packageDocument) {
         var packDoc = packageDocument;
         var bindings = packDoc.get('bindings');

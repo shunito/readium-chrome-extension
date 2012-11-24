@@ -79,7 +79,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			that.mediaOverlayController.pagesLoaded();
 			that.setFontSize();
 			that.injectTheme();
-			that.setNumPages();
+			that.pages.set("num_pages", that.reflowableLayout.calcNumPages(that.getBody(), that.model.get("two_up")));
 			that.applyKeydownHandler();
 
 			// Rationale: The assumption here is that if a hash fragment is specified, it is the result of Readium 
@@ -194,17 +194,11 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.model.off("change:two_up", this.setUpMode);
 		this.model.off("change:two_up", this.adjustIframeColumns);
 		this.model.off("change:current_margin", this.marginCallback);
-		
-		// call the super destructor
-		//Readium.Views.PaginationViewBase.prototype.destruct.call(this);
-
-		// START - from base
 		this.pages.off("change:current_page", this.showCurrentPages);
         this.model.off("change:font_size", this.setFontSize);
         this.mediaOverlayController.off("change:mo_text_id", this.highlightText);
         this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying);
         this.reflowableLayout.resetEl(document, this, this.zoomer);
-        // END - From base
 	},
 
 	// TODO: Extend this to be correct for right-to-left pagination
@@ -376,7 +370,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	//   valid XHTML for a link to another resource in the EPUB to be specfied relative to the current document's
 	//   path, rather than to the package document. As such, URIs passed to Readium must be either absolute references or 
 	//   relative to the package document. This method resolves URIs to conform to this condition. 
-	// Stays here
+	// REFACTORING CANDIDATE: This could be moved into some sort of utility method uri resolution
 	// Used: this
 	resolveRelativeURI: function (rel_uri) {
 		var relativeURI = new URI(rel_uri);
@@ -389,6 +383,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 	// Stays here
 	// Used: this
+	// REFACTORING CANDIDATE: No need to make that call through the epubController
 	applyKeydownHandler : function () {
 
 		var that = this;
@@ -432,12 +427,12 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 		// the content size has changed so recalc the number of 
 		// pages
-		this.setNumPages();
+		this.pages.set("num_pages", this.reflowableLayout.calcNumPages(this.getBody(), this.model.get("two_up")));
 	},
 
 	// Description: we are using experimental styles so we need to 
 	//   use modernizr to generate prefixes
-	// Stays here
+	// Move this to layout logic
 	// Used: this
 	stashModernizrPrefixedProps: function() {
 		var cssIfy = function(str) {
@@ -519,7 +514,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	},
 
 	// Save position in epub
-	// Refactor this, probably stays here
+	// Refactor this, probably stays here, although much else will move into finding visible elements
 	// Used: this
 	savePosition : function () {
 
@@ -666,7 +661,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			page = this.pages.get("current_page")[0];
 		}
 
-		this.setNumPages();
+		this.pages.set("num_pages", this.reflowableLayout.calcNumPages(this.getBody(), this.model.get("two_up")));
 		this.goToPage(page);
 	},
 
@@ -740,39 +735,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		return $('#flowing-wrapper').height();
 	},
 
-	// Description: calculate the number of pages in the current section,
-	//   based on section length : page size ratio
-	// Layout logic
-	// Used: this
-	calcNumPages: function() {
-
-		var body, offset, width, num;
-		
-		// get a reference to the dom body
-		body = this.getBody();
-
-		// cache the current offset 
-		offset = body.style[this.offset_dir];
-
-		// set the offset to 0 so that all overflow is part of
-		// the scroll width
-		body.style[this.offset_dir] = "0px";
-
-		// grab the scrollwidth => total content width
-		width = this.getBody().scrollWidth;
-
-		// reset the offset to its original value
-		body.style[this.offset_dir] = offset;
-
-		// perform calculation and return result...
-		num = Math.floor( (width + this.gap_width) / (this.gap_width + this.page_width) );
-
-		// in two up mode, always set to an even number of pages
-		if( num % 2 === 0 && this.model.get("two_up")) {
-			//num += 1;
-		}
-		return num;
-	},
+	
 
 	// Layout math
 	// Used: this, MediaOverlayController
@@ -973,10 +936,5 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		}, 100);
 	},
 
-	// Layout logic
-	// Used: this
-	setNumPages: function() {
-		var num = this.calcNumPages();
-		this.pages.set("num_pages", num);
-	}
+	
 });
