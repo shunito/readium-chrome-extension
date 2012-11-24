@@ -34,7 +34,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			this.offset_dir = "left";
 		}
 
-		this.model.on("change:font_size", this.setFontSize, this);
+		this.model.on("change:font_size", this.setFontSizeHandler, this);
 		this.model.on("change:two_up", this.pages.toggleTwoUp, this.pages);
 		this.pages.on("change:current_page", this.pageChangeHandler, this);
 		this.mediaOverlayController.on("change:mo_text_id", this.highlightText, this);
@@ -56,6 +56,12 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	injectThemeHandler : function () {
 
 		this.reflowableLayout.injectTheme(this.model.get("current_theme"), this.getBody());
+	},
+
+	setFontSizeHandler : function () {
+
+		var numPages = this.reflowableLayout.setFontSize(this.model.get("font_size"), this.getBody(), this.model.get("two_up"));
+		this.pages.set("num_pages", numPages);
 	},
 
 	render: function(goToLastPage, hashFragmentId) {
@@ -82,7 +88,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 				that.linkClickHandler,
 				that );
 			that.mediaOverlayController.pagesLoaded();
-			that.setFontSize();
+			that.reflowableLayout.setFontSize(that.model.get("font_size"), that.getBody(), that.model.get("two_up"));
 			that.reflowableLayout.injectTheme(that.model.get("current_theme"), that.getBody());
 			that.pages.set("num_pages", that.reflowableLayout.calcNumPages(that.getBody(), that.model.get("two_up")));
 			that.applyKeydownHandler();
@@ -200,7 +206,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.model.off("change:two_up", this.adjustIframeColumns);
 		this.model.off("change:current_margin", this.marginCallback);
 		this.pages.off("change:current_page", this.showCurrentPages);
-        this.model.off("change:font_size", this.setFontSize);
+        this.model.off("change:font_size", this.setFontSizeHandler);
         this.mediaOverlayController.off("change:mo_text_id", this.highlightText);
         this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying);
         this.reflowableLayout.resetEl(document, this, this.zoomer);
@@ -422,17 +428,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
                 // when we change the page, we have to tell MO to update its position
                 this.mediaOverlayController.reflowPageChanged();
         }
-	},
-
-	// Stays here
-	// Used: PaginationViewBase
-	setFontSize: function() {
-		var size = this.model.get("font_size") / 10;
-		$(this.getBody()).css("font-size", size + "em");
-
-		// the content size has changed so recalc the number of 
-		// pages
-		this.pages.set("num_pages", this.reflowableLayout.calcNumPages(this.getBody(), this.model.get("two_up")));
 	},
 
 	// Description: we are using experimental styles so we need to 

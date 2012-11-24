@@ -110,23 +110,23 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
             "mo-color": "#666"
         }
     },
-    // injectTheme: function() {
-    //     var theme = this.model.get("current_theme");
-    //     if(theme === "default") theme = "default-theme";
-    //     $(this.getBody()).css({
-    //         "color": this.themes[theme]["color"],
-    //         "background-color": this.themes[theme]["background-color"]
-    //     });
-        
-    //     // stop flicker due to application for alternate style sheets
-    //     // just set content to be invisible
-    //     $("#flowing-wrapper").css("visibility", "hidden");
-    //     this.reflowableLayout.activateEPubStyle(this.getBody(), this.model.get("current_theme"));
 
-    //     // wait for new stylesheets to parse before setting back to visible
-    //     setTimeout(function() {
-    //         $("#flowing-wrapper").css("visibility", "visible"); 
-    //     }, 100);
+    setFontSize: function(fontSize, body, isTwoUp) {
+        var size = fontSize / 10;
+        $(body).css("font-size", size + "em");
+
+        // the content size has changed so recalc the number of 
+        // pages
+        return this.calcNumPages(body, isTwoUp);
+    },
+
+    // setFontSize: function() {
+    //     var size = this.model.get("font_size") / 10;
+    //     $(this.getBody()).css("font-size", size + "em");
+
+    //     // the content size has changed so recalc the number of 
+    //     // pages
+    //     this.pages.set("num_pages", this.reflowableLayout.calcNumPages(this.getBody(), this.model.get("two_up")));
     // },
 
     // Description: calculate the number of pages in the current section,
