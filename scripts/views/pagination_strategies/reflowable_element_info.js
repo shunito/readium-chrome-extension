@@ -7,8 +7,138 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
     //  "PUBLIC" METHODS (THE API)                                                          //
     // ------------------------------------------------------------------------------------ //
 
-    // Layout math
-    // Used: MediaOverlayController
+    // TODO: Extend this to be correct for right-to-left pagination
+    findVisibleTextNode: function (body, viewDocument, isTwoUp) {
+
+        var documentLeft = 0;
+        var documentRight;
+        var columnGap;
+        var columnWidth;
+        var doc;
+        var $elements;
+        var $firstVisibleTextNode;
+
+        // Rationale: The intention here is to get a list of all the text nodes in the document, after which we'll
+        //   reduce this to the subset of text nodes that is visible on the page. We'll then select one text node
+        //   for which we can create a character offset CFI. This CFI will then refer to a "last position" in the 
+        //   EPUB, which can be used if the reader re-opens the EPUB.
+        // REFACTORING CANDIDATE: The "audiError" check is a total hack to solve a problem for a particular epub. This 
+        //   issue needs to be addressed.
+        $elements = $("body", body).find(":not(iframe)").contents().filter(function () {
+            if (this.nodeType === 3 && !$(this).parent().hasClass("audiError")) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        doc = $("#readium-flowing-content", viewDocument).contents()[0].documentElement;
+
+        if (isTwoUp) {
+            columnGap = parseInt($(doc).css("-webkit-column-gap").replace("px",""));
+            columnWidth = parseInt($(doc).css("-webkit-column-width").replace("px",""));
+            documentRight = documentLeft + columnGap + (columnWidth * 2);
+        } 
+        else {
+            documentRight = documentLeft + $(doc).width();
+        }
+
+        // Find the first visible text node 
+        $.each($elements, function() {
+
+            var POSITION_ERROR_MARGIN = 5;
+            var $textNodeParent = $(this).parent();
+            var elementLeft = $textNodeParent.position().left;
+            var elementRight = elementLeft + $textNodeParent.width();
+            var nodeText;
+
+            // Correct for minor right and left position errors
+            elementLeft = Math.abs(elementLeft) < POSITION_ERROR_MARGIN ? 0 : elementLeft;
+            elementRight = Math.abs(elementRight - documentRight) < POSITION_ERROR_MARGIN ? documentRight : elementRight;
+
+            // Heuristics to find a text node with actual text
+            nodeText = this.nodeValue.replace(/\n/g, "");
+            nodeText = nodeText.replace(/ /g, "");
+
+            if (elementLeft <= documentRight 
+                && elementRight >= documentLeft
+                && nodeText.length > 10) { // 10 is so the text node is actually a text node with writing - probably
+
+                $firstVisibleTextNode = $(this);
+
+                // Break the loop
+                return false;
+            }
+        });
+
+        return $firstVisibleTextNode;
+    },
+    // findVisibleTextNode: function () {
+
+    //     var documentLeft = 0;
+    //     var documentRight;
+    //     var columnGap;
+    //     var columnWidth;
+    //     var doc;
+    //     var $elements;
+    //     var $firstVisibleTextNode;
+
+    //     // Rationale: The intention here is to get a list of all the text nodes in the document, after which we'll
+    //     //   reduce this to the subset of text nodes that is visible on the page. We'll then select one text node
+    //     //   for which we can create a character offset CFI. This CFI will then refer to a "last position" in the 
+    //     //   EPUB, which can be used if the reader re-opens the EPUB.
+    //     // REFACTORING CANDIDATE: The "audiError" check is a total hack to solve a problem for a particular epub. This 
+    //     //   issue needs to be addressed.
+    //     $elements = $("body", this.getBody()).find(":not(iframe)").contents().filter(function () {
+    //         if (this.nodeType === 3 && !$(this).parent().hasClass("audiError")) {
+    //             return true;
+    //         } else {
+    //             return false;
+    //         }
+    //     });
+
+    //     doc = $("#readium-flowing-content").contents()[0].documentElement;
+
+    //     if (this.model.get("two_up")) {
+    //         columnGap = parseInt($(doc).css("-webkit-column-gap").replace("px",""));
+    //         columnWidth = parseInt($(doc).css("-webkit-column-width").replace("px",""));
+    //         documentRight = documentLeft + columnGap + (columnWidth * 2);
+    //     } 
+    //     else {
+    //         documentRight = documentLeft + $(doc).width();
+    //     }
+
+    //     // Find the first visible text node 
+    //     $.each($elements, function() {
+
+    //         var POSITION_ERROR_MARGIN = 5;
+    //         var $textNodeParent = $(this).parent();
+    //         var elementLeft = $textNodeParent.position().left;
+    //         var elementRight = elementLeft + $textNodeParent.width();
+    //         var nodeText;
+
+    //         // Correct for minor right and left position errors
+    //         elementLeft = Math.abs(elementLeft) < POSITION_ERROR_MARGIN ? 0 : elementLeft;
+    //         elementRight = Math.abs(elementRight - documentRight) < POSITION_ERROR_MARGIN ? documentRight : elementRight;
+
+    //         // Heuristics to find a text node with actual text
+    //         nodeText = this.nodeValue.replace(/\n/g, "");
+    //         nodeText = nodeText.replace(/ /g, "");
+
+    //         if (elementLeft <= documentRight 
+    //             && elementRight >= documentLeft
+    //             && nodeText.length > 10) { // 10 is so the text node is actually a text node with writing - probably
+
+    //             $firstVisibleTextNode = $(this);
+
+    //             // Break the loop
+    //             return false;
+    //         }
+    //     });
+
+    //     return $firstVisibleTextNode;
+    // },
+
     findVisiblePageElements: function(view, body, document) {
 
         var $elements = $(body).find("[id]");
@@ -22,23 +152,8 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
             
         return visibleElms;
     },
-    // findVisiblePageElements: function() {
-
-    //     var $elements = $(this.getBody()).find("[id]");
-    //     var doc = $("#readium-flowing-content").contents()[0].documentElement;
-    //     var doc_top = 0;
-    //     var doc_left = 0;
-    //     var doc_right = doc_left + $(doc).width();
-    //     var doc_bottom = doc_top + $(doc).height();
-        
-    //     var visibleElms = this.filterElementsByPosition($elements, doc_top, doc_bottom, doc_left, doc_right);
-            
-    //     return visibleElms;
-    // },
 
     // returns all the elements in the set that are inside the box
-    // Layout math
-    // Used: this
     filterElementsByPosition: function(view, $elements, documentTop, documentBottom, documentLeft, documentRight) {
         
         var $visibleElms = $elements.filter(function(idx) {
@@ -55,22 +170,8 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
 
         return $visibleElms;
     },
-    // filterElementsByPosition: function($elements, documentTop, documentBottom, documentLeft, documentRight) {
-        
-    //     var $visibleElms = $elements.filter(function(idx) {
-    //         var elm_top = $(this).offset().top;
-    //         var elm_left = $(this).offset().left;
-    //         var elm_right = elm_left + $(this).width();
-    //         var elm_bottom = elm_top + $(this).height();
-            
-    //         var is_ok_x = elm_left >= documentLeft && elm_right <= documentRight;
-    //         var is_ok_y = elm_top >= documentTop && elm_bottom <= documentBottom;
-            
-    //         return is_ok_x && is_ok_y;
-    //     });  
 
-    //     return $visibleElms;
-    // },
+
 
     // ------------------------------------------------------------------------------------ //
     //  "PRIVATE" HELPERS                                                                   //

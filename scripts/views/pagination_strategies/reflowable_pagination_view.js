@@ -229,74 +229,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
         this.reflowableLayout.resetEl(document, this, this.zoomer);
 	},
 
-	// TODO: Extend this to be correct for right-to-left pagination
-	// Mostly layout math
-	// Used: this
-	findVisibleTextNode: function () {
-
-        var documentLeft = 0;
-        var documentRight;
-        var columnGap;
-        var columnWidth;
-        var doc;
-        var $elements;
-        var $firstVisibleTextNode;
-
-		// Rationale: The intention here is to get a list of all the text nodes in the document, after which we'll
-		//   reduce this to the subset of text nodes that is visible on the page. We'll then select one text node
-		//   for which we can create a character offset CFI. This CFI will then refer to a "last position" in the 
-		//   EPUB, which can be used if the reader re-opens the EPUB.
-		// REFACTORING CANDIDATE: The "audiError" check is a total hack to solve a problem for a particular epub. This 
-		//   issue needs to be addressed.
-		$elements = $("body", this.getBody()).find(":not(iframe)").contents().filter(function () {
-			if (this.nodeType === 3 && !$(this).parent().hasClass("audiError")) {
-				return true;
-			} else {
-				return false;
-			}
-		});
-
-        doc = $("#readium-flowing-content").contents()[0].documentElement;
-
-        if (this.model.get("two_up")) {
-        	columnGap = parseInt($(doc).css("-webkit-column-gap").replace("px",""));
-        	columnWidth = parseInt($(doc).css("-webkit-column-width").replace("px",""));
-        	documentRight = documentLeft + columnGap + (columnWidth * 2);
-        } 
-        else {
-        	documentRight = documentLeft + $(doc).width();
-        }
-
-        // Find the first visible text node 
-        $.each($elements, function() {
-
-        	var POSITION_ERROR_MARGIN = 5;
-        	var $textNodeParent = $(this).parent();
-        	var elementLeft = $textNodeParent.position().left;
-        	var elementRight = elementLeft + $textNodeParent.width();
-        	var nodeText;
-
-        	// Correct for minor right and left position errors
-        	elementLeft = Math.abs(elementLeft) < POSITION_ERROR_MARGIN ? 0 : elementLeft;
-        	elementRight = Math.abs(elementRight - documentRight) < POSITION_ERROR_MARGIN ? documentRight : elementRight;
-
-        	// Heuristics to find a text node with actual text
-        	nodeText = this.nodeValue.replace(/\n/g, "");
-        	nodeText = nodeText.replace(/ /g, "");
-
-        	if (elementLeft <= documentRight 
-        		&& elementRight >= documentLeft
-        		&& nodeText.length > 10) { // 10 is so the text node is actually a text node with writing - probably
-
-        		$firstVisibleTextNode = $(this);
-
-        		// Break the loop
-        		return false;
-        	}
-        });
-
-        return $firstVisibleTextNode;
-	},
+	
 
 	// Currently for left-to-right pagination only
 	// Layout math
@@ -443,7 +376,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		var generatedCFI;
 
 		// Get first visible element with a text node 
-		$visibleTextNode = this.findVisibleTextNode();
+		$visibleTextNode = this.reflowableElementsInfo.findVisibleTextNode(this.getBody(), document, this.model.get("two_up"));
 
 		// Check if a last page marker already exists on this page
 		try {
