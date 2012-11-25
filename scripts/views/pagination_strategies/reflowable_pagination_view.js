@@ -42,7 +42,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.model.on("change:toc_visible", this.windowSizeChangeHandler, this);
 		this.model.on("repagination_event", this.windowSizeChangeHandler, this);
 		this.model.on("change:current_theme", this.injectThemeHandler, this);
-		this.model.on("change:two_up", this.handleSetUpMode, this);
+		this.model.on("change:two_up", this.setUpModeHandler, this);
 		this.model.on("change:two_up", this.adjustIframeColumnsHandler, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
 		this.model.on("save_position", this.savePosition, this);
@@ -65,7 +65,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.goToPage(pageInfo[1]);
 	},
 
-	handleSetUpMode : function () {
+	setUpModeHandler : function () {
 
 		this.reflowableLayout.setUpMode(this.el, this.model.get("two_up"));
 	},
@@ -93,7 +93,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			// Important: Firefox doesn't recognize e.srcElement, so this needs to be checked for whenever it's required.
 			if (!e.srcElement) e.srcElement = this;
 
-			var lastPageElementId = that.injectCFIElements();
+			var lastPageElementId = that.reflowableLayout.injectCFIElements(document, that.model.get("epubCFIs"), that.model.get("spine_position"));
 			var pageInfo = that.reflowableLayout.adjustIframeColumns(
 				that.offset_dir,
 				that.$("#readium-flowing-content"),
@@ -458,52 +458,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
                 // when we change the page, we have to tell MO to update its position
                 this.mediaOverlayController.reflowPageChanged();
         }
-	},
-
-	// Layout logic
-	// Used: this
-	injectCFIElements : function () {
-
-		var that = this;
-		var contentDocument;
-		var epubCFIs;
-		var lastPageElementId;
-
-		// Get the content document (assumes a reflowable publication)
-		contentDocument = $("#readium-flowing-content").contents()[0];
-
-		// TODO: Could check to make sure the document returned from the iframe has the same name as the 
-		//   content document specified by the href returned by the CFI.
-
-		// Inject elements for all the CFIs that reference this content document
-		epubCFIs = this.model.get("epubCFIs");
-		_.each(epubCFIs, function (cfi, key) {
-
-			if (cfi.contentDocSpinePos === that.model.get("spine_position")) {
-
-				try {
-					
-					EPUBcfi.Interpreter.injectElement(
-						key, 
-						contentDocument, 
-						cfi.payload,
-						["cfi-marker", "audiError"],
-	  					[],
-	  					["MathJax_Message"]);
-
-					if (cfi.type === "last-page") {
-						lastPageElementId = $(cfi.payload).attr("id");
-					}
-				} 
-				catch (e) {
-
-					console.log("Could not inject CFI");
-				}
-			}
-		});
-
-		// This will be undefined unless there is a "last-page" element injected into the page
-		return lastPageElementId;
 	},
 
 	// Save position in epub

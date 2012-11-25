@@ -54,6 +54,93 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
     //  "PRIVATE" HELPERS                                                                   //
     // ------------------------------------------------------------------------------------ //
 
+    injectCFIElements : function (document, epubCFIs, currSpinePosition) {
+
+        var that = this;
+        var contentDocument;
+        var epubCFIs;
+        var lastPageElementId;
+
+        // Get the content document (assumes a reflowable publication)
+        contentDocument = $("#readium-flowing-content", document).contents()[0];
+
+        // TODO: Could check to make sure the document returned from the iframe has the same name as the 
+        //   content document specified by the href returned by the CFI.
+
+        // Inject elements for all the CFIs that reference this content document
+        epubCFIs = epubCFIs;
+        _.each(epubCFIs, function (cfi, key) {
+
+            if (cfi.contentDocSpinePos === currSpinePosition) {
+
+                try {
+                    
+                    EPUBcfi.Interpreter.injectElement(
+                        key,
+                        contentDocument,
+                        cfi.payload,
+                        ["cfi-marker", "audiError"],
+                        [],
+                        ["MathJax_Message"]);
+
+                    if (cfi.type === "last-page") {
+                        lastPageElementId = $(cfi.payload).attr("id");
+                    }
+                } 
+                catch (e) {
+
+                    console.log("Could not inject CFI");
+                }
+            }
+        });
+
+        // This will be undefined unless there is a "last-page" element injected into the page
+        return lastPageElementId;
+    },
+    // injectCFIElements : function () {
+
+    //     var that = this;
+    //     var contentDocument;
+    //     var epubCFIs;
+    //     var lastPageElementId;
+
+    //     // Get the content document (assumes a reflowable publication)
+    //     contentDocument = $("#readium-flowing-content").contents()[0];
+
+    //     // TODO: Could check to make sure the document returned from the iframe has the same name as the 
+    //     //   content document specified by the href returned by the CFI.
+
+    //     // Inject elements for all the CFIs that reference this content document
+    //     epubCFIs = this.model.get("epubCFIs");
+    //     _.each(epubCFIs, function (cfi, key) {
+
+    //         if (cfi.contentDocSpinePos === that.model.get("spine_position")) {
+
+    //             try {
+                    
+    //                 EPUBcfi.Interpreter.injectElement(
+    //                     key, 
+    //                     contentDocument, 
+    //                     cfi.payload,
+    //                     ["cfi-marker", "audiError"],
+    //                     [],
+    //                     ["MathJax_Message"]);
+
+    //                 if (cfi.type === "last-page") {
+    //                     lastPageElementId = $(cfi.payload).attr("id");
+    //                 }
+    //             } 
+    //             catch (e) {
+
+    //                 console.log("Could not inject CFI");
+    //             }
+    //         }
+    //     });
+
+    //     // This will be undefined unless there is a "last-page" element injected into the page
+    //     return lastPageElementId;
+    // },
+
     getFrameWidth: function(view, currentMargin, isTwoUp) {
         var width;
         var margin = currentMargin;
