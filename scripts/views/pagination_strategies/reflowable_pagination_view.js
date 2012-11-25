@@ -231,52 +231,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 	
 
-	// Currently for left-to-right pagination only
-	// Layout math
-	// Used: this
-	findVisibleCharacterOffset : function($textNode) {
-
-		var $parentNode;
-		var elementTop;
-		var elementBottom;
-		var POSITION_ERROR_MARGIN = 5;
-		var $document;
-		var documentTop;
-		var documentBottom;
-		var percentOfTextOffPage;
-		var characterOffset;
-
-		// Get parent; text nodes do not have visibility properties.
-		$parentNode = $textNode.parent();
-
-		// Get document
-		$document = $($("#readium-flowing-content").contents()[0].documentElement);
-
-		// Find percentage of visible node on page
-		documentTop = $document.position().top;
-		documentBottom = documentTop + $document.height();
-
-		elementTop = $parentNode.offset().top;
-		elementBottom = elementTop + $parentNode.height();
-
-		// Element overlaps top of the page
-		if (elementTop < documentTop) {
-
-			percentOfTextOffPage = Math.abs(elementTop - documentTop) / $parentNode.height();
-			characterOffsetByPercent = Math.ceil(percentOfTextOffPage * $textNode[0].length);
-			characterOffset = Math.ceil(0.5 * ($textNode[0].length - characterOffsetByPercent)) + characterOffsetByPercent;
-		}
-		// Element is full on the page
-		else if (elementTop >= documentTop && elementTop <= documentBottom) {
-			characterOffset = 1;
-		}
-		// Element overlaps bottom of the page
-		else if (elementTop < documentBottom) {
-			characterOffset = 1;
-		}
-
-		return characterOffset;
-	},
+	
 
 	
 
@@ -408,7 +363,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			return; 
 		}
 
-		characterOffset = this.findVisibleCharacterOffset($visibleTextNode);
+		characterOffset = this.reflowableElementsInfo.findVisibleCharacterOffset($visibleTextNode, document);
 
 		// Get the content document idref
 		contentDocumentIdref = this.model.getCurrentSection().get("idref");
