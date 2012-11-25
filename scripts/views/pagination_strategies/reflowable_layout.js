@@ -54,6 +54,97 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
     //  "PRIVATE" HELPERS                                                                   //
     // ------------------------------------------------------------------------------------ //
 
+    // REFACTORING CANDIDATE: This is a temporary method to encapsulate some logic from the reflowable view that is
+    //   also duplicated in the adjustIframeColumns method in this model
+    accountForOffset : function (document, isTwoUp, firstPageIsOffset, currentPages, ppd) {
+
+        var $reflowableIframe = $("#readium-flowing-content", document);
+        if (isTwoUp) {
+            // If the first page is offset, adjust the window to only show one page
+            var firstPageIsOffset = firstPageIsOffset;
+            var firstPageOffsetValue;
+
+            // Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
+            //   only the first page should be showing in that display
+            var onFirstPage = 
+                currentPages[0] === 0 &&
+                currentPages[1] === 1 
+                ? true : false;
+
+            if (firstPageIsOffset && onFirstPage) {
+
+                if (ppd === "rtl") {
+
+                    firstPageOffset = -(2 * (this.page_width + this.gap_width));
+                    $reflowableIframe.css("margin-left", firstPageOffset + "px");
+                }
+                // Left-to-right pagination
+                else {
+
+                    firstPageOffset = this.page_width + (this.gap_width * 2);
+                    $reflowableIframe.css("margin-left", firstPageOffset + "px");
+                }
+
+                return 1;
+            }
+            else {
+
+                $reflowableIframe.css("margin-left", "0px");
+                return currentPages[0];
+            }
+        }
+        else {
+
+            $reflowableIframe.css("margin-left", "0px");
+            return currentPages[0];
+        }
+    },
+    // accountForOffset : function () {
+
+    //     var $reflowableIframe = that.$("#readium-flowing-content");
+    //     if (that.model.get("two_up")) {
+    //         // If the first page is offset, adjust the window to only show one page
+    //         var firstPageIsOffset = that.model.getCurrentSection().firstPageOffset();
+    //         var firstPageOffsetValue;
+
+    //         // Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
+    //         //   only the first page should be showing in that display
+    //         var onFirstPage = 
+    //             that.pages.get("current_page")[0] === 0 &&
+    //             that.pages.get("current_page")[1] === 1 
+    //             ? true : false;
+
+    //         if (firstPageIsOffset && onFirstPage) {
+
+    //             if (that.model.epub.get("page_prog_dir") === "rtl") {
+
+    //                 firstPageOffset = -(2 * (that.page_width + that.gap_width));
+    //                 $reflowableIframe.css("margin-left", firstPageOffset + "px");
+    //             }
+    //             // Left-to-right pagination
+    //             else {
+
+    //                 firstPageOffset = that.page_width + (that.gap_width * 2);
+    //                 $reflowableIframe.css("margin-left", firstPageOffset + "px");
+    //             }
+
+    //             that.goToPage(1);
+    //         }
+    //         else {
+
+    //             $reflowableIframe.css("margin-left", "0px");
+    //             that.goToPage(that.pages.get("current_page")[0]);
+    //         }
+    //     }
+    //     else {
+
+    //         $reflowableIframe.css("margin-left", "0px");
+    //         that.goToPage(that.pages.get("current_page")[0]);
+    //     }
+
+    //     that.savePosition();
+    // },
+
     injectCFIElements : function (document, epubCFIs, currSpinePosition) {
 
         var that = this;
@@ -97,49 +188,6 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         // This will be undefined unless there is a "last-page" element injected into the page
         return lastPageElementId;
     },
-    // injectCFIElements : function () {
-
-    //     var that = this;
-    //     var contentDocument;
-    //     var epubCFIs;
-    //     var lastPageElementId;
-
-    //     // Get the content document (assumes a reflowable publication)
-    //     contentDocument = $("#readium-flowing-content").contents()[0];
-
-    //     // TODO: Could check to make sure the document returned from the iframe has the same name as the 
-    //     //   content document specified by the href returned by the CFI.
-
-    //     // Inject elements for all the CFIs that reference this content document
-    //     epubCFIs = this.model.get("epubCFIs");
-    //     _.each(epubCFIs, function (cfi, key) {
-
-    //         if (cfi.contentDocSpinePos === that.model.get("spine_position")) {
-
-    //             try {
-                    
-    //                 EPUBcfi.Interpreter.injectElement(
-    //                     key, 
-    //                     contentDocument, 
-    //                     cfi.payload,
-    //                     ["cfi-marker", "audiError"],
-    //                     [],
-    //                     ["MathJax_Message"]);
-
-    //                 if (cfi.type === "last-page") {
-    //                     lastPageElementId = $(cfi.payload).attr("id");
-    //                 }
-    //             } 
-    //             catch (e) {
-
-    //                 console.log("Could not inject CFI");
-    //             }
-    //         }
-    //     });
-
-    //     // This will be undefined unless there is a "last-page" element injected into the page
-    //     return lastPageElementId;
-    // },
 
     getFrameWidth: function(view, currentMargin, isTwoUp) {
         var width;
@@ -192,18 +240,6 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         css["height"] = this.frame_height.toString() + "px";
         return css;
     },
-    // getBodyColumnCss: function() {
-    //     var css = {};
-    //     css[this.cssColumAxis] = "horizontal";
-    //     css[this.cssColumGap] = this.gap_width.toString() + "px";
-    //     css[this.cssColumWidth] = this.page_width.toString() + "px";
-    //     css["padding"] = "0px";
-    //     css["margin"] = "0px";
-    //     css["position"] = "absolute";
-    //     css["width"] = this.page_width.toString() + "px";
-    //     css["height"] = this.frame_height.toString() + "px";
-    //     return css;
-    // },
 
     adjustIframeColumns: function(offsetDir, $flowingContent, body, isTwoUp, view, firstPageOffset, currentPages, ppd, currentMargin ) {
         var prop_dir = offsetDir;
@@ -271,72 +307,6 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         return [this.calcNumPages(body, isTwoUp), page];
         // this.goToPage(page);
     },
-
-    // adjustIframeColumns: function() {
-    //     var prop_dir = this.offset_dir;
-    //     var $frame = this.$('#readium-flowing-content');
-    //     var page;
-
-    //     this.setFrameSize();
-    //     this.frame_width = parseInt($frame.width(), 10);
-    //     this.frame_height = parseInt($frame.height(), 10);
-    //     this.gap_width = Math.floor(this.frame_width / 7);
-    //     if(this.model.get("two_up")) {
-    //         this.page_width = Math.floor((this.frame_width - this.gap_width) / 2);
-    //     }
-    //     else {
-    //         this.page_width = this.frame_width;
-    //     }
-
-    //     // it is important for us to make sure there is no padding or
-    //     // margin on the <html> elem, or it will mess with our column code
-    //     $(this.getBody()).css( this.getBodyColumnCss() );
-
-    //     // If the first page is offset, adjust the window to only show one page
-    //     if (this.model.get("two_up")) {
-            
-    //         var firstPageIsOffset = this.model.getCurrentSection().firstPageOffset();
-    //         var firstPageOffsetValue;
-
-    //         // Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
-    //         //   only the first page should be showing in that display
-    //         // REFACTORING CANDIDATE: This logic is similar to that in pageChangeHandler
-    //         var onFirstPage = 
-    //             this.pages.get("current_page")[0] === 0 &&
-    //             this.pages.get("current_page")[1] === 1 
-    //             ? true : false;
-
-    //         if (firstPageIsOffset && onFirstPage) {
-
-    //             if (this.model.epub.get("page_prog_dir") === "rtl") {
-
-    //                 firstPageOffset = -(2 * (this.page_width + this.gap_width));
-    //                 $frame.css("margin-left", firstPageOffset + "px");
-    //             }
-    //             // Left-to-right pagination
-    //             else {
-
-    //                 firstPageOffset = this.page_width + (this.gap_width * 2);
-    //                 $frame.css("margin-left", firstPageOffset + "px");
-    //             }
-
-    //             page = 1;
-    //         }
-    //         else {
-
-    //             $frame.css("margin-left", "0px");
-    //             page = this.pages.get("current_page")[0];
-    //         }
-    //     }
-    //     else {
-
-    //         $frame.css("margin-left", "0px");
-    //         page = this.pages.get("current_page")[0];
-    //     }
-
-    //     this.pages.set("num_pages", this.reflowableLayout.calcNumPages(this.getBody(), this.model.get("two_up")));
-    //     this.goToPage(page);
-    // },
 
     injectTheme: function(currentTheme, body) {
         var theme = currentTheme;
