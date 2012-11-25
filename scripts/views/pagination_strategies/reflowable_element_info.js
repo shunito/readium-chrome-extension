@@ -7,6 +7,77 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
     //  "PUBLIC" METHODS (THE API)                                                          //
     // ------------------------------------------------------------------------------------ //
 
+    getElemPageNumber: function(elem, offsetDir, pageWidth, gapWidth, body) {
+        
+        var $elem;
+        var elemWasInvisible = false;
+        var rects, shift;
+        var elemRectWidth;
+
+        // Rationale: Elements with an epub:type="pagebreak" attribute value are likely to be set as 
+        //   display:none, as they indicate the end of a page in the corresponding physical version of a book. We need 
+        //   the position of these elements to get the reflowable page number to set in the viewer. Therefore, 
+        //   we check if the element has this epub:type value, set it visible, find its location and then set it to 
+        //   display:none again. 
+        // REFACTORING CANDIDATE: We might want to do this for any element with display:none. 
+        $elem = $(elem);
+        if ($elem.attr("epub:type") === "pagebreak" && !$elem.is(":visible")) {
+
+            elemWasInvisible = true;
+            $elem.show();
+        }
+
+        rects = elem.getClientRects();
+        if(!rects || rects.length < 1) {
+            // if there were no rects the elem had display none
+            return -1;
+        }
+
+        shift = rects[0][offsetDir];
+
+        // calculate to the center of the elem
+        // Rationale: The -1 or +1 adjustment is to account for the case in which the target element for which the shift offset
+        //   is calculated is at the edge of a page and has 0 width. In this case, if a minor arbitrary adjustment is not applied, 
+        //   the calculated page number will be off by 1.   
+        elemRectWidth = rects[0].left - rects[0].right;
+        if (offsetDir === "right" && elemRectWidth === 0) {
+            shift -= 1;
+        }
+        else if (offsetDir === "left" && elemRectWidth === 0) {
+            shift += 1;
+        } // Rationale: There shouldn't be any other case here. The explict second (if else) condition is for clarity.
+        shift += Math.abs(elemRectWidth);
+        
+        // Re-hide the element if it was original set as display:none
+        if (elemWasInvisible) {
+            $elem.hide();
+        }
+
+        // `clientRects` are relative to the top left corner of the frame, but
+        // for right to left we actually need to measure relative to right edge
+        // of the frame
+        if (offsetDir === "right") {
+            // the right edge is exactly `this.page_width` pixels from the right 
+            // edge
+            shift = pageWidth - shift;
+        }
+        // less the amount we already shifted to get to cp
+        shift -= parseInt(body.style[offsetDir], 10); 
+        return Math.ceil( shift / (pageWidth + gapWidth) );
+    },
+
+    // REFACTORING CANDIDATE: This might be part of the public interface
+    getElemPageNumberById: function(elemId, viewDocument, offsetDir, pageWidth, gapWidth, body) {
+        var doc = $("#readium-flowing-content", viewDocument).contents()[0].documentElement;
+        var elem = $(doc).find("#" + elemId);
+        if (elem.length == 0) {
+            return -1;
+        }
+        else {
+            return this.getElemPageNumber(elem[0], offsetDir, pageWidth, gapWidth, body);
+        }
+    },
+
     // Currently for left-to-right pagination only
     findVisibleCharacterOffset : function($textNode, viewDocument) {
 

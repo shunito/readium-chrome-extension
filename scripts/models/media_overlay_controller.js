@@ -96,7 +96,15 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             var currMoPage = -1;
             var currMoId = this.get("mo_text_id");
             if (currMoId != null && currMoId != undefined && currMoId != "") {
-                currMoPage = this.currentView.getElemPageNumberById(currMoId);
+                // REFACTORING CANDIDATE: This has got to change. Tight coupling and lots of indirection. 
+                currMoPage = this.currentView.reflowableElementsInfo.getElemPageNumberById(
+                    currMoId, 
+                    document,
+                    this.currentView.offset_dir,
+                    this.currentView.reflowableElementsInfo.page_width,
+                    this.currentView.reflowableElementsInfo.gap_width,
+                    this.currentView.getBody()
+                    );
             }
                 
             // if media overlays is on our current page, then resume playback

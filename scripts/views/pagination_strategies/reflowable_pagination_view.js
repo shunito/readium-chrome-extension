@@ -151,8 +151,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		
 		return [this.model.get("spine_position")];
 	},
-
-
     
     // override
     // Used: PaginationViewBase
@@ -198,7 +196,12 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 				el = el.children[0];
 			}
 
-			var page = this.getElemPageNumber(el);
+			var page = this.reflowableElementsInfo.getElemPageNumber(
+				el, 
+				this.offset_dir, 
+				this.reflowableLayout.page_width, 
+				this.reflowableLayout.gap_width,
+				this.getBody());
             if (page > 0) {
                 this.pages.goToPage(page);	
 			}
@@ -228,12 +231,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
         this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying);
         this.reflowableLayout.resetEl(document, this, this.zoomer);
 	},
-
-	
-
-	
-
-	
 
 	// Description: Handles clicks of anchor tags by navigating to
 	//   the proper location in the epub spine, or opening
@@ -425,81 +422,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	calcPageOffset: function(page_num) {
 		return (page_num - 1) * (this.reflowableLayout.page_width + this.reflowableLayout.gap_width);
 	},
-
-	// Layout math
-	// Used: this, MediaOverlayController
-    getElemPageNumber: function(elem) {
-		
-		var $elem;
-		var elemWasInvisible = false;
-		var rects, shift;
-		var elemRectWidth;
-
-		// Rationale: Elements with an epub:type="pagebreak" attribute value are likely to be set as 
-		//   display:none, as they indicate the end of a page in the corresponding physical version of a book. We need 
-		//   the position of these elements to get the reflowable page number to set in the viewer. Therefore, 
-		//   we check if the element has this epub:type value, set it visible, find its location and then set it to 
-		//   display:none again. 
-		// REFACTORING CANDIDATE: We might want to do this for any element with display:none. 
-		$elem = $(elem);
-		if ($elem.attr("epub:type") === "pagebreak" && !$elem.is(":visible")) {
-
-			elemWasInvisible = true;
-			$elem.show();
-		}
-
-		rects = elem.getClientRects();
-		if(!rects || rects.length < 1) {
-			// if there were no rects the elem had display none
-			return -1;
-		}
-
-		shift = rects[0][this.offset_dir];
-
-		// calculate to the center of the elem
-		// Rationale: The -1 or +1 adjustment is to account for the case in which the target element for which the shift offset
-		//   is calculated is at the edge of a page and has 0 width. In this case, if a minor arbitrary adjustment is not applied, 
-		//   the calculated page number will be off by 1.   
-		elemRectWidth = rects[0].left - rects[0].right;
-		if (this.offset_dir === "right" && elemRectWidth === 0) {
-			shift -= 1;
-		}
-		else if (this.offset_dir === "left" && elemRectWidth === 0) {
-			shift += 1;
-		} // Rationale: There shouldn't be any other case here. The explict second (if else) condition is for clarity.
-		shift += Math.abs(elemRectWidth);
-		
-        // Re-hide the element if it was original set as display:none
-        if (elemWasInvisible) {
-            $elem.hide();
-        }
-
-		// `clientRects` are relative to the top left corner of the frame, but
-		// for right to left we actually need to measure relative to right edge
-		// of the frame
-		if(this.offset_dir === "right") {
-			// the right edge is exactly `this.page_width` pixels from the right 
-			// edge
-			shift = this.reflowableLayout.page_width - shift;
-		}
-		// less the amount we already shifted to get to cp
-		shift -= parseInt(this.getBody().style[this.offset_dir], 10); 
-		return Math.ceil( shift / (this.reflowableLayout.page_width + this.reflowableLayout.gap_width) );
-	},
-
-	// REFACTORING CANDIDATE: This might be part of the public interface
-	// Layout math
-	// Used: this, mediaOverlayController
-	getElemPageNumberById: function(elemId) {
-        var doc = $("#readium-flowing-content").contents()[0].documentElement;
-        var elem = $(doc).find("#" + elemId);
-        if (elem.length == 0) {
-            return -1;
-        }
-        else {
-            return this.getElemPageNumber(elem[0]);
-        }
-    },
 
     // Stays here although it needs to be refactored; logic is duplicated in this 
     // Used: this
