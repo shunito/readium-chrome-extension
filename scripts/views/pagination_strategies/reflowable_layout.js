@@ -99,51 +99,6 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
             return currentPages[0];
         }
     },
-    // accountForOffset : function () {
-
-    //     var $reflowableIframe = that.$("#readium-flowing-content");
-    //     if (that.model.get("two_up")) {
-    //         // If the first page is offset, adjust the window to only show one page
-    //         var firstPageIsOffset = that.model.getCurrentSection().firstPageOffset();
-    //         var firstPageOffsetValue;
-
-    //         // Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
-    //         //   only the first page should be showing in that display
-    //         var onFirstPage = 
-    //             that.pages.get("current_page")[0] === 0 &&
-    //             that.pages.get("current_page")[1] === 1 
-    //             ? true : false;
-
-    //         if (firstPageIsOffset && onFirstPage) {
-
-    //             if (that.model.epub.get("page_prog_dir") === "rtl") {
-
-    //                 firstPageOffset = -(2 * (that.page_width + that.gap_width));
-    //                 $reflowableIframe.css("margin-left", firstPageOffset + "px");
-    //             }
-    //             // Left-to-right pagination
-    //             else {
-
-    //                 firstPageOffset = that.page_width + (that.gap_width * 2);
-    //                 $reflowableIframe.css("margin-left", firstPageOffset + "px");
-    //             }
-
-    //             that.goToPage(1);
-    //         }
-    //         else {
-
-    //             $reflowableIframe.css("margin-left", "0px");
-    //             that.goToPage(that.pages.get("current_page")[0]);
-    //         }
-    //     }
-    //     else {
-
-    //         $reflowableIframe.css("margin-left", "0px");
-    //         that.goToPage(that.pages.get("current_page")[0]);
-    //     }
-
-    //     that.savePosition();
-    // },
 
     injectCFIElements : function (document, epubCFIs, currSpinePosition) {
 

@@ -265,7 +265,8 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             this.moTargetNode = null;
         }
         else {
-        	pageElms = this.currentView.findVisiblePageElements();
+            // This coupling between this model and the view needs to be refactored out
+        	pageElms = this.currentView.reflowableElementsInfo.findVisiblePageElements(this.currentView, this.currentView.getBody(), document);
             var doc_href = this.currentSection.get("href");
             
 	        var node = null;

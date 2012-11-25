@@ -11,6 +11,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 		var that = this;
 		this.reflowableLayout = new Readium.Views.ReflowableLayout();
+		this.reflowableElementsInfo = new Readium.Views.ReflowableElementInfo();
 
 		// --- START from base
 		this.zoomer = options.zoomer;
@@ -151,21 +152,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		return [this.model.get("spine_position")];
 	},
 
-	// Layout math
-	// Used: MediaOverlayController
-    findVisiblePageElements: function() {
 
-        var $elements = $(this.getBody()).find("[id]");
-        var doc = $("#readium-flowing-content").contents()[0].documentElement;
-        var doc_top = 0;
-        var doc_left = 0;
-        var doc_right = doc_left + $(doc).width();
-        var doc_bottom = doc_top + $(doc).height();
-        
-        var visibleElms = this.filterElementsByPosition($elements, doc_top, doc_bottom, doc_left, doc_right);
-            
-        return visibleElms;
-    },
     
     // override
     // Used: PaginationViewBase
@@ -358,25 +345,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		return characterOffset;
 	},
 
-	// returns all the elements in the set that are inside the box
-	// Layout math
-	// Used: this
-    filterElementsByPosition: function($elements, documentTop, documentBottom, documentLeft, documentRight) {
-        
-        var $visibleElms = $elements.filter(function(idx) {
-            var elm_top = $(this).offset().top;
-            var elm_left = $(this).offset().left;
-            var elm_right = elm_left + $(this).width();
-            var elm_bottom = elm_top + $(this).height();
-            
-            var is_ok_x = elm_left >= documentLeft && elm_right <= documentRight;
-            var is_ok_y = elm_top >= documentTop && elm_bottom <= documentBottom;
-            
-            return is_ok_x && is_ok_y;
-        });  
-
-        return $visibleElms;
-    },
+	
 
 	// Description: Handles clicks of anchor tags by navigating to
 	//   the proper location in the epub spine, or opening
