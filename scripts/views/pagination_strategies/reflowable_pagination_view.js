@@ -43,9 +43,26 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.model.on("repagination_event", this.windowSizeChangeHandler, this);
 		this.model.on("change:current_theme", this.injectThemeHandler, this);
 		this.model.on("change:two_up", this.handleSetUpMode, this);
-		this.model.on("change:two_up", this.adjustIframeColumns, this);
+		this.model.on("change:two_up", this.adjustIframeColumnsHandler, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
 		this.model.on("save_position", this.savePosition, this);
+	},
+
+	adjustIframeColumnsHandler : function () {
+
+		var pageInfo = this.reflowableLayout.adjustIframeColumns(
+				this.offset_dir,
+				this.$("#readium-flowing-content"),
+				this.getBody(),
+				this.model.get("two_up"),
+				this,
+				this.model.getCurrentSection().firstPageOffset(),
+				this.pages.get("current_page"),
+				this.model.epub.get("page_prog_dir"),
+				this.model.get("current_margin"));
+
+		this.pages.set("num_pages", pageInfo[0]);
+		this.goToPage(pageInfo[1]);
 	},
 
 	handleSetUpMode : function () {
@@ -77,7 +94,20 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			if (!e.srcElement) e.srcElement = this;
 
 			var lastPageElementId = that.injectCFIElements();
-			that.adjustIframeColumns();
+			var pageInfo = that.reflowableLayout.adjustIframeColumns(
+				that.offset_dir,
+				that.$("#readium-flowing-content"),
+				that.getBody(),
+				that.model.get("two_up"),
+				that,
+				that.model.getCurrentSection().firstPageOffset(),
+				that.pages.get("current_page"),
+				that.model.epub.get("page_prog_dir"),
+				that.model.get("current_margin"));
+
+			that.pages.set("num_pages", pageInfo[0]);
+			that.goToPage(pageInfo[1]);
+
 			that.reflowableLayout.iframeLoadCallback(
 				e, 
 				this, 
@@ -203,7 +233,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.model.off("repagination_event", this.windowSizeChangeHandler);
 		this.model.off("change:current_theme", this.windowSizeChangeHandler);
 		this.model.off("change:two_up", this.setUpMode);
-		this.model.off("change:two_up", this.adjustIframeColumns);
+		this.model.off("change:two_up", this.adjustIframeColumnsHandler);
 		this.model.off("change:current_margin", this.marginCallback);
 		this.pages.off("change:current_page", this.showCurrentPages);
         this.model.off("change:font_size", this.setFontSizeHandler);
@@ -430,21 +460,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
         }
 	},
 
-	// Might be some layout logic
-	// Used: this
-	getBodyColumnCss: function() {
-		var css = {};
-		css[this.cssColumAxis] = "horizontal";
-		css[this.cssColumGap] = this.gap_width.toString() + "px";
-		css[this.cssColumWidth] = this.page_width.toString() + "px";
-		css["padding"] = "0px";
-		css["margin"] = "0px";
-		css["position"] = "absolute";
-		css["width"] = this.page_width.toString() + "px";
-		css["height"] = this.frame_height.toString() + "px";
-		return css;
-	},
-
 	// Layout logic
 	// Used: this
 	injectCFIElements : function () {
@@ -575,74 +590,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.model.save();
 	},
 
-	// Layout logic
-	// Used: this
-	adjustIframeColumns: function() {
-		var prop_dir = this.offset_dir;
-		var $frame = this.$('#readium-flowing-content');
-		var page;
-
-		this.setFrameSize();
-		this.frame_width = parseInt($frame.width(), 10);
-		this.frame_height = parseInt($frame.height(), 10);
-		this.gap_width = Math.floor(this.frame_width / 7);
-		if(this.model.get("two_up")) {
-			this.page_width = Math.floor((this.frame_width - this.gap_width) / 2);
-		}
-		else {
-			this.page_width = this.frame_width;
-		}
-
-		// it is important for us to make sure there is no padding or
-		// margin on the <html> elem, or it will mess with our column code
-		$(this.getBody()).css( this.getBodyColumnCss() );
-
-		// If the first page is offset, adjust the window to only show one page
-		if (this.model.get("two_up")) {
-			
-			var firstPageIsOffset = this.model.getCurrentSection().firstPageOffset();
-			var firstPageOffsetValue;
-
-			// Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
-			//   only the first page should be showing in that display
-			// REFACTORING CANDIDATE: This logic is similar to that in pageChangeHandler
-			var onFirstPage = 
-				this.pages.get("current_page")[0] === 0 &&
-			    this.pages.get("current_page")[1] === 1 
-			    ? true : false;
-
-			if (firstPageIsOffset && onFirstPage) {
-
-				if (this.model.epub.get("page_prog_dir") === "rtl") {
-
-					firstPageOffset = -(2 * (this.page_width + this.gap_width));
-					$frame.css("margin-left", firstPageOffset + "px");
-				}
-				// Left-to-right pagination
-				else {
-
-					firstPageOffset = this.page_width + (this.gap_width * 2);
-					$frame.css("margin-left", firstPageOffset + "px");
-				}
-
-				page = 1;
-			}
-			else {
-
-				$frame.css("margin-left", "0px");
-				page = this.pages.get("current_page")[0];
-			}
-		}
-		else {
-
-			$frame.css("margin-left", "0px");
-			page = this.pages.get("current_page")[0];
-		}
-
-		this.pages.set("num_pages", this.reflowableLayout.calcNumPages(this.getBody(), this.model.get("two_up")));
-		this.goToPage(page);
-	},
-
 	// This is now part of the public interface
 	// Description: helper method to get the a reference to the documentElement
 	// of the document in this strategy's iFrame.
@@ -665,55 +612,8 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	// Layout logic 
 	// Used: this
 	calcPageOffset: function(page_num) {
-		return (page_num - 1) * (this.page_width + this.gap_width);
+		return (page_num - 1) * (this.reflowableLayout.page_width + this.reflowableLayout.gap_width);
 	},
-
-	// Rationale: on iOS frames are automatically expanded to fit the content dom
-	// thus we cannot use relative size for the iframe and must set abs 
-	// pixel size
-	// Layout logic
-	// Used: this
-	setFrameSize: function() {
-		var width = this.getFrameWidth().toString() + "px";
-		var height = this.getFrameHeight().toString() + "px";
-
-		this.$('#readium-flowing-content').attr("width", width);
-		this.$('#readium-flowing-content').attr("height", height);
-		this.$('#readium-flowing-content').css("width", width);
-		this.$('#readium-flowing-content').css("height", height);
-	},
-
-	// Layout logic
-	// Used: this
-	getFrameWidth: function() {
-		var width;
-		var margin = this.model.get("current_margin");
-		if (margin === 1) {
-			this.model.get("two_up") ? (width = 0.95) : (width = 0.90);
-		}
-		else if (margin === 2) {
-			this.model.get("two_up") ? (width = 0.89) : (width = 0.80);
-		}
-		else if (margin === 3) {
-			this.model.get("two_up") ? (width = 0.83) : (width = 0.70);	
-		}
-		else if (margin === 4) {
-			this.model.get("two_up") ? (width = 0.77) : (width = 0.60);	
-		}
-		else {
-			this.model.get("two_up") ? (width = 0.70) : (width = 0.50);	
-		}
-		
-		return Math.floor( $('#flowing-wrapper').width() * width );
-	},
-
-	// Layout logic
-	// Used: this
-	getFrameHeight: function() {
-		return $('#flowing-wrapper').height();
-	},
-
-	
 
 	// Layout math
 	// Used: this, MediaOverlayController
@@ -769,11 +669,11 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		if(this.offset_dir === "right") {
 			// the right edge is exactly `this.page_width` pixels from the right 
 			// edge
-			shift = this.page_width - shift;
+			shift = this.reflowableLayout.page_width - shift;
 		}
 		// less the amount we already shifted to get to cp
 		shift -= parseInt(this.getBody().style[this.offset_dir], 10); 
-		return Math.ceil( shift / (this.page_width + this.gap_width) );
+		return Math.ceil( shift / (this.reflowableLayout.page_width + this.reflowableLayout.gap_width) );
 	},
 
 	// REFACTORING CANDIDATE: This might be part of the public interface
@@ -843,10 +743,21 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		}, 150);
 	},
 
-	// Stays here 
-	// Used: this
 	windowSizeChangeHandler: function() {
-		this.adjustIframeColumns();
+		var pageInfo = this.reflowableLayout.adjustIframeColumns(
+				this.offset_dir,
+				this.$("#readium-flowing-content"),
+				this.getBody(),
+				this.model.get("two_up"),
+				this,
+				this.model.getCurrentSection().firstPageOffset(),
+				this.pages.get("current_page"),
+				this.model.epub.get("page_prog_dir"),
+				this.model.get("current_margin")
+				);
+
+		this.pages.set("num_pages", pageInfo[0]);
+		this.goToPage(pageInfo[1]);
 		
 		// Make sure we return to the correct position in the epub (This also requires clearing the hash fragment) on resize.
 		this.goToHashFragment(this.model.get("hash_fragment"));
@@ -855,6 +766,19 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
     // Stays here
     // Used: this
 	marginCallback: function() {
-		this.adjustIframeColumns();
+		var pageInfo = this.reflowableLayout.adjustIframeColumns(
+				this.offset_dir,
+				this.$("#readium-flowing-content"),
+				this.getBody(),
+				this.model.get("two_up"),
+				this,
+				this.model.getCurrentSection().firstPageOffset(),
+				this.pages.get("current_page"),
+				this.model.epub.get("page_prog_dir"),
+				this.model.get("current_margin")
+				);
+
+		this.pages.set("num_pages", pageInfo[0]);
+		this.goToPage(pageInfo[1]);
 	}
 });

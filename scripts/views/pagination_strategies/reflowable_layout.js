@@ -54,6 +54,203 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
     //  "PRIVATE" HELPERS                                                                   //
     // ------------------------------------------------------------------------------------ //
 
+    getFrameWidth: function(view, currentMargin, isTwoUp) {
+        var width;
+        var margin = currentMargin;
+        if (margin === 1) {
+            isTwoUp ? (width = 0.95) : (width = 0.90);
+        }
+        else if (margin === 2) {
+            isTwoUp ? (width = 0.89) : (width = 0.80);
+        }
+        else if (margin === 3) {
+            isTwoUp ? (width = 0.83) : (width = 0.70); 
+        }
+        else if (margin === 4) {
+            isTwoUp ? (width = 0.77) : (width = 0.60); 
+        }
+        else {
+            isTwoUp ? (width = 0.70) : (width = 0.50); 
+        }
+        
+        return Math.floor( $('#flowing-wrapper', view.$el).width() * width );
+    },
+
+    // Rationale: on iOS frames are automatically expanded to fit the content dom
+    // thus we cannot use relative size for the iframe and must set abs 
+    // pixel size
+    // Layout logic
+    // Used: this
+    setFrameSize: function(view, currentMargin, isTwoUp) {
+        var width = this.getFrameWidth(view, currentMargin, isTwoUp).toString() + "px";
+
+        // REFACTORING CANDIDATE: the $el is no good
+        var height = $('#flowing-wrapper', view.$el).height().toString() + "px"; 
+
+        $('#readium-flowing-content', view.$el).attr("width", width);
+        $('#readium-flowing-content', view.$el).attr("height", height);
+        $('#readium-flowing-content', view.$el).css("width", width);
+        $('#readium-flowing-content', view.$el).css("height", height);
+    },
+
+    getBodyColumnCss: function(view) {
+        var css = {};
+        css[view.cssColumAxis] = "horizontal";
+        css[view.cssColumGap] = this.gap_width.toString() + "px";
+        css[view.cssColumWidth] = this.page_width.toString() + "px";
+        css["padding"] = "0px";
+        css["margin"] = "0px";
+        css["position"] = "absolute";
+        css["width"] = this.page_width.toString() + "px";
+        css["height"] = this.frame_height.toString() + "px";
+        return css;
+    },
+    // getBodyColumnCss: function() {
+    //     var css = {};
+    //     css[this.cssColumAxis] = "horizontal";
+    //     css[this.cssColumGap] = this.gap_width.toString() + "px";
+    //     css[this.cssColumWidth] = this.page_width.toString() + "px";
+    //     css["padding"] = "0px";
+    //     css["margin"] = "0px";
+    //     css["position"] = "absolute";
+    //     css["width"] = this.page_width.toString() + "px";
+    //     css["height"] = this.frame_height.toString() + "px";
+    //     return css;
+    // },
+
+    adjustIframeColumns: function(offsetDir, $flowingContent, body, isTwoUp, view, firstPageOffset, currentPages, ppd, currentMargin ) {
+        var prop_dir = offsetDir;
+        var $frame = $flowingContent;
+        var page;
+
+        this.setFrameSize(view, currentMargin, isTwoUp); // Move set frame size
+        this.frame_width = parseInt($frame.width(), 10);
+        this.frame_height = parseInt($frame.height(), 10);
+        this.gap_width = Math.floor(this.frame_width / 7);
+        if (isTwoUp) {
+            this.page_width = Math.floor((this.frame_width - this.gap_width) / 2);
+        }
+        else {
+            this.page_width = this.frame_width;
+        }
+
+        // it is important for us to make sure there is no padding or
+        // margin on the <html> elem, or it will mess with our column code
+        $(body).css( this.getBodyColumnCss(view) );
+
+        // If the first page is offset, adjust the window to only show one page
+        if (isTwoUp) {
+            
+            var firstPageIsOffset = firstPageOffset;
+            var firstPageOffsetValue;
+
+            // Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
+            //   only the first page should be showing in that display
+            // REFACTORING CANDIDATE: This logic is similar to that in pageChangeHandler
+            var onFirstPage = 
+                currentPages[0] === 0 &&
+                currentPages[1] === 1 
+                ? true : false;
+
+            if (firstPageIsOffset && onFirstPage) {
+
+                if (ppd === "rtl") {
+
+                    firstPageOffset = -(2 * (this.page_width + this.gap_width));
+                    $frame.css("margin-left", firstPageOffset + "px");
+                }
+                // Left-to-right pagination
+                else {
+
+                    firstPageOffset = this.page_width + (this.gap_width * 2);
+                    $frame.css("margin-left", firstPageOffset + "px");
+                }
+
+                page = 1;
+            }
+            else {
+
+                $frame.css("margin-left", "0px");
+                page = currentPages[0];
+            }
+        }
+        else {
+
+            $frame.css("margin-left", "0px");
+            page = currentPages[0];
+        }
+
+        // this.pages.set("num_pages", this.reflowableLayout.calcNumPages(this.getBody(), this.model.get("two_up")));
+        return [this.calcNumPages(body, isTwoUp), page];
+        // this.goToPage(page);
+    },
+
+    // adjustIframeColumns: function() {
+    //     var prop_dir = this.offset_dir;
+    //     var $frame = this.$('#readium-flowing-content');
+    //     var page;
+
+    //     this.setFrameSize();
+    //     this.frame_width = parseInt($frame.width(), 10);
+    //     this.frame_height = parseInt($frame.height(), 10);
+    //     this.gap_width = Math.floor(this.frame_width / 7);
+    //     if(this.model.get("two_up")) {
+    //         this.page_width = Math.floor((this.frame_width - this.gap_width) / 2);
+    //     }
+    //     else {
+    //         this.page_width = this.frame_width;
+    //     }
+
+    //     // it is important for us to make sure there is no padding or
+    //     // margin on the <html> elem, or it will mess with our column code
+    //     $(this.getBody()).css( this.getBodyColumnCss() );
+
+    //     // If the first page is offset, adjust the window to only show one page
+    //     if (this.model.get("two_up")) {
+            
+    //         var firstPageIsOffset = this.model.getCurrentSection().firstPageOffset();
+    //         var firstPageOffsetValue;
+
+    //         // Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
+    //         //   only the first page should be showing in that display
+    //         // REFACTORING CANDIDATE: This logic is similar to that in pageChangeHandler
+    //         var onFirstPage = 
+    //             this.pages.get("current_page")[0] === 0 &&
+    //             this.pages.get("current_page")[1] === 1 
+    //             ? true : false;
+
+    //         if (firstPageIsOffset && onFirstPage) {
+
+    //             if (this.model.epub.get("page_prog_dir") === "rtl") {
+
+    //                 firstPageOffset = -(2 * (this.page_width + this.gap_width));
+    //                 $frame.css("margin-left", firstPageOffset + "px");
+    //             }
+    //             // Left-to-right pagination
+    //             else {
+
+    //                 firstPageOffset = this.page_width + (this.gap_width * 2);
+    //                 $frame.css("margin-left", firstPageOffset + "px");
+    //             }
+
+    //             page = 1;
+    //         }
+    //         else {
+
+    //             $frame.css("margin-left", "0px");
+    //             page = this.pages.get("current_page")[0];
+    //         }
+    //     }
+    //     else {
+
+    //         $frame.css("margin-left", "0px");
+    //         page = this.pages.get("current_page")[0];
+    //     }
+
+    //     this.pages.set("num_pages", this.reflowableLayout.calcNumPages(this.getBody(), this.model.get("two_up")));
+    //     this.goToPage(page);
+    // },
+
     injectTheme: function(currentTheme, body) {
         var theme = currentTheme;
         if (theme === "default") {
@@ -171,6 +368,8 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         }
         return num;
     },
+
+    // -----------  Most of this is unique to the reflowable view --------------------- //
 
     getBindings: function(packageDocument) {
         var packDoc = packageDocument;
