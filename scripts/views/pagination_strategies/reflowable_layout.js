@@ -6,6 +6,8 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
     // ------------------------------------------------------------------------------------ //
 
     initialize: function(options) {
+        // make sure we have proper vendor prefixed props for when we need them
+        this.stashModernizrPrefixedProps();
     },
 
     iframeLoadCallback: function(e, dom, packageDocument, bindingTemplate, goLeftHandler, goRightHandler, linkClickHandler, handlerContext) {
@@ -169,8 +171,6 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
     // Rationale: on iOS frames are automatically expanded to fit the content dom
     // thus we cannot use relative size for the iframe and must set abs 
     // pixel size
-    // Layout logic
-    // Used: this
     setFrameSize: function(view, currentMargin, isTwoUp) {
         var width = this.getFrameWidth(view, currentMargin, isTwoUp).toString() + "px";
 
@@ -183,11 +183,11 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         $('#readium-flowing-content', view.$el).css("height", height);
     },
 
-    getBodyColumnCss: function(view) {
+    getBodyColumnCss: function() {
         var css = {};
-        css[view.cssColumAxis] = "horizontal";
-        css[view.cssColumGap] = this.gap_width.toString() + "px";
-        css[view.cssColumWidth] = this.page_width.toString() + "px";
+        css[this.cssColumnAxis] = "horizontal";
+        css[this.cssColumnGap] = this.gap_width.toString() + "px";
+        css[this.cssColumnWidth] = this.page_width.toString() + "px";
         css["padding"] = "0px";
         css["margin"] = "0px";
         css["position"] = "absolute";
@@ -201,7 +201,8 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         var $frame = $flowingContent;
         var page;
 
-        this.setFrameSize(view, currentMargin, isTwoUp); // Move set frame size
+        this.setFrameSize(view, currentMargin, isTwoUp);
+
         this.frame_width = parseInt($frame.width(), 10);
         this.frame_height = parseInt($frame.height(), 10);
         this.gap_width = Math.floor(this.frame_width / 7);
@@ -214,7 +215,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
 
         // it is important for us to make sure there is no padding or
         // margin on the <html> elem, or it will mess with our column code
-        $(body).css( this.getBodyColumnCss(view) );
+        $(body).css( this.getBodyColumnCss() );
 
         // If the first page is offset, adjust the window to only show one page
         if (isTwoUp) {
@@ -331,7 +332,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
 
     // Description: we are using experimental styles so we need to 
     //   use modernizr to generate prefixes
-    stashModernizrPrefixedProps: function(view) {
+    stashModernizrPrefixedProps: function() {
         var cssIfy = function(str) {
             return str.replace(/([A-Z])/g, function(str,m1){ 
                 return '-' + m1.toLowerCase(); 
@@ -339,14 +340,14 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         };
 
         // ask modernizr for the vendor prefixed version
-        view.columAxis =  Modernizr.prefixed('columnAxis') || 'columnAxis';
-        view.columGap =  Modernizr.prefixed('columnGap') || 'columnGap';
-        view.columWidth =  Modernizr.prefixed('columnWidth') || 'columnWidth';
+        this.columnAxis =  Modernizr.prefixed('columnAxis') || 'columnAxis';
+        this.columnGap =  Modernizr.prefixed('columnGap') || 'columnGap';
+        this.columnWidth =  Modernizr.prefixed('columnWidth') || 'columnWidth';
 
         // we are interested in the css prefixed version
-        view.cssColumAxis =  cssIfy(view.columAxis);
-        view.cssColumGap =  cssIfy(view.columGap);
-        view.cssColumWidth =  cssIfy(view.columWidth);
+        this.cssColumnAxis =  cssIfy(this.columnAxis);
+        this.cssColumnGap =  cssIfy(this.columnGap);
+        this.cssColumnWidth =  cssIfy(this.columnWidth);
     },
 
     // Description: calculate the number of pages in the current section,

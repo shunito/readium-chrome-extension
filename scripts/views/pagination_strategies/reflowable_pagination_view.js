@@ -23,9 +23,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
         this.bindingTemplate = Handlebars.templates.binding_template;
 		this.page_template = Handlebars.templates.reflowing_template;
 
-		// make sure we have proper vendor prefixed props for when we need them
-		this.reflowableLayout.stashModernizrPrefixedProps(this);
-
 		// if this book does right to left pagination we need to set the
 		// offset on the right
 		if(this.model.epub.get("page_prog_dir") === "rtl") {
@@ -279,6 +276,8 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	// Stays here
 	// Used: this
 	// REFACTORING CANDIDATE: No need to make that call through the epubController
+
+	// Actually, the handler is being applied here, so it should be moved to layout logic
 	applyKeydownHandler : function () {
 
 		var that = this;
@@ -408,11 +407,13 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	},
 
 	// Used: this
+	// Layout logic helper, mostly
 	hideContent: function() {
 		$("#flowing-wrapper").css("opacity", "0");
 	},
 
 	// Used: this
+	// Layout logic helper, mostly
 	showContent: function() {
 		$("#flowing-wrapper").css("opacity", "1");
 	},
