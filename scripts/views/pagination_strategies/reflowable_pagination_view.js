@@ -13,7 +13,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.reflowableLayout = new Readium.Views.ReflowableLayout();
 		this.reflowableElementsInfo = new Readium.Views.ReflowableElementInfo();
 
-		// --- START from base
 		this.zoomer = options.zoomer;
         this.pages = new Readium.Models.ReadiumPagination({model : this.model});
         this.mediaOverlayController = this.model.get("media_overlay_controller");
@@ -50,10 +49,10 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 		var pageInfo = this.reflowableLayout.adjustIframeColumns(
 				this.offset_dir,
-				this.$("#readium-flowing-content"),
-				this.getBody(),
+				this.$("#readium-flowing-content").contents()[0].documentElement,
+				this.$("#readium-flowing-content")[0],
+				this.$("#flowing-wrapper")[0],
 				this.model.get("two_up"),
-				this,
 				this.model.getCurrentSection().firstPageOffset(),
 				this.pages.get("current_page"),
 				this.model.epub.get("page_prog_dir"),
@@ -65,12 +64,12 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 	setUpModeHandler : function () {
 
-		this.reflowableLayout.setUpMode(this.el, this.model.get("two_up"));
+		this.reflowableLayout.setUpMode(this.el, $("#spine-divider", document), this.model.get("two_up"));
 	},
 
 	injectThemeHandler : function () {
 
-		this.reflowableLayout.injectTheme(this.model.get("current_theme"), this.getBody());
+		this.reflowableLayout.injectTheme(this.model.get("current_theme"), this.getBody(), $("#flowing-wrapper", this.el));
 	},
 
 	setFontSizeHandler : function () {
@@ -84,20 +83,23 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		var json = this.model.getCurrentSection().toJSON();
 
 		// make everything invisible to prevent flicker
-		this.reflowableLayout.setUpMode(this.el, this.model.get("two_up"));
+		this.reflowableLayout.setUpMode(this.el, $("#spine-divider", this.el), this.model.get("two_up"));
 		this.$('#container').html( this.page_template(json) );
 		
 		this.$('#readium-flowing-content').on("load", function(e) {
 			// Important: Firefox doesn't recognize e.srcElement, so this needs to be checked for whenever it's required.
 			if (!e.srcElement) e.srcElement = this;
 
-			var lastPageElementId = that.reflowableLayout.injectCFIElements(document, that.model.get("epubCFIs"), that.model.get("spine_position"));
+			var lastPageElementId = that.reflowableLayout.injectCFIElements(
+				$("#readium-flowing-content", document).contents()[0].documentElement, 
+				that.model.get("epubCFIs"), 
+				that.model.get("spine_position"));
 			var pageInfo = that.reflowableLayout.adjustIframeColumns(
 				that.offset_dir,
-				that.$("#readium-flowing-content"),
-				that.getBody(),
+				that.$("#readium-flowing-content").contents()[0].documentElement,
+				that.$("#readium-flowing-content")[0],
+				that.$("#flowing-wrapper")[0],
 				that.model.get("two_up"),
-				that,
 				that.model.getCurrentSection().firstPageOffset(),
 				that.pages.get("current_page"),
 				that.model.epub.get("page_prog_dir"),
@@ -117,7 +119,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 				that );
 			that.mediaOverlayController.pagesLoaded();
 			that.reflowableLayout.setFontSize(that.model.get("font_size"), that.getBody(), that.model.get("two_up"));
-			that.reflowableLayout.injectTheme(that.model.get("current_theme"), that.getBody());
+			that.reflowableLayout.injectTheme(that.model.get("current_theme"), that.getBody(), $("#flowing-wrapper", that.el));
 			that.pages.set("num_pages", that.reflowableLayout.calcNumPages(that.getBody(), that.model.get("two_up")));
 			that.applyKeydownHandler();
 
@@ -226,7 +228,12 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
         this.model.off("change:font_size", this.setFontSizeHandler);
         this.mediaOverlayController.off("change:mo_text_id", this.highlightText);
         this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying);
-        this.reflowableLayout.resetEl(document, this, this.zoomer);
+        this.reflowableLayout.resetEl(
+        	this.getBody(), 
+        	$("#readium-flowing-content", this.el), 
+        	$("#spine-divider", this.el),
+        	$("#page-wrap", this.el),
+        	this.zoomer);
 	},
 
 	// Description: Handles clicks of anchor tags by navigating to
@@ -432,7 +439,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		setTimeout(function () {
 
 			var pageNumToGoTo = that.reflowableLayout.accountForOffset(
-				document, 
+				$("#readium-flowing-content", document), 
 				that.model.get("two_up"),
 				that.model.getCurrentSection().firstPageOffset(),
 				that.pages.get("current_page"),
@@ -446,10 +453,10 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	windowSizeChangeHandler: function() {
 		var pageInfo = this.reflowableLayout.adjustIframeColumns(
 				this.offset_dir,
-				this.$("#readium-flowing-content"),
-				this.getBody(),
+				this.$("#readium-flowing-content").contents()[0].documentElement,
+				this.$("#readium-flowing-content")[0],
+				this.$("#flowing-wrapper")[0],
 				this.model.get("two_up"),
-				this,
 				this.model.getCurrentSection().firstPageOffset(),
 				this.pages.get("current_page"),
 				this.model.epub.get("page_prog_dir"),
@@ -468,10 +475,10 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	marginCallback: function() {
 		var pageInfo = this.reflowableLayout.adjustIframeColumns(
 				this.offset_dir,
-				this.$("#readium-flowing-content"),
-				this.getBody(),
+				this.$("#readium-flowing-content").contents()[0].documentElement,
+				this.$("#readium-flowing-content")[0],
+				this.$("#flowing-wrapper")[0],
 				this.model.get("two_up"),
-				this,
 				this.model.getCurrentSection().firstPageOffset(),
 				this.pages.get("current_page"),
 				this.model.epub.get("page_prog_dir"),
