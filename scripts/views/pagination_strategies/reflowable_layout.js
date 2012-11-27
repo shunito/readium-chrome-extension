@@ -16,7 +16,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         this.applySwitches( $(e.srcElement).contents(), dom );
         this.injectMathJax(e.srcElement);
         this.injectLinkHandler(e.srcElement, linkClickHandler, handlerContext);
-        var trigs = this.parseTriggers(e.srcElement.contentDocument, e.srcElement.contentDocument);
+        var trigs = this.parseTriggers(e.srcElement.contentDocument);
         this.applyTriggers(e.srcElement.contentDocument, trigs);
         $(e.srcElement).attr('title', Acc.page + ' - ' + Acc.title);
     },
@@ -428,11 +428,11 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
 
     // Description: For reflowable content we only add what is in the body tag.
     //   Lots of times the triggers are in the head of the dom
-    parseTriggers: function(dom, reflowableDom) {
+    parseTriggers: function(epubContentDocument) {
         var triggers = [];
-        $('trigger', dom).each(function() {
+        $('trigger', epubContentDocument.parentNode).each(function() {
             
-            triggers.push(new Readium.Models.Trigger(reflowableDom) );
+            triggers.push(new Readium.Models.Trigger(epubContentDocument.parentNode) );
         });
         
         return triggers;
@@ -504,11 +504,11 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         });
     },
 
-    resetEl: function(epubContentDocument, readiumFlowingContent, spineDivider, pageWrap, zoomer) {
+    resetEl: function(epubContentDocument, readiumBookViewEl, spineDivider, pageWrap, zoomer) {
 
         $("body", epubContentDocument).removeClass("apple-fixed-layout");
-        $(readiumFlowingContent).attr("style", "");
-        $(readiumFlowingContent).toggleClass("two-up", false);
+        $(readiumBookViewEl).attr("style", "");
+        $(readiumBookViewEl).toggleClass("two-up", false);
         $(spineDivider).toggle(false);
         zoomer.reset();
 

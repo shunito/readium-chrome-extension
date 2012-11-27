@@ -49,9 +49,9 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 		var pageInfo = this.reflowableLayout.adjustIframeColumns(
 				this.offset_dir,
-				this.$("#readium-flowing-content").contents()[0].documentElement,
-				this.$("#readium-flowing-content")[0],
-				this.$("#flowing-wrapper")[0],
+				this.getEpubContentDocument(),
+				this.getReadiumFlowingContent(),
+				this.getFlowingWrapper(),
 				this.model.get("two_up"),
 				this.model.getCurrentSection().firstPageOffset(),
 				this.pages.get("current_page"),
@@ -64,17 +64,23 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 	setUpModeHandler : function () {
 
-		this.reflowableLayout.setUpMode(this.el, $("#spine-divider", document), this.model.get("two_up"));
+		this.reflowableLayout.setUpMode(this.el, this.getSpineDivider(), this.model.get("two_up"));
 	},
 
 	injectThemeHandler : function () {
 
-		this.reflowableLayout.injectTheme(this.model.get("current_theme"), this.getBody(), $("#flowing-wrapper", this.el));
+		this.reflowableLayout.injectTheme(
+			this.model.get("current_theme"), 
+			this.getEpubContentDocument(), 
+			this.getFlowingWrapper());
 	},
 
 	setFontSizeHandler : function () {
 
-		var numPages = this.reflowableLayout.setFontSize(this.model.get("font_size"), this.getBody(), this.model.get("two_up"));
+		var numPages = this.reflowableLayout.setFontSize(
+			this.model.get("font_size"), 
+			this.getEpubContentDocument(), 
+			this.model.get("two_up"));
 		this.pages.set("num_pages", numPages);
 	},
 
@@ -83,7 +89,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		var json = this.model.getCurrentSection().toJSON();
 
 		// make everything invisible to prevent flicker
-		this.reflowableLayout.setUpMode(this.el, $("#spine-divider", this.el), this.model.get("two_up"));
+		this.reflowableLayout.setUpMode(this.el, this.getSpineDivider(), this.model.get("two_up"));
 		this.$('#container').html( this.page_template(json) );
 		
 		this.$('#readium-flowing-content').on("load", function(e) {
@@ -91,14 +97,14 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			if (!e.srcElement) e.srcElement = this;
 
 			var lastPageElementId = that.reflowableLayout.injectCFIElements(
-				$("#readium-flowing-content", document).contents()[0].documentElement, 
+				that.getEpubContentDocument(), 
 				that.model.get("epubCFIs"), 
 				that.model.get("spine_position"));
 			var pageInfo = that.reflowableLayout.adjustIframeColumns(
 				that.offset_dir,
-				that.$("#readium-flowing-content").contents()[0].documentElement,
-				that.$("#readium-flowing-content")[0],
-				that.$("#flowing-wrapper")[0],
+				that.getEpubContentDocument(),
+				that.getReadiumFlowingContent(),
+				that.getFlowingWrapper(),
 				that.model.get("two_up"),
 				that.model.getCurrentSection().firstPageOffset(),
 				that.pages.get("current_page"),
@@ -118,9 +124,19 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 				that.linkClickHandler,
 				that );
 			that.mediaOverlayController.pagesLoaded();
-			that.reflowableLayout.setFontSize(that.model.get("font_size"), that.getBody(), that.model.get("two_up"));
-			that.reflowableLayout.injectTheme(that.model.get("current_theme"), that.getBody(), $("#flowing-wrapper", that.el));
-			that.pages.set("num_pages", that.reflowableLayout.calcNumPages(that.getBody(), that.model.get("two_up")));
+			that.reflowableLayout.setFontSize(
+				that.model.get("font_size"), 
+				that.getEpubContentDocument(), 
+				that.model.get("two_up"));
+			that.reflowableLayout.injectTheme(
+				that.model.get("current_theme"), 
+				that.getEpubContentDocument(), 
+				that.getFlowingWrapper());
+			that.pages.set(
+				"num_pages", 
+				that.reflowableLayout.calcNumPages(
+					that.getEpubContentDocument(), 
+					that.model.get("two_up")));
 			that.applyKeydownHandler();
 
 			// Rationale: The assumption here is that if a hash fragment is specified, it is the result of Readium 
@@ -230,9 +246,9 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
         this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying);
         this.reflowableLayout.resetEl(
         	this.getBody(), 
-        	$("#readium-flowing-content", this.el), 
-        	$("#spine-divider", this.el),
-        	$("#page-wrap", this.el),
+        	this.el, 
+        	this.getSpineDivider(),
+        	this.getPageWrap(),
         	this.zoomer);
 	},
 
@@ -283,7 +299,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	// Stays here
 	// Used: this
 	// REFACTORING CANDIDATE: No need to make that call through the epubController
-
 	// Actually, the handler is being applied here, so it should be moved to layout logic
 	applyKeydownHandler : function () {
 
@@ -407,14 +422,36 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	// This is now part of the public interface
 	// Description: helper method to get the a reference to the documentElement
 	// of the document in this strategy's iFrame.
-	// TODO: this is a bad name for this function
-	// Used: this, MediaOverlayViewHelper
-	getBody: function() {
+	// Rationale: This method is the same as epubContentDocument as other parts of readium call
+	//   this. It should be removed at some point.
+	getBody : function() {
 		return this.$('#readium-flowing-content').contents()[0].documentElement;
 	},
 
-	// Used: this
-	// Layout logic helper, mostly
+	getReadiumBookViewEl : function () {
+		return this.el;
+	},
+
+	getFlowingWrapper : function () {
+		return this.$("#flowing-wrapper")[0];
+	},
+
+	getPageWrap : function () {
+		return this.$("#page-wrap")[0];
+	},
+
+	getReadiumFlowingContent : function () {
+		return this.$("#readium-flowing-content")[0];
+	},
+
+	getEpubContentDocument : function () {
+		return this.$("#readium-flowing-content").contents()[0].documentElement;
+	},
+
+	getSpineDivider : function () {
+		return this.$("#spine-divider")[0];
+	},
+
 	hideContent: function() {
 		$("#flowing-wrapper").css("opacity", "0");
 	},
@@ -439,7 +476,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		setTimeout(function () {
 
 			var pageNumToGoTo = that.reflowableLayout.accountForOffset(
-				$("#readium-flowing-content", document), 
+				that.getReadiumFlowingContent(), 
 				that.model.get("two_up"),
 				that.model.getCurrentSection().firstPageOffset(),
 				that.pages.get("current_page"),
@@ -453,9 +490,9 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	windowSizeChangeHandler: function() {
 		var pageInfo = this.reflowableLayout.adjustIframeColumns(
 				this.offset_dir,
-				this.$("#readium-flowing-content").contents()[0].documentElement,
-				this.$("#readium-flowing-content")[0],
-				this.$("#flowing-wrapper")[0],
+				this.getEpubContentDocument(),
+				this.getReadiumFlowingContent(),
+				this.getFlowingWrapper(),
 				this.model.get("two_up"),
 				this.model.getCurrentSection().firstPageOffset(),
 				this.pages.get("current_page"),
@@ -470,14 +507,12 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.goToHashFragment(this.model.get("hash_fragment"));
 	},
     
-    // Stays here
-    // Used: this
 	marginCallback: function() {
 		var pageInfo = this.reflowableLayout.adjustIframeColumns(
 				this.offset_dir,
-				this.$("#readium-flowing-content").contents()[0].documentElement,
-				this.$("#readium-flowing-content")[0],
-				this.$("#flowing-wrapper")[0],
+				this.getEpubContentDocument(),
+				this.getReadiumFlowingContent(),
+				this.getFlowingWrapper(),
 				this.model.get("two_up"),
 				this.model.getCurrentSection().firstPageOffset(),
 				this.pages.get("current_page"),
