@@ -89,10 +89,10 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 		// make everything invisible to prevent flicker
 		// This can move to layout
-		this.reflowableLayout.setUpMode(
-			this.getReadiumBookViewEl(), 
-			this.getSpineDivider(), 
-			this.model.get("two_up"));
+		// this.reflowableLayout.setUpMode(
+		// 	this.getReadiumBookViewEl(), 
+		// 	this.getSpineDivider(), 
+		// 	this.model.get("two_up"));
 
 		// This can move to layout
 		this.$('#container').html( this.page_template(json) );
@@ -106,21 +106,23 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 				that.model.get("epubCFIs"), 
 				that.model.get("spine_position"));
 
-			var pageInfo = that.reflowableLayout.adjustIframeColumns(
-				that.offset_dir,
-				that.getEpubContentDocument(),
-				that.getReadiumFlowingContent(),
-				that.getFlowingWrapper(),
-				that.model.get("two_up"),
-				that.model.getCurrentSection().firstPageOffset(),
-				that.pages.get("current_page"),
-				that.model.epub.get("page_prog_dir"),
-				that.model.get("current_margin"));
+			that.rePaginationHandler();
+
+			// var pageInfo = that.reflowableLayout.adjustIframeColumns(
+			// 	that.offset_dir,
+			// 	that.getEpubContentDocument(),
+			// 	that.getReadiumFlowingContent(),
+			// 	that.getFlowingWrapper(),
+			// 	that.model.get("two_up"),
+			// 	that.model.getCurrentSection().firstPageOffset(),
+			// 	that.pages.get("current_page"),
+			// 	that.model.epub.get("page_prog_dir"),
+			// 	that.model.get("current_margin"));
 
 			// that.pages.set("num_pages", pageInfo[0]);
 			// There's a dependency here. A page must be shown before other view calculations can be made in the 
 			//    go to hash method
-			that.goToPage(pageInfo[1]);
+			// that.goToPage(pageInfo[1]);
 
 			that.reflowableLayout.iframeLoadCallback(
 				e, 
@@ -135,11 +137,11 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 			that.mediaOverlayController.pagesLoaded();
 
-			that.reflowableLayout.setFontSize(
-				that.model.get("font_size"), 
-				that.getEpubContentDocument(), 
-				that.model.get("two_up")
-				);
+			// that.reflowableLayout.setFontSize(
+			// 	that.model.get("font_size"), 
+			// 	that.getEpubContentDocument(), 
+			// 	that.model.get("two_up")
+			// 	);
 
 			that.reflowableLayout.injectTheme(
 				that.model.get("current_theme"), 
@@ -147,13 +149,13 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 				that.getFlowingWrapper()
 				);
 
-			that.pages.set(
-				"num_pages", 
-				that.reflowableLayout.calcNumPages(
-					that.getEpubContentDocument(), 
-					that.model.get("two_up")
-					)
-				);
+			// that.pages.set(
+			// 	"num_pages", 
+			// 	that.reflowableLayout.calcNumPages(
+			// 		that.getEpubContentDocument(), 
+			// 		that.model.get("two_up")
+			// 		)
+			// 	);
 
 			that.applyKeydownHandler();
 
@@ -260,6 +262,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
         this.model.off("change:font_size", this.setFontSizeHandler);
         this.mediaOverlayController.off("change:mo_text_id", this.highlightText);
         this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying);
+
         this.reflowableLayout.resetEl(
         	this.getBody(), 
         	this.el, 
@@ -485,50 +488,77 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.hideContent();
 		setTimeout(function () {
 
-			var pageNumToGoTo = that.reflowableLayout.accountForOffset(
-				that.getReadiumFlowingContent(), 
-				that.model.get("two_up"),
-				that.model.getCurrentSection().firstPageOffset(),
-				that.pages.get("current_page"),
-				that.model.epub.get("page_prog_dir"));
-			that.goToPage(pageNumToGoTo);
+			// var pageNumToGoTo = that.reflowableLayout.accountForOffset(
+			// 	that.getReadiumFlowingContent(), 
+			// 	that.model.get("two_up"),
+			// 	that.model.getCurrentSection().firstPageOffset(),
+			// 	that.pages.get("current_page"),
+			// 	that.model.epub.get("page_prog_dir"));
+			// that.goToPage(pageNumToGoTo);
+
+			that.rePaginationHandler();
 			that.savePosition();
 
 		}, 150);
 	},
 
 	windowSizeChangeHandler: function() {
-		var pageInfo = this.reflowableLayout.adjustIframeColumns(
-				this.offset_dir,
-				this.getEpubContentDocument(),
-				this.getReadiumFlowingContent(),
-				this.getFlowingWrapper(),
-				this.model.get("two_up"),
-				this.model.getCurrentSection().firstPageOffset(),
-				this.pages.get("current_page"),
-				this.model.epub.get("page_prog_dir"),
-				this.model.get("current_margin")
-				);
+		// var pageInfo = this.reflowableLayout.adjustIframeColumns(
+		// 		this.offset_dir,
+		// 		this.getEpubContentDocument(),
+		// 		this.getReadiumFlowingContent(),
+		// 		this.getFlowingWrapper(),
+		// 		this.model.get("two_up"),
+		// 		this.model.getCurrentSection().firstPageOffset(),
+		// 		this.pages.get("current_page"),
+		// 		this.model.epub.get("page_prog_dir"),
+		// 		this.model.get("current_margin")
+		// 		);
 
-		this.pages.set("num_pages", pageInfo[0]);
-		this.goToPage(pageInfo[1]);
+		// this.pages.set("num_pages", pageInfo[0]);
+		// this.goToPage(pageInfo[1]);
+
+		this.rePaginationHandler();
 		
 		// Make sure we return to the correct position in the epub (This also requires clearing the hash fragment) on resize.
 		this.goToHashFragment(this.model.get("hash_fragment"));
 	},
     
 	marginCallback: function() {
-		var pageInfo = this.reflowableLayout.adjustIframeColumns(
-				this.offset_dir,
-				this.getEpubContentDocument(),
-				this.getReadiumFlowingContent(),
-				this.getFlowingWrapper(),
-				this.model.get("two_up"),
-				this.model.getCurrentSection().firstPageOffset(),
-				this.pages.get("current_page"),
-				this.model.epub.get("page_prog_dir"),
-				this.model.get("current_margin")
-				);
+		// var pageInfo = this.reflowableLayout.adjustIframeColumns(
+		// 		this.offset_dir,
+		// 		this.getEpubContentDocument(),
+		// 		this.getReadiumFlowingContent(),
+		// 		this.getFlowingWrapper(),
+		// 		this.model.get("two_up"),
+		// 		this.model.getCurrentSection().firstPageOffset(),
+		// 		this.pages.get("current_page"),
+		// 		this.model.epub.get("page_prog_dir"),
+		// 		this.model.get("current_margin")
+		// 		);
+
+		// this.pages.set("num_pages", pageInfo[0]);
+		// this.goToPage(pageInfo[1]);
+
+		this.rePaginationHandler();
+	},
+
+	rePaginationHandler : function () {
+
+		var pageInfo = this.reflowableLayout.paginateContentDocument(
+			this.getReadiumBookViewEl(),
+			this.getSpineDivider(),
+			this.model.get("two_up"),
+			this.offset_dir,
+			this.getEpubContentDocument(),
+			this.getReadiumFlowingContent(),
+			this.getFlowingWrapper(),
+			this.model.getCurrentSection().firstPageOffset(),
+			this.pages.get("current_page"),
+			this.model.epub.get("page_prog_dir"),
+			this.model.get("current_margin"),
+			this.model.get("font_size")
+			);
 
 		this.pages.set("num_pages", pageInfo[0]);
 		this.goToPage(pageInfo[1]);

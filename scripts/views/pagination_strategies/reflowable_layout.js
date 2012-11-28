@@ -10,6 +10,39 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         this.stashModernizrPrefixedProps();
     },
 
+
+    // ------------------------------------------------------------------------------------ //
+    //  "PRIVATE" HELPERS                                                                   //
+    // ------------------------------------------------------------------------------------ //
+
+
+    // Description: we are using experimental styles so we need to 
+    //   use modernizr to generate prefixes
+    stashModernizrPrefixedProps: function() {
+        var cssIfy = function(str) {
+            return str.replace(/([A-Z])/g, function(str,m1){ 
+                return '-' + m1.toLowerCase(); 
+            }).replace(/^ms-/,'-ms-');
+        };
+
+        // ask modernizr for the vendor prefixed version
+        this.columnAxis =  Modernizr.prefixed('columnAxis') || 'columnAxis';
+        this.columnGap =  Modernizr.prefixed('columnGap') || 'columnGap';
+        this.columnWidth =  Modernizr.prefixed('columnWidth') || 'columnWidth';
+
+        // we are interested in the css prefixed version
+        this.cssColumnAxis =  cssIfy(this.columnAxis);
+        this.cssColumnGap =  cssIfy(this.columnGap);
+        this.cssColumnWidth =  cssIfy(this.columnWidth);
+    },
+
+
+
+    // ------------------------------------------------------------------------------------ //
+    //  INITIALIZE CONTENT DOCUMENT CONTAINER
+    // ------------------------------------------------------------------------------------ //
+
+
     iframeLoadCallback: function(e, dom, packageDocument, bindingTemplate, goLeftHandler, goRightHandler, linkClickHandler, handlerContext) {
         
         this.applyBindings( $(e.srcElement).contents(), dom, packageDocument, bindingTemplate);
@@ -19,86 +52,6 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         var trigs = this.parseTriggers(e.srcElement.contentDocument);
         this.applyTriggers(e.srcElement.contentDocument, trigs);
         $(e.srcElement).attr('title', Acc.page + ' - ' + Acc.title);
-    },
-    
-    // Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
-    //   only the day-night alternate tags are available as an option.  
-    activateEPubStyle: function(bookDom, currentTheme) {
-
-        var selector;
-        
-        // Apply night theme for the book; nothing will be applied if the ePub's style sheets do not contain a style
-        // set with the 'night' tag
-        if (currentTheme === "night-theme") {
-
-            selector = new Readium.Models.AlternateStyleTagSelector;
-            bookDom = selector.activateAlternateStyleSet(["night"], bookDom);
-
-        }
-        else {
-
-            selector = new Readium.Models.AlternateStyleTagSelector;
-            bookDom = selector.activateAlternateStyleSet([""], bookDom);
-        }
-    },
-
-    // REFACTORING CANDIDATE: This method could use a better name. The purpose of this method is to make one or two 
-    //   pages of an epub visible. "setUpMode" seems non-specific. 
-    // Description: Changes the html to make either 1 or 2 pages visible in their iframes
-    setUpMode: function (readiumBookViewEl, spineDivider, isTwoUp) {
-
-        $(readiumBookViewEl).toggleClass("two-up", isTwoUp);
-        $(spineDivider).toggle(isTwoUp);
-    },
-
-    // ------------------------------------------------------------------------------------ //
-    //  "PRIVATE" HELPERS                                                                   //
-    // ------------------------------------------------------------------------------------ //
-
-    // REFACTORING CANDIDATE: This is a temporary method to encapsulate some logic from the reflowable view that is
-    //   also duplicated in the adjustIframeColumns method in this model
-    accountForOffset : function (readiumFlowingContent, isTwoUp, firstPageIsOffset, currentPages, ppd) {
-
-        var $reflowableIframe = $(readiumFlowingContent);
-        if (isTwoUp) {
-            // If the first page is offset, adjust the window to only show one page
-            var firstPageIsOffset = firstPageIsOffset;
-            var firstPageOffsetValue;
-
-            // Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
-            //   only the first page should be showing in that display
-            var onFirstPage = 
-                currentPages[0] === 0 &&
-                currentPages[1] === 1 
-                ? true : false;
-
-            if (firstPageIsOffset && onFirstPage) {
-
-                if (ppd === "rtl") {
-
-                    firstPageOffset = -(2 * (this.page_width + this.gap_width));
-                    $reflowableIframe.css("margin-left", firstPageOffset + "px");
-                }
-                // Left-to-right pagination
-                else {
-
-                    firstPageOffset = this.page_width + (this.gap_width * 2);
-                    $reflowableIframe.css("margin-left", firstPageOffset + "px");
-                }
-
-                return 1;
-            }
-            else {
-
-                $reflowableIframe.css("margin-left", "0px");
-                return currentPages[0];
-            }
-        }
-        else {
-
-            $reflowableIframe.css("margin-left", "0px");
-            return currentPages[0];
-        }
     },
 
     injectCFIElements : function (epubContentDocument, epubCFIs, currSpinePosition) {
@@ -144,248 +97,6 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         // This will be undefined unless there is a "last-page" element injected into the page
         return lastPageElementId;
     },
-
-    getFrameWidth: function(flowingWrapperWidth, currentMargin, isTwoUp) {
-
-        var width;
-        var margin = currentMargin;
-        if (margin === 1) {
-            isTwoUp ? (width = 0.95) : (width = 0.90);
-        }
-        else if (margin === 2) {
-            isTwoUp ? (width = 0.89) : (width = 0.80);
-        }
-        else if (margin === 3) {
-            isTwoUp ? (width = 0.83) : (width = 0.70); 
-        }
-        else if (margin === 4) {
-            isTwoUp ? (width = 0.77) : (width = 0.60); 
-        }
-        else {
-            isTwoUp ? (width = 0.70) : (width = 0.50); 
-        }
-        
-        return Math.floor( flowingWrapperWidth * width );
-        // $('#flowing-wrapper', view.$el).width()
-    },
-
-    // Rationale: on iOS frames are automatically expanded to fit the content dom
-    // thus we cannot use relative size for the iframe and must set abs 
-    // pixel size
-    setFrameSize: function(flowingWrapperWidth, flowingWrapperHeight, readiumFlowingContent, currentMargin, isTwoUp) {
-
-        var width = this.getFrameWidth(flowingWrapperWidth, currentMargin, isTwoUp).toString() + "px";
-
-        // REFACTORING CANDIDATE: the $el is no good
-        var height = flowingWrapperHeight.toString() + "px"; 
-
-        $(readiumFlowingContent).attr("width", width);
-        $(readiumFlowingContent).attr("height", height);
-        $(readiumFlowingContent).css("width", width);
-        $(readiumFlowingContent).css("height", height);
-    },
-
-    getBodyColumnCss: function() {
-        var css = {};
-        css[this.cssColumnAxis] = "horizontal";
-        css[this.cssColumnGap] = this.gap_width.toString() + "px";
-        css[this.cssColumnWidth] = this.page_width.toString() + "px";
-        css["padding"] = "0px";
-        css["margin"] = "0px";
-        css["position"] = "absolute";
-        css["width"] = this.page_width.toString() + "px";
-        css["height"] = this.frame_height.toString() + "px";
-        return css;
-    },
-
-    adjustIframeColumns: function(offsetDir, epubContentDocument, readiumFlowingContent, flowingWrapper, isTwoUp, firstPageOffset, currentPages, ppd, currentMargin ) {
-
-        var prop_dir = offsetDir;
-        var $frame = $(readiumFlowingContent);
-        var page;
-
-        this.setFrameSize($(flowingWrapper).width(), $(flowingWrapper).height(), readiumFlowingContent, currentMargin, isTwoUp);
-
-        this.frame_width = parseInt($frame.width(), 10);
-        this.frame_height = parseInt($frame.height(), 10);
-        this.gap_width = Math.floor(this.frame_width / 7);
-        if (isTwoUp) {
-            this.page_width = Math.floor((this.frame_width - this.gap_width) / 2);
-        }
-        else {
-            this.page_width = this.frame_width;
-        }
-
-        // it is important for us to make sure there is no padding or
-        // margin on the <html> elem, or it will mess with our column code
-        $(epubContentDocument).css( this.getBodyColumnCss() );
-
-        // If the first page is offset, adjust the window to only show one page
-        if (isTwoUp) {
-            
-            var firstPageIsOffset = firstPageOffset;
-            var firstPageOffsetValue;
-
-            // Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
-            //   only the first page should be showing in that display
-            // REFACTORING CANDIDATE: This logic is similar to that in pageChangeHandler
-            var onFirstPage = 
-                currentPages[0] === 0 &&
-                currentPages[1] === 1 
-                ? true : false;
-
-            if (firstPageIsOffset && onFirstPage) {
-
-                if (ppd === "rtl") {
-
-                    firstPageOffset = -(2 * (this.page_width + this.gap_width));
-                    $frame.css("margin-left", firstPageOffset + "px");
-                }
-                // Left-to-right pagination
-                else {
-
-                    firstPageOffset = this.page_width + (this.gap_width * 2);
-                    $frame.css("margin-left", firstPageOffset + "px");
-                }
-
-                page = 1;
-            }
-            else {
-
-                $frame.css("margin-left", "0px");
-                page = currentPages[0];
-            }
-        }
-        else {
-
-            $frame.css("margin-left", "0px");
-            page = currentPages[0];
-        }
-
-        return [this.calcNumPages(epubContentDocument, isTwoUp), page];
-    },
-
-    injectTheme: function(currentTheme, epubContentDocument, flowingWrapper) {
-
-        var theme = currentTheme;
-        if (theme === "default") {
-            theme = "default-theme";
-        }
-
-        $(epubContentDocument).css({
-            "color": this.themes[theme]["color"],
-            "background-color": this.themes[theme]["background-color"]
-        });
-        
-        // stop flicker due to application for alternate style sheets
-        // just set content to be invisible
-        $(flowingWrapper).css("visibility", "hidden");
-        this.activateEPubStyle(epubContentDocument, currentTheme);
-
-        // wait for new stylesheets to parse before setting back to visible
-        setTimeout(function() {
-            $(flowingWrapper).css("visibility", "visible"); 
-        }, 100);
-    },
-
-    // Rationale: sadly this is just a reprint of what is already in the
-    //   themes stylesheet. It isn't very DRY but the implementation is
-    //   cleaner this way
-    themes: {
-        "default-theme": {
-            "background-color": "white",
-            "color": "black",
-            "mo-color": "#777"
-        },
-
-        "vancouver-theme": {
-            "background-color": "#DDD",
-            "color": "#576b96",
-            "mo-color": "#777"
-        },
-
-        "ballard-theme": {
-            "background-color": "#576b96",
-            "color": "#DDD",
-            "mo-color": "#888"
-        },
-
-        "parchment-theme": {
-            "background-color": "#f7f1cf",
-            "color": "#774c27",
-            "mo-color": "#eebb22"
-        },
-
-        "night-theme": {
-            "background-color": "#141414",
-            "color": "white",
-            "mo-color": "#666"
-        }
-    },
-
-    setFontSize: function(fontSize, epubContentDocument, isTwoUp) {
-
-        var size = fontSize / 10;
-        $(epubContentDocument).css("font-size", size + "em");
-
-        // the content size has changed so recalc the number of 
-        // pages
-        return this.calcNumPages(epubContentDocument, isTwoUp);
-    },
-
-    // Description: we are using experimental styles so we need to 
-    //   use modernizr to generate prefixes
-    stashModernizrPrefixedProps: function() {
-        var cssIfy = function(str) {
-            return str.replace(/([A-Z])/g, function(str,m1){ 
-                return '-' + m1.toLowerCase(); 
-            }).replace(/^ms-/,'-ms-');
-        };
-
-        // ask modernizr for the vendor prefixed version
-        this.columnAxis =  Modernizr.prefixed('columnAxis') || 'columnAxis';
-        this.columnGap =  Modernizr.prefixed('columnGap') || 'columnGap';
-        this.columnWidth =  Modernizr.prefixed('columnWidth') || 'columnWidth';
-
-        // we are interested in the css prefixed version
-        this.cssColumnAxis =  cssIfy(this.columnAxis);
-        this.cssColumnGap =  cssIfy(this.columnGap);
-        this.cssColumnWidth =  cssIfy(this.columnWidth);
-    },
-
-    // Description: calculate the number of pages in the current section,
-    //   based on section length : page size ratio
-    calcNumPages: function(epubContentDocument, isTwoUp) {
-
-        var body, offset, width, num;
-        
-        // get a reference to the dom body
-        body = epubContentDocument;
-
-        // cache the current offset 
-        offset = body.style[this.offset_dir];
-
-        // set the offset to 0 so that all overflow is part of
-        // the scroll width
-        body.style[this.offset_dir] = "0px";
-
-        // grab the scrollwidth => total content width
-        width = epubContentDocument.scrollWidth;
-
-        // reset the offset to its original value
-        body.style[this.offset_dir] = offset;
-
-        // perform calculation and return result...
-        num = Math.floor( (width + this.gap_width) / (this.gap_width + this.page_width) );
-
-        // in two up mode, always set to an even number of pages
-        if( num % 2 === 0 && isTwoUp) {
-            //num += 1;
-        }
-        return num;
-    },
-
-    // -----------  Most of this is unique to the reflowable view --------------------- //
 
     getBindings: function(packageDocument) {
         var packDoc = packageDocument;
@@ -503,7 +214,326 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         });
     },
 
-    resetEl: function(epubContentDocument, readiumBookViewEl, spineDivider, pageWrap, zoomer) {
+
+
+
+
+
+
+    // ------------------------------------------------------------------------------------ //
+    //  PAGINATE REFLOWABLE CONTENT DOCUMENT
+    // ------------------------------------------------------------------------------------ //
+
+    paginateContentDocument : function (readiumBookViewEl, spineDivider, isTwoUp, offsetDir, epubContentDocument, readiumFlowingContent, flowingWrapper, firstPageOffset, currentPages, ppd, currentMargin, fontSize) {
+
+        this.setUpMode(readiumBookViewEl, spineDivider, isTwoUp);
+        var pageInfo = this.adjustIframeColumns(offsetDir, epubContentDocument, readiumFlowingContent, flowingWrapper, isTwoUp, firstPageOffset, currentPages, ppd, currentMargin);
+        var numPages = this.setFontSize(fontSize, epubContentDocument, isTwoUp);
+
+        return [numPages, pageInfo[1]];
+    },
+
+    // Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
+    //   only the day-night alternate tags are available as an option.  
+    activateEPubStyle : function(bookDom, currentTheme) {
+
+        var selector;
+        
+        // Apply night theme for the book; nothing will be applied if the ePub's style sheets do not contain a style
+        // set with the 'night' tag
+        if (currentTheme === "night-theme") {
+
+            selector = new Readium.Models.AlternateStyleTagSelector;
+            bookDom = selector.activateAlternateStyleSet(["night"], bookDom);
+
+        }
+        else {
+
+            selector = new Readium.Models.AlternateStyleTagSelector;
+            bookDom = selector.activateAlternateStyleSet([""], bookDom);
+        }
+    },
+
+    // REFACTORING CANDIDATE: This method could use a better name. The purpose of this method is to make one or two 
+    //   pages of an epub visible. "setUpMode" seems non-specific. 
+    // Description: Changes the html to make either 1 or 2 pages visible in their iframes
+    setUpMode : function (readiumBookViewEl, spineDivider, isTwoUp) {
+
+        $(readiumBookViewEl).toggleClass("two-up", isTwoUp);
+        $(spineDivider).toggle(isTwoUp);
+    },
+
+    // Description: calculate the number of pages in the current section,
+    //   based on section length : page size ratio
+    calcNumPages : function (epubContentDocument, isTwoUp) {
+
+        var body, offset, width, num;
+        
+        // get a reference to the dom body
+        body = epubContentDocument;
+
+        // cache the current offset 
+        offset = body.style[this.offset_dir];
+
+        // set the offset to 0 so that all overflow is part of
+        // the scroll width
+        body.style[this.offset_dir] = "0px";
+
+        // grab the scrollwidth => total content width
+        width = epubContentDocument.scrollWidth;
+
+        // reset the offset to its original value
+        body.style[this.offset_dir] = offset;
+
+        // perform calculation and return result...
+        num = Math.floor( (width + this.gap_width) / (this.gap_width + this.page_width) );
+
+        // in two up mode, always set to an even number of pages
+        if( num % 2 === 0 && isTwoUp) {
+            //num += 1;
+        }
+        return num;
+    },
+
+    getFrameWidth : function (flowingWrapperWidth, currentMargin, isTwoUp) {
+
+        var width;
+        var margin = currentMargin;
+        if (margin === 1) {
+            isTwoUp ? (width = 0.95) : (width = 0.90);
+        }
+        else if (margin === 2) {
+            isTwoUp ? (width = 0.89) : (width = 0.80);
+        }
+        else if (margin === 3) {
+            isTwoUp ? (width = 0.83) : (width = 0.70); 
+        }
+        else if (margin === 4) {
+            isTwoUp ? (width = 0.77) : (width = 0.60); 
+        }
+        else {
+            isTwoUp ? (width = 0.70) : (width = 0.50); 
+        }
+        
+        return Math.floor( flowingWrapperWidth * width );
+    },
+
+    // Rationale: on iOS frames are automatically expanded to fit the content dom
+    // thus we cannot use relative size for the iframe and must set abs 
+    // pixel size
+    setFrameSize : function (flowingWrapperWidth, flowingWrapperHeight, readiumFlowingContent, currentMargin, isTwoUp) {
+
+        var width = this.getFrameWidth(flowingWrapperWidth, currentMargin, isTwoUp).toString() + "px";
+
+        // REFACTORING CANDIDATE: the $el is no good
+        var height = flowingWrapperHeight.toString() + "px"; 
+
+        $(readiumFlowingContent).attr("width", width);
+        $(readiumFlowingContent).attr("height", height);
+        $(readiumFlowingContent).css("width", width);
+        $(readiumFlowingContent).css("height", height);
+    },
+
+    getBodyColumnCss : function () {
+        var css = {};
+        css[this.cssColumnAxis] = "horizontal";
+        css[this.cssColumnGap] = this.gap_width.toString() + "px";
+        css[this.cssColumnWidth] = this.page_width.toString() + "px";
+        css["padding"] = "0px";
+        css["margin"] = "0px";
+        css["position"] = "absolute";
+        css["width"] = this.page_width.toString() + "px";
+        css["height"] = this.frame_height.toString() + "px";
+        return css;
+    },
+
+    // REFACTORING CANDIDATE: This is a temporary method to encapsulate some logic from the reflowable view that is
+    //   also duplicated in the adjustIframeColumns method in this model
+    accountForOffset : function (readiumFlowingContent, isTwoUp, firstPageIsOffset, currentPages, ppd) {
+
+        var $reflowableIframe = $(readiumFlowingContent);
+
+        if (isTwoUp) {
+            // If the first page is offset, adjust the window to only show one page
+            var firstPageIsOffset = firstPageIsOffset;
+            var firstPageOffsetValue;
+
+            // Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
+            //   only the first page should be showing in that display
+            var onFirstPage = 
+                currentPages[0] === 0 &&
+                currentPages[1] === 1 
+                ? true : false;
+
+            if (firstPageIsOffset && onFirstPage) {
+
+                if (ppd === "rtl") {
+
+                    firstPageOffset = -(2 * (this.page_width + this.gap_width));
+                    $reflowableIframe.css("margin-left", firstPageOffset + "px");
+                }
+                // Left-to-right pagination
+                else {
+
+                    firstPageOffset = this.page_width + (this.gap_width * 2);
+                    $reflowableIframe.css("margin-left", firstPageOffset + "px");
+                }
+
+                return 1;
+            }
+            else {
+
+                $reflowableIframe.css("margin-left", "0px");
+                return currentPages[0];
+            }
+        }
+        else {
+
+            $reflowableIframe.css("margin-left", "0px");
+            return currentPages[0];
+        }
+    },
+
+    adjustIframeColumns : function (offsetDir, epubContentDocument, readiumFlowingContent, flowingWrapper, isTwoUp, firstPageOffset, currentPages, ppd, currentMargin ) {
+
+        var prop_dir = offsetDir;
+        var $frame = $(readiumFlowingContent);
+        var page;
+
+        this.setFrameSize($(flowingWrapper).width(), $(flowingWrapper).height(), readiumFlowingContent, currentMargin, isTwoUp);
+
+        this.frame_width = parseInt($frame.width(), 10);
+        this.frame_height = parseInt($frame.height(), 10);
+        this.gap_width = Math.floor(this.frame_width / 7);
+        if (isTwoUp) {
+            this.page_width = Math.floor((this.frame_width - this.gap_width) / 2);
+        }
+        else {
+            this.page_width = this.frame_width;
+        }
+
+        // it is important for us to make sure there is no padding or
+        // margin on the <html> elem, or it will mess with our column code
+        $(epubContentDocument).css( this.getBodyColumnCss() );
+
+        // If the first page is offset, adjust the window to only show one page
+        if (isTwoUp) {
+            
+            var firstPageIsOffset = firstPageOffset;
+            var firstPageOffsetValue;
+
+            // Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
+            //   only the first page should be showing in that display
+            // REFACTORING CANDIDATE: This logic is similar to that in pageChangeHandler
+            var onFirstPage = 
+                currentPages[0] === 0 &&
+                currentPages[1] === 1 
+                ? true : false;
+
+            if (firstPageIsOffset && onFirstPage) {
+
+                if (ppd === "rtl") {
+
+                    firstPageOffset = -(2 * (this.page_width + this.gap_width));
+                    $frame.css("margin-left", firstPageOffset + "px");
+                }
+                // Left-to-right pagination
+                else {
+
+                    firstPageOffset = this.page_width + (this.gap_width * 2);
+                    $frame.css("margin-left", firstPageOffset + "px");
+                }
+
+                page = 1;
+            }
+            else {
+
+                $frame.css("margin-left", "0px");
+                page = currentPages[0];
+            }
+        }
+        else {
+
+            $frame.css("margin-left", "0px");
+            page = currentPages[0];
+        }
+
+        return [this.calcNumPages(epubContentDocument, isTwoUp), page];
+    },
+
+    injectTheme : function (currentTheme, epubContentDocument, flowingWrapper) {
+
+        var theme = currentTheme;
+        if (theme === "default") {
+            theme = "default-theme";
+        }
+
+        $(epubContentDocument).css({
+            "color": this.themes[theme]["color"],
+            "background-color": this.themes[theme]["background-color"]
+        });
+        
+        // stop flicker due to application for alternate style sheets
+        // just set content to be invisible
+        $(flowingWrapper).css("visibility", "hidden");
+        this.activateEPubStyle(epubContentDocument, currentTheme);
+
+        // wait for new stylesheets to parse before setting back to visible
+        setTimeout(function() {
+            $(flowingWrapper).css("visibility", "visible"); 
+        }, 100);
+    },
+
+    // Rationale: sadly this is just a reprint of what is already in the
+    //   themes stylesheet. It isn't very DRY but the implementation is
+    //   cleaner this way
+    themes: {
+        "default-theme": {
+            "background-color": "white",
+            "color": "black",
+            "mo-color": "#777"
+        },
+
+        "vancouver-theme": {
+            "background-color": "#DDD",
+            "color": "#576b96",
+            "mo-color": "#777"
+        },
+
+        "ballard-theme": {
+            "background-color": "#576b96",
+            "color": "#DDD",
+            "mo-color": "#888"
+        },
+
+        "parchment-theme": {
+            "background-color": "#f7f1cf",
+            "color": "#774c27",
+            "mo-color": "#eebb22"
+        },
+
+        "night-theme": {
+            "background-color": "#141414",
+            "color": "white",
+            "mo-color": "#666"
+        }
+    },
+
+    setFontSize : function(fontSize, epubContentDocument, isTwoUp) {
+
+        var size = fontSize / 10;
+        $(epubContentDocument).css("font-size", size + "em");
+
+        // the content size has changed so recalc the number of 
+        // pages
+        return this.calcNumPages(epubContentDocument, isTwoUp);
+    },
+
+    // ------------------------------------------------------------------------------------ //
+    //  Other methods
+    // ------------------------------------------------------------------------------------ //
+
+    resetEl : function(epubContentDocument, readiumBookViewEl, spineDivider, pageWrap, zoomer) {
 
         $("body", epubContentDocument).removeClass("apple-fixed-layout");
         $(readiumBookViewEl).attr("style", "");
