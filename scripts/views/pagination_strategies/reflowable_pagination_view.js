@@ -42,7 +42,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.model.on("change:two_up", this.setUpModeHandler, this);
 		this.model.on("change:two_up", this.adjustIframeColumnsHandler, this);
 		this.model.on("change:current_margin", this.marginCallback, this);
-		this.model.on("save_position", this.savePosition, this);
 	},
 
 	adjustIframeColumnsHandler : function () {
@@ -64,7 +63,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 	setUpModeHandler : function () {
 
-		this.reflowableLayout.setUpMode(this.el, this.getSpineDivider(), this.model.get("two_up"));
+		this.reflowableLayout.setUpMode(this.getReadiumBookViewEl(), this.getSpineDivider(), this.model.get("two_up"));
 	},
 
 	injectThemeHandler : function () {
@@ -89,7 +88,13 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		var json = this.model.getCurrentSection().toJSON();
 
 		// make everything invisible to prevent flicker
-		this.reflowableLayout.setUpMode(this.el, this.getSpineDivider(), this.model.get("two_up"));
+		// This can move to layout
+		this.reflowableLayout.setUpMode(
+			this.getReadiumBookViewEl(), 
+			this.getSpineDivider(), 
+			this.model.get("two_up"));
+
+		// This can move to layout
 		this.$('#container').html( this.page_template(json) );
 		
 		this.$('#readium-flowing-content').on("load", function(e) {
@@ -100,6 +105,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 				that.getEpubContentDocument(), 
 				that.model.get("epubCFIs"), 
 				that.model.get("spine_position"));
+
 			var pageInfo = that.reflowableLayout.adjustIframeColumns(
 				that.offset_dir,
 				that.getEpubContentDocument(),
@@ -111,7 +117,9 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 				that.model.epub.get("page_prog_dir"),
 				that.model.get("current_margin"));
 
-			that.pages.set("num_pages", pageInfo[0]);
+			// that.pages.set("num_pages", pageInfo[0]);
+			// There's a dependency here. A page must be shown before other view calculations can be made in the 
+			//    go to hash method
 			that.goToPage(pageInfo[1]);
 
 			that.reflowableLayout.iframeLoadCallback(
@@ -122,21 +130,31 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 				that.pages.goLeft,
 				that.pages.goRight,
 				that.linkClickHandler,
-				that );
+				that 
+				);
+
 			that.mediaOverlayController.pagesLoaded();
+
 			that.reflowableLayout.setFontSize(
 				that.model.get("font_size"), 
 				that.getEpubContentDocument(), 
-				that.model.get("two_up"));
+				that.model.get("two_up")
+				);
+
 			that.reflowableLayout.injectTheme(
 				that.model.get("current_theme"), 
 				that.getEpubContentDocument(), 
-				that.getFlowingWrapper());
+				that.getFlowingWrapper()
+				);
+
 			that.pages.set(
 				"num_pages", 
 				that.reflowableLayout.calcNumPages(
 					that.getEpubContentDocument(), 
-					that.model.get("two_up")));
+					that.model.get("two_up")
+					)
+				);
+
 			that.applyKeydownHandler();
 
 			// Rationale: The assumption here is that if a hash fragment is specified, it is the result of Readium 
@@ -167,7 +185,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		return [this.model.get("spine_position")];
 	},
     
-    // override
     // Used: PaginationViewBase
 	indicateMoIsPlaying: function () {
 		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
@@ -178,7 +195,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		);
 	},
 
-    // override
     // Used: PaginationViewBase
 	highlightText: function () {
 		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
@@ -255,8 +271,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	// Description: Handles clicks of anchor tags by navigating to
 	//   the proper location in the epub spine, or opening
 	//   a new window for external links
-	// Stays here
-	// Used: PaginationViewBase
 	linkClickHandler: function (e) {
 		e.preventDefault();
 
@@ -296,8 +310,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		return relativeURI.resolve(iframeDocURI).toString();
 	},
 
-	// Stays here
-	// Used: this
 	// REFACTORING CANDIDATE: No need to make that call through the epubController
 	// Actually, the handler is being applied here, so it should be moved to layout logic
 	applyKeydownHandler : function () {
@@ -321,6 +333,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	// Used: this
 	goToPage: function(page) {
         // check to make sure we're not already on that page
+        // REFACTORING CANDIDATE: This should be this.pages.get("current_page")
         if (this.model.get("current_page") != undefined && this.model.get("current_page").indexOf(page) != -1) {
             return;
         }
@@ -337,7 +350,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 	// Save position in epub
 	// Refactor this, probably stays here, although much else will move into finding visible elements
-	// Used: this
 	savePosition : function () {
 
 		var $visibleTextNode;
@@ -468,8 +480,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		return (page_num - 1) * (this.reflowableLayout.page_width + this.reflowableLayout.gap_width);
 	},
 
-    // Stays here although it needs to be refactored; logic is duplicated in this 
-    // Used: this
 	pageChangeHandler: function() {
         var that = this;
 		this.hideContent();

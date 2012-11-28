@@ -45,11 +45,10 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
     // REFACTORING CANDIDATE: This method could use a better name. The purpose of this method is to make one or two 
     //   pages of an epub visible. "setUpMode" seems non-specific. 
     // Description: Changes the html to make either 1 or 2 pages visible in their iframes
-    setUpMode: function(readiumBookViewEl, spineDivider, isTwoUp) {
+    setUpMode: function (readiumBookViewEl, spineDivider, isTwoUp) {
 
-        var two_up = isTwoUp;
-        $(readiumBookViewEl).toggleClass("two-up", two_up);
-        $(spineDivider).toggle(two_up);
+        $(readiumBookViewEl).toggleClass("two-up", isTwoUp);
+        $(spineDivider).toggle(isTwoUp);
     },
 
     // ------------------------------------------------------------------------------------ //
