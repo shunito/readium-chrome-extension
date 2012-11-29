@@ -99,11 +99,10 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
                 // REFACTORING CANDIDATE: This has got to change. Tight coupling and lots of indirection. 
                 currMoPage = this.currentView.reflowableElementsInfo.getElemPageNumberById(
                     currMoId, 
-                    document,
+                    this.currentView.getEpubContentDocument(),
                     this.currentView.offsetDirection(),
                     this.currentView.reflowableElementsInfo.page_width,
-                    this.currentView.reflowableElementsInfo.gap_width,
-                    this.currentView.getBody()
+                    this.currentView.reflowableElementsInfo.gap_width
                     );
             }
                 
@@ -274,7 +273,10 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         }
         else {
             // This coupling between this model and the view needs to be refactored out
-        	pageElms = this.currentView.reflowableElementsInfo.findVisiblePageElements(this.currentView, this.currentView.getBody(), document);
+        	pageElms = this.currentView.reflowableElementsInfo.findVisiblePageElements(
+                this.currentView.getReadiumBookViewEl(),
+                this.currentView.getEpubContentDocument()
+                );
             var doc_href = this.currentSection.get("href");
             
 	        var node = null;

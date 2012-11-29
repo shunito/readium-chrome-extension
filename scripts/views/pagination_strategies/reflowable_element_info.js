@@ -7,7 +7,7 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
     //  "PUBLIC" METHODS (THE API)                                                          //
     // ------------------------------------------------------------------------------------ //
 
-    getElemPageNumber: function(elem, offsetDir, pageWidth, gapWidth, body) {
+    getElemPageNumber: function(elem, offsetDir, pageWidth, gapWidth, epubContentDocument) {
         
         var $elem;
         var elemWasInvisible = false;
@@ -62,24 +62,23 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
             shift = pageWidth - shift;
         }
         // less the amount we already shifted to get to cp
-        shift -= parseInt(body.style[offsetDir], 10); 
+        shift -= parseInt(epubContentDocument.style[offsetDir], 10); 
         return Math.ceil( shift / (pageWidth + gapWidth) );
     },
 
-    // REFACTORING CANDIDATE: This might be part of the public interface
-    getElemPageNumberById: function(elemId, viewDocument, offsetDir, pageWidth, gapWidth, body) {
-        var doc = $("#readium-flowing-content", viewDocument).contents()[0].documentElement;
-        var elem = $(doc).find("#" + elemId);
+    getElemPageNumberById: function(elemId, epubContentDocument, offsetDir, pageWidth, gapWidth) {
+
+        var elem = $(epubContentDocument).find("#" + elemId);
         if (elem.length == 0) {
             return -1;
         }
         else {
-            return this.getElemPageNumber(elem[0], offsetDir, pageWidth, gapWidth, body);
+            return this.getElemPageNumber(elem[0], offsetDir, pageWidth, gapWidth, epubContentDocument);
         }
     },
 
     // Currently for left-to-right pagination only
-    findVisibleCharacterOffset : function($textNode, viewDocument) {
+    findVisibleCharacterOffset : function($textNode, epubContentDocument) {
 
         var $parentNode;
         var elementTop;
@@ -95,7 +94,7 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
         $parentNode = $textNode.parent();
 
         // Get document
-        $document = $($("#readium-flowing-content", viewDocument).contents()[0].documentElement);
+        $document = $(epubContentDocument);
 
         // Find percentage of visible node on page
         documentTop = $document.position().top;
@@ -124,7 +123,7 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
     },
 
     // TODO: Extend this to be correct for right-to-left pagination
-    findVisibleTextNode: function (body, viewDocument, isTwoUp) {
+    findVisibleTextNode: function (epubContentDocument, isTwoUp) {
 
         var documentLeft = 0;
         var documentRight;
@@ -140,7 +139,7 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
         //   EPUB, which can be used if the reader re-opens the EPUB.
         // REFACTORING CANDIDATE: The "audiError" check is a total hack to solve a problem for a particular epub. This 
         //   issue needs to be addressed.
-        $elements = $("body", body).find(":not(iframe)").contents().filter(function () {
+        $elements = $("body", epubContentDocument).find(":not(iframe)").contents().filter(function () {
             if (this.nodeType === 3 && !$(this).parent().hasClass("audiError")) {
                 return true;
             } else {
@@ -148,7 +147,7 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
             }
         });
 
-        doc = $("#readium-flowing-content", viewDocument).contents()[0].documentElement;
+        doc = epubContentDocument;
 
         if (isTwoUp) {
             columnGap = parseInt($(doc).css("-webkit-column-gap").replace("px",""));
@@ -190,28 +189,32 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
         return $firstVisibleTextNode;
     },
 
-    findVisiblePageElements: function(view, body, document) {
+    findVisiblePageElements: function(readiumBookViewEl, epubContentDocument) {
 
-        var $elements = $(body).find("[id]");
-        var doc = $("#readium-flowing-content", document).contents()[0].documentElement;
+        var $elements = $(epubContentDocument).find("[id]");
+        var doc = epubContentDocument;
         var doc_top = 0;
         var doc_left = 0;
         var doc_right = doc_left + $(doc).width();
         var doc_bottom = doc_top + $(doc).height();
         
-        var visibleElms = this.filterElementsByPosition(view, $elements, doc_top, doc_bottom, doc_left, doc_right);
+        var visibleElms = this.filterElementsByPosition(readiumBookViewEl, $elements, doc_top, doc_bottom, doc_left, doc_right);
             
         return visibleElms;
     },
 
+    // ------------------------------------------------------------------------------------ //
+    //  "PRIVATE" HELPERS                                                                   //
+    // ------------------------------------------------------------------------------------ //
+
     // returns all the elements in the set that are inside the box
-    filterElementsByPosition: function(view, $elements, documentTop, documentBottom, documentLeft, documentRight) {
+    filterElementsByPosition: function(readiumBookViewEl, $elements, documentTop, documentBottom, documentLeft, documentRight) {
         
         var $visibleElms = $elements.filter(function(idx) {
-            var elm_top = $(view.el).offset().top;
-            var elm_left = $(view.el).offset().left;
-            var elm_right = elm_left + $(view.el).width();
-            var elm_bottom = elm_top + $(view.el).height();
+            var elm_top = $(readiumBookViewEl).offset().top;
+            var elm_left = $(readiumBookViewEl).offset().left;
+            var elm_right = elm_left + $(readiumBookViewEl).width();
+            var elm_bottom = elm_top + $(readiumBookViewEl).height();
             
             var is_ok_x = elm_left >= documentLeft && elm_right <= documentRight;
             var is_ok_y = elm_top >= documentTop && elm_bottom <= documentBottom;
@@ -220,13 +223,5 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
         });  
 
         return $visibleElms;
-    },
-
-
-
-    // ------------------------------------------------------------------------------------ //
-    //  "PRIVATE" HELPERS                                                                   //
-    // ------------------------------------------------------------------------------------ //
-
-
+    }
 });
