@@ -100,7 +100,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
                 currMoPage = this.currentView.reflowableElementsInfo.getElemPageNumberById(
                     currMoId, 
                     document,
-                    this.currentView.offset_dir,
+                    this.currentView.offsetDirection(),
                     this.currentView.reflowableElementsInfo.page_width,
                     this.currentView.reflowableElementsInfo.gap_width,
                     this.currentView.getBody()

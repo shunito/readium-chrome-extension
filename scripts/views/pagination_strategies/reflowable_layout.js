@@ -1,20 +1,118 @@
 
 Readium.Views.ReflowableLayout = Backbone.Model.extend({
 
-    // ------------------------------------------------------------------------------------ //
-    //  "PUBLIC" METHODS (THE API)                                                          //
-    // ------------------------------------------------------------------------------------ //
-
-    initialize: function(options) {
+    initialize: function (options) {
         // make sure we have proper vendor prefixed props for when we need them
         this.stashModernizrPrefixedProps();
     },
 
+    // ------------------------------------------------------------------------------------ //
+    //  "PUBLIC" METHODS (THE API)                                                          //
+    // ------------------------------------------------------------------------------------ //
+
+    initializeContentDocument : function (epubContentDocument, epubCFIs, currSpinePosition, readiumFlowingContent, packageDocument, bindingTemplate, linkClickHandler, handlerContext, currentTheme, flowingWrapper, readiumFlowingContent, keydownHandler) {
+
+        var lastPageElementId = this.injectCFIElements(
+            epubContentDocument, 
+            epubCFIs, 
+            currSpinePosition
+            );
+
+        this.iframeLoadCallback(
+            readiumFlowingContent, 
+            epubContentDocument, 
+            packageDocument,
+            bindingTemplate,
+            linkClickHandler,
+            handlerContext
+        );
+
+        this.injectTheme(
+            currentTheme, 
+            epubContentDocument, 
+            flowingWrapper
+        );
+
+        this.injectKeydownHandler(
+            readiumFlowingContent, 
+            keydownHandler, 
+            handlerContext
+        );
+
+        return lastPageElementId;
+    },
+
+    paginateContentDocument : function (readiumBookViewEl, spineDivider, isTwoUp, offsetDir, epubContentDocument, readiumFlowingContent, flowingWrapper, firstPageOffset, currentPages, ppd, currentMargin, fontSize) {
+
+        this.setUpMode(
+            readiumBookViewEl, 
+            spineDivider, 
+            isTwoUp
+            );
+
+        var pageInfo = this.adjustIframeColumns(
+            offsetDir, 
+            epubContentDocument, 
+            readiumFlowingContent, 
+            flowingWrapper, 
+            isTwoUp, 
+            firstPageOffset, 
+            currentPages, 
+            ppd, 
+            currentMargin
+            );
+
+        var numPages = this.setFontSize(
+            fontSize, 
+            epubContentDocument, 
+            isTwoUp
+            );
+
+        return [numPages, pageInfo[1]];
+    },
+
+    injectTheme : function (currentTheme, epubContentDocument, flowingWrapper) {
+
+        var theme = currentTheme;
+        if (theme === "default") {
+            theme = "default-theme";
+        }
+
+        $(epubContentDocument).css({
+            "color": this.themes[theme]["color"],
+            "background-color": this.themes[theme]["background-color"]
+        });
+        
+        // stop flicker due to application for alternate style sheets
+        // just set content to be invisible
+        $(flowingWrapper).css("visibility", "hidden");
+        this.activateEPubStyle(epubContentDocument, currentTheme);
+
+        // wait for new stylesheets to parse before setting back to visible
+        setTimeout(function() {
+            $(flowingWrapper).css("visibility", "visible"); 
+        }, 100);
+    },
+
+    resetEl : function (epubContentDocument, readiumBookViewEl, spineDivider, pageWrap, zoomer) {
+
+        $("body", epubContentDocument).removeClass("apple-fixed-layout");
+        $(readiumBookViewEl).attr("style", "");
+        $(readiumBookViewEl).toggleClass("two-up", false);
+        $(spineDivider).toggle(false);
+        zoomer.reset();
+
+        $(pageWrap).css({
+            "position": "relative",
+            "right": "0px", 
+            "top": "0px",
+            "-webkit-transform": "scale(1.0) translate(0px, 0px)"
+        });
+    },
 
     // ------------------------------------------------------------------------------------ //
     //  "PRIVATE" HELPERS                                                                   //
     // ------------------------------------------------------------------------------------ //
-
 
     // Description: we are using experimental styles so we need to 
     //   use modernizr to generate prefixes
@@ -36,22 +134,30 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         this.cssColumnWidth =  cssIfy(this.columnWidth);
     },
 
-
-
     // ------------------------------------------------------------------------------------ //
-    //  INITIALIZE CONTENT DOCUMENT CONTAINER
+    //  PRIVATE METHODS FOR INITIALIZING EPUB CONTENT DOCUMENT CONTAINER                    //
     // ------------------------------------------------------------------------------------ //
 
+    iframeLoadCallback: function (readiumFlowingContent, epubContentDocument, packageDocument, bindingTemplate, linkClickHandler, handlerContext) {
 
-    iframeLoadCallback: function(e, dom, packageDocument, bindingTemplate, goLeftHandler, goRightHandler, linkClickHandler, handlerContext) {
-        
-        this.applyBindings( $(e.srcElement).contents(), dom, packageDocument, bindingTemplate);
-        this.applySwitches( $(e.srcElement).contents(), dom );
-        this.injectMathJax(e.srcElement);
-        this.injectLinkHandler(e.srcElement, linkClickHandler, handlerContext);
-        var trigs = this.parseTriggers(e.srcElement.contentDocument);
-        this.applyTriggers(e.srcElement.contentDocument, trigs);
-        $(e.srcElement).attr('title', Acc.page + ' - ' + Acc.title);
+        this.applyBindings( readiumFlowingContent, epubContentDocument, packageDocument, bindingTemplate );
+            // $(e.srcElement).contents(), dom, packageDocument, bindingTemplate);
+
+        this.applySwitches( epubContentDocument, readiumFlowingContent ); 
+            // $(e.srcElement).contents(), dom );
+
+        this.injectMathJax(epubContentDocument);
+            // e.srcElement);
+
+        this.injectLinkHandler(epubContentDocument, linkClickHandler, handlerContext);
+            // e.srcElement, linkClickHandler, handlerContext);
+
+        var triggers = this.parseTriggers(epubContentDocument);
+            // e.srcElement.contentDocument);
+
+        this.applyTriggers(epubContentDocument, triggers);
+
+        $(epubContentDocument).attr('title', Acc.page + ' - ' + Acc.title);
     },
 
     injectCFIElements : function (epubContentDocument, epubCFIs, currSpinePosition) {
@@ -98,7 +204,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         return lastPageElementId;
     },
 
-    getBindings: function(packageDocument) {
+    getBindings: function (packageDocument) {
         var packDoc = packageDocument;
         var bindings = packDoc.get('bindings');
         return bindings.map(function(binding) {
@@ -109,7 +215,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         })
     },
 
-    applyBindings: function(readiumFlowingContent, epubContentDocument, packageDocument, bindingTemplate) {
+    applyBindings: function (readiumFlowingContent, epubContentDocument, packageDocument, bindingTemplate) {
 
         var bindings = this.getBindings(packageDocument);
         var i = 0;
@@ -130,7 +236,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         }
     },
 
-    applyTriggers: function(epubContentDocument, triggers) {
+    applyTriggers: function (epubContentDocument, triggers) {
         for(var i = 0 ; i < triggers.length; i++) {
             triggers[i].subscribe(epubContentDocument.parentNode);
         }
@@ -138,7 +244,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
 
     // Description: For reflowable content we only add what is in the body tag.
     //   Lots of times the triggers are in the head of the dom
-    parseTriggers: function(epubContentDocument) {
+    parseTriggers: function (epubContentDocument) {
         var triggers = [];
         $('trigger', epubContentDocument.parentNode).each(function() {
             
@@ -150,7 +256,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
 
     // Description: Parse the epub "switch" tags and hide
     //   cases that are not supported
-    applySwitches: function(epubContentDocument, readiumFlowingContent) {
+    applySwitches: function (epubContentDocument, readiumFlowingContent) {
 
         // helper method, returns true if a given case node
         // is supported, false otherwise
@@ -195,7 +301,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
     injectMathJax: function (epubContentDocument) {
 
         var doc, script, head;
-        doc = epubContentDocument;
+        doc = epubContentDocument.parentNode;
         head = doc.getElementsByTagName("head")[0];
         // if the content doc is SVG there is no head, and thus
         // mathjax will not be required
@@ -207,35 +313,27 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         }
     },
 
-    injectLinkHandler: function(epubContentDocument, linkClickHandler, handlerContext) {
+    injectLinkHandler: function (epubContentDocument, linkClickHandler, handlerContext) {
 
-        $('a', epubContentDocument).click(function(e) {
+        $('a', epubContentDocument).click(function (e) {
             linkClickHandler.call(handlerContext, e);
         });
     },
 
+    injectKeydownHandler : function (readiumFlowingContent, keydownHandler, handlerContext) {
 
-
-
-
-
-
-    // ------------------------------------------------------------------------------------ //
-    //  PAGINATE REFLOWABLE CONTENT DOCUMENT
-    // ------------------------------------------------------------------------------------ //
-
-    paginateContentDocument : function (readiumBookViewEl, spineDivider, isTwoUp, offsetDir, epubContentDocument, readiumFlowingContent, flowingWrapper, firstPageOffset, currentPages, ppd, currentMargin, fontSize) {
-
-        this.setUpMode(readiumBookViewEl, spineDivider, isTwoUp);
-        var pageInfo = this.adjustIframeColumns(offsetDir, epubContentDocument, readiumFlowingContent, flowingWrapper, isTwoUp, firstPageOffset, currentPages, ppd, currentMargin);
-        var numPages = this.setFontSize(fontSize, epubContentDocument, isTwoUp);
-
-        return [numPages, pageInfo[1]];
+        $(readiumFlowingContent).contents().keydown(function (e) {
+            keydownHandler.call(handlerContext, e);
+        });
     },
+
+    // ------------------------------------------------------------------------------------ //
+    //  PRIVATE METHODS FOR PAGINATING EPUB REFLOWABLE CONTENT DOCUMENT
+    // ------------------------------------------------------------------------------------ //
 
     // Description: Activates a style set for the ePub, based on the currently selected theme. At present, 
     //   only the day-night alternate tags are available as an option.  
-    activateEPubStyle : function(bookDom, currentTheme) {
+    activateEPubStyle : function (bookDom, currentTheme) {
 
         var selector;
         
@@ -265,7 +363,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
 
     // Description: calculate the number of pages in the current section,
     //   based on section length : page size ratio
-    calcNumPages : function (epubContentDocument, isTwoUp) {
+    calcNumPages : function (epubContentDocument, isTwoUp, offsetDir) {
 
         var body, offset, width, num;
         
@@ -273,17 +371,17 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         body = epubContentDocument;
 
         // cache the current offset 
-        offset = body.style[this.offset_dir];
+        offset = body.style[offsetDir];
 
         // set the offset to 0 so that all overflow is part of
         // the scroll width
-        body.style[this.offset_dir] = "0px";
+        body.style[offsetDir] = "0px";
 
         // grab the scrollwidth => total content width
         width = epubContentDocument.scrollWidth;
 
         // reset the offset to its original value
-        body.style[this.offset_dir] = offset;
+        body.style[offsetDir] = offset;
 
         // perform calculation and return result...
         num = Math.floor( (width + this.gap_width) / (this.gap_width + this.page_width) );
@@ -458,30 +556,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
             page = currentPages[0];
         }
 
-        return [this.calcNumPages(epubContentDocument, isTwoUp), page];
-    },
-
-    injectTheme : function (currentTheme, epubContentDocument, flowingWrapper) {
-
-        var theme = currentTheme;
-        if (theme === "default") {
-            theme = "default-theme";
-        }
-
-        $(epubContentDocument).css({
-            "color": this.themes[theme]["color"],
-            "background-color": this.themes[theme]["background-color"]
-        });
-        
-        // stop flicker due to application for alternate style sheets
-        // just set content to be invisible
-        $(flowingWrapper).css("visibility", "hidden");
-        this.activateEPubStyle(epubContentDocument, currentTheme);
-
-        // wait for new stylesheets to parse before setting back to visible
-        setTimeout(function() {
-            $(flowingWrapper).css("visibility", "visible"); 
-        }, 100);
+        return [this.calcNumPages(epubContentDocument, isTwoUp, offsetDir), page];
     },
 
     // Rationale: sadly this is just a reprint of what is already in the
@@ -519,7 +594,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         }
     },
 
-    setFontSize : function(fontSize, epubContentDocument, isTwoUp) {
+    setFontSize : function (fontSize, epubContentDocument, isTwoUp) {
 
         var size = fontSize / 10;
         $(epubContentDocument).css("font-size", size + "em");
@@ -527,25 +602,5 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         // the content size has changed so recalc the number of 
         // pages
         return this.calcNumPages(epubContentDocument, isTwoUp);
-    },
-
-    // ------------------------------------------------------------------------------------ //
-    //  Other methods
-    // ------------------------------------------------------------------------------------ //
-
-    resetEl : function(epubContentDocument, readiumBookViewEl, spineDivider, pageWrap, zoomer) {
-
-        $("body", epubContentDocument).removeClass("apple-fixed-layout");
-        $(readiumBookViewEl).attr("style", "");
-        $(readiumBookViewEl).toggleClass("two-up", false);
-        $(spineDivider).toggle(false);
-        zoomer.reset();
-
-        $(pageWrap).css({
-            "position": "relative",
-            "right": "0px", 
-            "top": "0px",
-            "-webkit-transform": "scale(1.0) translate(0px, 0px)"
-        });
     }
 });

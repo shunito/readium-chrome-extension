@@ -3,182 +3,84 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 	el: "#readium-book-view-el",
 
-	// ------------------------------------------------------------------------------------ //
-	//  "PUBLIC" METHODS (THE API)                                                          //
-	// ------------------------------------------------------------------------------------ //
-
 	initialize: function(options) {
 
-		var that = this;
+		// Initalize delegates and other models
 		this.reflowableLayout = new Readium.Views.ReflowableLayout();
 		this.reflowableElementsInfo = new Readium.Views.ReflowableElementInfo();
-
+		this.pages = new Readium.Models.ReadiumPagination({model : this.model});
 		this.zoomer = options.zoomer;
-        this.pages = new Readium.Models.ReadiumPagination({model : this.model});
         this.mediaOverlayController = this.model.get("media_overlay_controller");
         this.mediaOverlayController.setPages(this.pages);
         this.mediaOverlayController.setView(this);
 
-        this.bindingTemplate = Handlebars.templates.binding_template;
-		this.page_template = Handlebars.templates.reflowing_template;
-
-		// if this book does right to left pagination we need to set the
-		// offset on the right
-		if(this.model.epub.get("page_prog_dir") === "rtl") {
-			this.offset_dir = "right";
-		}
-		else {
-			this.offset_dir = "left";
-		}
-
-		this.model.on("change:font_size", this.setFontSizeHandler, this);
-		this.model.on("change:two_up", this.pages.toggleTwoUp, this.pages);
-		this.pages.on("change:current_page", this.pageChangeHandler, this);
+        // Initialize handlers
 		this.mediaOverlayController.on("change:mo_text_id", this.highlightText, this);
         this.mediaOverlayController.on("change:active_mo", this.indicateMoIsPlaying, this);
+		this.model.on("change:font_size", this.rePaginationHandler, this);
+		this.model.on("change:two_up", this.pages.toggleTwoUp, this.pages);
+		this.model.on("change:two_up", this.rePaginationHandler, this);
+		this.model.on("change:current_margin", this.rePaginationHandler, this);
+		this.pages.on("change:current_page", this.pageChangeHandler, this);
 		this.model.on("change:toc_visible", this.windowSizeChangeHandler, this);
 		this.model.on("repagination_event", this.windowSizeChangeHandler, this);
-		this.model.on("change:current_theme", this.injectThemeHandler, this);
-		this.model.on("change:two_up", this.setUpModeHandler, this);
-		this.model.on("change:two_up", this.adjustIframeColumnsHandler, this);
-		this.model.on("change:current_margin", this.marginCallback, this);
+		this.model.on("change:current_theme", this.themeChangeHandler, this);
 	},
 
-	adjustIframeColumnsHandler : function () {
+	// Description: Remove all handlers so they don't hang around in memory
+	destruct: function() {
+		
+		this.mediaOverlayController.off("change:mo_text_id", this.highlightText, this);
+        this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying, this);
+		this.model.off("change:font_size", this.rePaginationHandler, this);
+		this.model.off("change:two_up", this.pages.toggleTwoUp, this.pages);
+		this.model.off("change:two_up", this.rePaginationHandler, this);
+		this.model.off("change:current_margin", this.rePaginationHandler, this);
+		this.pages.off("change:current_page", this.pageChangeHandler, this);
+		this.model.off("change:toc_visible", this.windowSizeChangeHandler, this);
+		this.model.off("repagination_event", this.windowSizeChangeHandler, this);
+		this.model.off("change:current_theme", this.themeChangeHandler, this);
 
-		var pageInfo = this.reflowableLayout.adjustIframeColumns(
-				this.offset_dir,
-				this.getEpubContentDocument(),
-				this.getReadiumFlowingContent(),
-				this.getFlowingWrapper(),
-				this.model.get("two_up"),
-				this.model.getCurrentSection().firstPageOffset(),
-				this.pages.get("current_page"),
-				this.model.epub.get("page_prog_dir"),
-				this.model.get("current_margin"));
-
-		this.pages.set("num_pages", pageInfo[0]);
-		this.goToPage(pageInfo[1]);
+        this.reflowableLayout.resetEl(
+        	this.getBody(), 
+        	this.el, 
+        	this.getSpineDivider(),
+        	this.getPageWrap(),
+        	this.zoomer);
 	},
 
-	setUpModeHandler : function () {
+	// ------------------------------------------------------------------------------------ //
+	//  "PUBLIC" METHODS (THE API)                                                          //
+	// ------------------------------------------------------------------------------------ //
 
-		this.reflowableLayout.setUpMode(this.getReadiumBookViewEl(), this.getSpineDivider(), this.model.get("two_up"));
-	},
+	render : function (goToLastPage, hashFragmentId) {
 
-	injectThemeHandler : function () {
-
-		this.reflowableLayout.injectTheme(
-			this.model.get("current_theme"), 
-			this.getEpubContentDocument(), 
-			this.getFlowingWrapper());
-	},
-
-	setFontSizeHandler : function () {
-
-		var numPages = this.reflowableLayout.setFontSize(
-			this.model.get("font_size"), 
-			this.getEpubContentDocument(), 
-			this.model.get("two_up"));
-		this.pages.set("num_pages", numPages);
-	},
-
-	render: function(goToLastPage, hashFragmentId) {
 		var that = this;
 		var json = this.model.getCurrentSection().toJSON();
-
-		// make everything invisible to prevent flicker
-		// This can move to layout
-		// this.reflowableLayout.setUpMode(
-		// 	this.getReadiumBookViewEl(), 
-		// 	this.getSpineDivider(), 
-		// 	this.model.get("two_up"));
-
-		// This can move to layout
-		this.$('#container').html( this.page_template(json) );
+		$(this.getContainer()).html( Handlebars.templates.reflowing_template(json) );
 		
-		this.$('#readium-flowing-content').on("load", function(e) {
-			// Important: Firefox doesn't recognize e.srcElement, so this needs to be checked for whenever it's required.
-			if (!e.srcElement) e.srcElement = this;
+		// Wait for iframe to load EPUB content document
+		$(this.getReadiumFlowingContent()).on("load", function (e) {
 
-			var lastPageElementId = that.reflowableLayout.injectCFIElements(
-				that.getEpubContentDocument(), 
-				that.model.get("epubCFIs"), 
-				that.model.get("spine_position"));
-
-			that.rePaginationHandler();
-
-			// var pageInfo = that.reflowableLayout.adjustIframeColumns(
-			// 	that.offset_dir,
-			// 	that.getEpubContentDocument(),
-			// 	that.getReadiumFlowingContent(),
-			// 	that.getFlowingWrapper(),
-			// 	that.model.get("two_up"),
-			// 	that.model.getCurrentSection().firstPageOffset(),
-			// 	that.pages.get("current_page"),
-			// 	that.model.epub.get("page_prog_dir"),
-			// 	that.model.get("current_margin"));
-
-			// that.pages.set("num_pages", pageInfo[0]);
-			// There's a dependency here. A page must be shown before other view calculations can be made in the 
-			//    go to hash method
-			// that.goToPage(pageInfo[1]);
-
-			that.reflowableLayout.iframeLoadCallback(
-				e, 
-				this, 
-				that.model.epub.getPackageDocument(),
-				that.bindingTemplate,
-				that.pages.goLeft,
-				that.pages.goRight,
-				that.linkClickHandler,
-				that 
-				);
-
+			var lastPageElementId = that.initializeContentDocument();
 			that.mediaOverlayController.pagesLoaded();
-
-			// that.reflowableLayout.setFontSize(
-			// 	that.model.get("font_size"), 
-			// 	that.getEpubContentDocument(), 
-			// 	that.model.get("two_up")
-			// 	);
-
-			that.reflowableLayout.injectTheme(
-				that.model.get("current_theme"), 
-				that.getEpubContentDocument(), 
-				that.getFlowingWrapper()
-				);
-
-			// that.pages.set(
-			// 	"num_pages", 
-			// 	that.reflowableLayout.calcNumPages(
-			// 		that.getEpubContentDocument(), 
-			// 		that.model.get("two_up")
-			// 		)
-			// 	);
-
-			that.applyKeydownHandler();
 
 			// Rationale: The assumption here is that if a hash fragment is specified, it is the result of Readium 
 			//   following a clicked linked, either an internal link, or a link from the table of contents. The intention
 			//   to follow a link should supersede restoring the last-page position, as this should only be done for the 
 			//   case where Readium is re-opening the book, from the library view. 
 			if (hashFragmentId) {
-
 				that.goToHashFragment(hashFragmentId);
 			}
 			else if (lastPageElementId) {
-
 				that.goToHashFragment(lastPageElementId);
 			}
 			else {
 
 				if (goToLastPage) {
-
 					that.pages.goToLastPage();
 				}
 				else {
-
 					that.pages.goToPage(1);
 				}		
 			}
@@ -187,7 +89,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		return [this.model.get("spine_position")];
 	},
     
-    // Used: PaginationViewBase
 	indicateMoIsPlaying: function () {
 		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
 		moHelper.renderReflowableMoPlaying(
@@ -197,7 +98,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		);
 	},
 
-    // Used: PaginationViewBase
 	highlightText: function () {
 		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
 		moHelper.renderReflowableMoFragHighlight(
@@ -206,12 +106,11 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			this.mediaOverlayController.get("mo_text_id")
 		);
 	},
-    
+
 	// Description: navigate to a url hash fragment by calculating the page of
 	//   the corresponding elem and setting the page number on `this.model`
 	//   as precondition the hash fragment should identify an element in the
 	//   section rendered by this view
-	// Used: epubController, reflowablePagination
 	goToHashFragment: function(hashFragmentId) {
 
 		// this method is triggered in response to 
@@ -231,7 +130,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 			var page = this.reflowableElementsInfo.getElemPageNumber(
 				el, 
-				this.offset_dir, 
+				this.offsetDirection(), 
 				this.reflowableLayout.page_width, 
 				this.reflowableLayout.gap_width,
 				this.getBody());
@@ -240,115 +139,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			}
 		}
 		// else false alarm no work to do
-	},
-
-	// ------------------------------------------------------------------------------------ //
-	//  "PRIVATE" HELPERS                                                                   //
-	// ------------------------------------------------------------------------------------ //
-
-	// Description: Sometimes these views hang around in memory before
-	//   the GC's get them. we need to remove all of the handlers
-	//   that were registered on the model
-	destruct: function() {
-		
-		this.pages.off("change:current_page", this.pageChangeHandler);
-		this.model.off("change:toc_visible", this.windowSizeChangeHandler);
-		this.model.off("repagination_event", this.windowSizeChangeHandler);
-		this.model.off("change:current_theme", this.windowSizeChangeHandler);
-		this.model.off("change:two_up", this.setUpMode);
-		this.model.off("change:two_up", this.adjustIframeColumnsHandler);
-		this.model.off("change:current_margin", this.marginCallback);
-		this.pages.off("change:current_page", this.showCurrentPages);
-        this.model.off("change:font_size", this.setFontSizeHandler);
-        this.mediaOverlayController.off("change:mo_text_id", this.highlightText);
-        this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying);
-
-        this.reflowableLayout.resetEl(
-        	this.getBody(), 
-        	this.el, 
-        	this.getSpineDivider(),
-        	this.getPageWrap(),
-        	this.zoomer);
-	},
-
-	// Description: Handles clicks of anchor tags by navigating to
-	//   the proper location in the epub spine, or opening
-	//   a new window for external links
-	linkClickHandler: function (e) {
-		e.preventDefault();
-
-		var href;
-
-		// Check for both href and xlink:href attribute and get value
-		if (e.currentTarget.attributes["xlink:href"]) {
-			href = e.currentTarget.attributes["xlink:href"].value;
-		}
-		else {
-			href = e.currentTarget.attributes["href"].value;
-		}
-
-		// Resolve the relative path for the requested resource.
-		href = this.resolveRelativeURI(href);
-		if (href.match(/^http(s)?:/)) {
-			window.open(href);
-		} 
-		else {
-			this.model.goToHref(href);
-		}
-	},
-
-	// Rationale: For the purpose of looking up EPUB resources in the package document manifest, Readium expects that 
-	//   all relative links be specified as relative to the package document URI (or absolute references). However, it is 
-	//   valid XHTML for a link to another resource in the EPUB to be specfied relative to the current document's
-	//   path, rather than to the package document. As such, URIs passed to Readium must be either absolute references or 
-	//   relative to the package document. This method resolves URIs to conform to this condition. 
-	// REFACTORING CANDIDATE: This could be moved into some sort of utility method uri resolution
-	// Used: this
-	resolveRelativeURI: function (rel_uri) {
-		var relativeURI = new URI(rel_uri);
-
-		// Get URI for resource currently loaded in the view's iframe
-		var iframeDocURI = new URI($("#readium-flowing-content").attr("src"));
-
-		return relativeURI.resolve(iframeDocURI).toString();
-	},
-
-	// REFACTORING CANDIDATE: No need to make that call through the epubController
-	// Actually, the handler is being applied here, so it should be moved to layout logic
-	applyKeydownHandler : function () {
-
-		var that = this;
-
-		this.$("#readium-flowing-content").contents().keydown(function (e) {
-
-			if (e.which == 39) {
-				that.model.paginator.v.pages.goRight();
-			}
-							
-			if (e.which == 37) {
-				that.model.paginator.v.pages.goLeft();
-			}
-		});
-	},
-
-	// REFACTORING CANDIDATE: I think this is actually part of the public interface
-	// Move some of this to layout math
-	// Used: this
-	goToPage: function(page) {
-        // check to make sure we're not already on that page
-        // REFACTORING CANDIDATE: This should be this.pages.get("current_page")
-        if (this.model.get("current_page") != undefined && this.model.get("current_page").indexOf(page) != -1) {
-            return;
-        }
-		var offset = this.calcPageOffset(page).toString() + "px";
-		$(this.getBody()).css(this.offset_dir, "-" + offset);
-		this.showContent();
-        
-        if (this.model.get("two_up") == false || 
-            (this.model.get("two_up") && page % 2 === 1)) {
-                // when we change the page, we have to tell MO to update its position
-                this.mediaOverlayController.reflowPageChanged();
-        }
 	},
 
 	// Save position in epub
@@ -432,11 +222,12 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 		// Save the last page marker been added
 		this.model.save();
-	},
+	},	
 
-	// This is now part of the public interface
-	// Description: helper method to get the a reference to the documentElement
-	// of the document in this strategy's iFrame.
+	// ------------------------------------------------------------------------------------ //
+	//  PRIVATE GETTERS FOR VIEW                                                            //
+	// ------------------------------------------------------------------------------------ //    
+
 	// Rationale: This method is the same as epubContentDocument as other parts of readium call
 	//   this. It should be removed at some point.
 	getBody : function() {
@@ -445,6 +236,10 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 	getReadiumBookViewEl : function () {
 		return this.el;
+	},
+
+	getContainer : function () {
+		return this.$('#container')[0];
 	},
 
 	getFlowingWrapper : function () {
@@ -467,89 +262,91 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		return this.$("#spine-divider")[0];
 	},
 
-	hideContent: function() {
-		$("#flowing-wrapper").css("opacity", "0");
-	},
+	// ------------------------------------------------------------------------------------ //
+	// PRIVATE EVENT HANDLERS                               								//
+	// ------------------------------------------------------------------------------------ //
 
-	// Used: this
-	// Layout logic helper, mostly
-	showContent: function() {
-		$("#flowing-wrapper").css("opacity", "1");
-	},
+	keydownHandler : function (e) {
 
-	// Layout logic 
-	// Used: this
-	calcPageOffset: function(page_num) {
-		return (page_num - 1) * (this.reflowableLayout.page_width + this.reflowableLayout.gap_width);
-	},
+        if (e.which == 39) {
+            this.pages.goRight();
+        }
+                        
+        if (e.which == 37) {
+            this.pages.goRight();
+        }
+    },
+
+	// Description: Handles clicks of anchor tags by navigating to
+	//   the proper location in the epub spine, or opening
+	//   a new window for external links
+	linkClickHandler : function (e) {
+
+		var href;
+		e.preventDefault();
+
+		// Check for both href and xlink:href attribute and get value
+		if (e.currentTarget.attributes["xlink:href"]) {
+			href = e.currentTarget.attributes["xlink:href"].value;
+		}
+		else {
+			href = e.currentTarget.attributes["href"].value;
+		}
+
+		// Resolve the relative path for the requested resource.
+		href = this.resolveRelativeURI(href);
+		if (href.match(/^http(s)?:/)) {
+			window.open(href);
+		} 
+		else {
+			this.model.goToHref(href);
+		}
+	},	
 
 	pageChangeHandler: function() {
+
         var that = this;
 		this.hideContent();
 		setTimeout(function () {
 
-			// var pageNumToGoTo = that.reflowableLayout.accountForOffset(
-			// 	that.getReadiumFlowingContent(), 
-			// 	that.model.get("two_up"),
-			// 	that.model.getCurrentSection().firstPageOffset(),
-			// 	that.pages.get("current_page"),
-			// 	that.model.epub.get("page_prog_dir"));
-			// that.goToPage(pageNumToGoTo);
-
-			that.rePaginationHandler();
-			that.savePosition();
+			that.paginateContentDocument();
 
 		}, 150);
 	},
 
 	windowSizeChangeHandler: function() {
-		// var pageInfo = this.reflowableLayout.adjustIframeColumns(
-		// 		this.offset_dir,
-		// 		this.getEpubContentDocument(),
-		// 		this.getReadiumFlowingContent(),
-		// 		this.getFlowingWrapper(),
-		// 		this.model.get("two_up"),
-		// 		this.model.getCurrentSection().firstPageOffset(),
-		// 		this.pages.get("current_page"),
-		// 		this.model.epub.get("page_prog_dir"),
-		// 		this.model.get("current_margin")
-		// 		);
 
-		// this.pages.set("num_pages", pageInfo[0]);
-		// this.goToPage(pageInfo[1]);
-
-		this.rePaginationHandler();
+		this.paginateContentDocument();
 		
 		// Make sure we return to the correct position in the epub (This also requires clearing the hash fragment) on resize.
 		this.goToHashFragment(this.model.get("hash_fragment"));
 	},
     
-	marginCallback: function() {
-		// var pageInfo = this.reflowableLayout.adjustIframeColumns(
-		// 		this.offset_dir,
-		// 		this.getEpubContentDocument(),
-		// 		this.getReadiumFlowingContent(),
-		// 		this.getFlowingWrapper(),
-		// 		this.model.get("two_up"),
-		// 		this.model.getCurrentSection().firstPageOffset(),
-		// 		this.pages.get("current_page"),
-		// 		this.model.epub.get("page_prog_dir"),
-		// 		this.model.get("current_margin")
-		// 		);
+	rePaginationHandler: function() {
 
-		// this.pages.set("num_pages", pageInfo[0]);
-		// this.goToPage(pageInfo[1]);
-
-		this.rePaginationHandler();
+		this.paginateContentDocument();
 	},
 
-	rePaginationHandler : function () {
+	themeChangeHandler : function () {
+
+		this.reflowableLayout.injectTheme(
+			this.model.get("current_theme"), 
+			this.getEpubContentDocument(), 
+			this.getFlowingWrapper());
+	},
+
+	// ------------------------------------------------------------------------------------ //
+	//  "PRIVATE" HELPERS AND UTILITY METHODS                                               //
+	// ------------------------------------------------------------------------------------ //
+
+	// Rationale: This method delegates the pagination of a content document to the reflowable layout model
+	paginateContentDocument : function () {
 
 		var pageInfo = this.reflowableLayout.paginateContentDocument(
 			this.getReadiumBookViewEl(),
 			this.getSpineDivider(),
 			this.model.get("two_up"),
-			this.offset_dir,
+			this.offsetDirection(),
 			this.getEpubContentDocument(),
 			this.getReadiumFlowingContent(),
 			this.getFlowingWrapper(),
@@ -561,6 +358,85 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			);
 
 		this.pages.set("num_pages", pageInfo[0]);
-		this.goToPage(pageInfo[1]);
+		this.showPage(pageInfo[1]);
+		this.savePosition();
+	},
+
+	initializeContentDocument : function () {
+
+		var elementId = this.reflowableLayout.initializeContentDocument(
+			this.getEpubContentDocument(), 
+			this.model.get("epubCFIs"), 
+			this.model.get("spine_position"), 
+			this.getReadiumFlowingContent(), 
+			this.model.packageDocument, 
+			Handlebars.templates.bindingTemplate, 
+			this.linkClickHandler, 
+			this, 
+			this.model.get("current_theme"), 
+			this.getFlowingWrapper(), 
+			this.getReadiumFlowingContent(), 
+			this.keydownHandler
+			);
+
+		this.paginateContentDocument();
+
+		return elementId;
+	},
+
+	showPage: function(page) {
+        // check to make sure we're not already on that page
+        // REFACTORING CANDIDATE: This should be this.pages.get("current_page")
+        if (this.model.get("current_page") != undefined && this.model.get("current_page").indexOf(page) != -1) {
+            return;
+        }
+		var offset = this.calcPageOffset(page).toString() + "px";
+		$(this.getBody()).css(this.offsetDirection(), "-" + offset);
+		this.showContent();
+        
+        if (this.model.get("two_up") == false || 
+            (this.model.get("two_up") && page % 2 === 1)) {
+                // when we change the page, we have to tell MO to update its position
+                this.mediaOverlayController.reflowPageChanged();
+        }
+	},
+	
+	// Rationale: For the purpose of looking up EPUB resources in the package document manifest, Readium expects that 
+	//   all relative links be specified as relative to the package document URI (or absolute references). However, it is 
+	//   valid XHTML for a link to another resource in the EPUB to be specfied relative to the current document's
+	//   path, rather than to the package document. As such, URIs passed to Readium must be either absolute references or 
+	//   relative to the package document. This method resolves URIs to conform to this condition. 
+	// REFACTORING CANDIDATE: This could be moved into some sort of utility method uri resolution
+	resolveRelativeURI : function (rel_uri) {
+		var relativeURI = new URI(rel_uri);
+
+		// Get URI for resource currently loaded in the view's iframe
+		var iframeDocURI = new URI($("#readium-flowing-content").attr("src"));
+
+		return relativeURI.resolve(iframeDocURI).toString();
+	},
+
+	hideContent : function() {
+		$("#flowing-wrapper").css("opacity", "0");
+	},
+
+	showContent : function() {
+		$("#flowing-wrapper").css("opacity", "1");
+	},
+
+	calcPageOffset : function(page_num) {
+		return (page_num - 1) * (this.reflowableLayout.page_width + this.reflowableLayout.gap_width);
+	},
+
+	offsetDirection : function () {
+
+		// if this book does right to left pagination we need to set the
+		// offset on the right
+		if (this.model.epub.get("page_prog_dir") === "rtl") {
+			return "right";
+		}
+		else {
+			return "left";
+		}
 	}
 });
