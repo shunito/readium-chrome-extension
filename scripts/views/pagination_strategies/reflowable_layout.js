@@ -12,20 +12,20 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
 
     initializeContentDocument : function (epubContentDocument, epubCFIs, currSpinePosition, readiumFlowingContent, packageDocument, bindingTemplate, linkClickHandler, handlerContext, currentTheme, flowingWrapper, readiumFlowingContent, keydownHandler) {
 
+        var triggers;
         var lastPageElementId = this.injectCFIElements(
             epubContentDocument, 
             epubCFIs, 
             currSpinePosition
             );
 
-        this.iframeLoadCallback(
-            readiumFlowingContent, 
-            epubContentDocument, 
-            packageDocument,
-            bindingTemplate,
-            linkClickHandler,
-            handlerContext
-        );
+        this.applyBindings( readiumFlowingContent, epubContentDocument, packageDocument, bindingTemplate );
+        this.applySwitches( epubContentDocument, readiumFlowingContent ); 
+        this.injectMathJax(epubContentDocument);
+        this.injectLinkHandler(epubContentDocument, linkClickHandler, handlerContext);
+        triggers = this.parseTriggers(epubContentDocument);
+        this.applyTriggers(epubContentDocument, triggers);
+        $(epubContentDocument).attr('title', Acc.page + ' - ' + Acc.title);
 
         this.injectTheme(
             currentTheme, 
@@ -137,28 +137,6 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
     // ------------------------------------------------------------------------------------ //
     //  PRIVATE METHODS FOR INITIALIZING EPUB CONTENT DOCUMENT CONTAINER                    //
     // ------------------------------------------------------------------------------------ //
-
-    iframeLoadCallback: function (readiumFlowingContent, epubContentDocument, packageDocument, bindingTemplate, linkClickHandler, handlerContext) {
-
-        this.applyBindings( readiumFlowingContent, epubContentDocument, packageDocument, bindingTemplate );
-            // $(e.srcElement).contents(), dom, packageDocument, bindingTemplate);
-
-        this.applySwitches( epubContentDocument, readiumFlowingContent ); 
-            // $(e.srcElement).contents(), dom );
-
-        this.injectMathJax(epubContentDocument);
-            // e.srcElement);
-
-        this.injectLinkHandler(epubContentDocument, linkClickHandler, handlerContext);
-            // e.srcElement, linkClickHandler, handlerContext);
-
-        var triggers = this.parseTriggers(epubContentDocument);
-            // e.srcElement.contentDocument);
-
-        this.applyTriggers(epubContentDocument, triggers);
-
-        $(epubContentDocument).attr('title', Acc.page + ' - ' + Acc.title);
-    },
 
     injectCFIElements : function (epubContentDocument, epubCFIs, currSpinePosition) {
 
