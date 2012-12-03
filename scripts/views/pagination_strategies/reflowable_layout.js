@@ -393,13 +393,12 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
     },
 
     // Rationale: on iOS frames are automatically expanded to fit the content dom
-    // thus we cannot use relative size for the iframe and must set abs 
-    // pixel size
+    //   thus we cannot use relative size for the iframe and must set abs 
+    //   pixel size
     setFrameSize : function (flowingWrapperWidth, flowingWrapperHeight, readiumFlowingContent, currentMargin, isTwoUp) {
 
         var width = this.getFrameWidth(flowingWrapperWidth, currentMargin, isTwoUp).toString() + "px";
 
-        // REFACTORING CANDIDATE: the $el is no good
         var height = flowingWrapperHeight.toString() + "px"; 
 
         $(readiumFlowingContent).attr("width", width);

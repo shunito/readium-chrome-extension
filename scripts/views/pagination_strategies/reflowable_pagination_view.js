@@ -27,9 +27,10 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.model.on("change:current_theme", this.themeChangeHandler, this);
 	},
 
-	// Description: Remove all handlers so they don't hang around in memory
+	
 	destruct: function() {
-		
+	
+		// Remove all handlers so they don't hang around in memory	
 		this.mediaOverlayController.off("change:mo_text_id", this.highlightText, this);
         this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying, this);
 		this.model.off("change:font_size", this.rePaginationHandler, this);
@@ -107,10 +108,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		);
 	},
 
-	// Description: navigate to a url hash fragment by calculating the page of
-	//   the corresponding elem and setting the page number on `this.model`
-	//   as precondition the hash fragment should identify an element in the
-	//   section rendered by this view
+	// Description: Find an element with this specified id and show the page that contains the element.
 	goToHashFragment: function(hashFragmentId) {
 
 		// this method is triggered in response to 
@@ -134,6 +132,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 				this.reflowableLayout.page_width, 
 				this.reflowableLayout.gap_width,
 				this.getBody());
+
             if (page > 0) {
                 this.pages.goToPage(page);	
 			}
@@ -141,8 +140,8 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		// else false alarm no work to do
 	},
 
-	// Save position in epub
-	// Refactor this, probably stays here, although much else will move into finding visible elements
+	// Description: Generates a CFI for an element is that is currently visible on the page. This CFI and a last-page payload
+	//   is then saved for the current EPUB.
 	savePosition : function () {
 
 		var $visibleTextNode;
@@ -385,11 +384,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	},
 
 	showPage: function(page) {
-        // check to make sure we're not already on that page
-        // REFACTORING CANDIDATE: This should be this.pages.get("current_page")
-        if (this.model.get("current_page") != undefined && this.model.get("current_page").indexOf(page) != -1) {
-            return;
-        }
+
 		var offset = this.calcPageOffset(page).toString() + "px";
 		$(this.getBody()).css(this.offsetDirection(), "-" + offset);
 		this.showContent();
@@ -406,7 +401,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	//   valid XHTML for a link to another resource in the EPUB to be specfied relative to the current document's
 	//   path, rather than to the package document. As such, URIs passed to Readium must be either absolute references or 
 	//   relative to the package document. This method resolves URIs to conform to this condition. 
-	// REFACTORING CANDIDATE: This could be moved into some sort of utility method uri resolution
 	resolveRelativeURI : function (rel_uri) {
 		var relativeURI = new URI(rel_uri);
 
