@@ -111,7 +111,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
     },
 
     // ------------------------------------------------------------------------------------ //
-    //  "PRIVATE" HELPERS                                                                   //
+    //  PRIVATE HELPERS                                                                     //
     // ------------------------------------------------------------------------------------ //
 
     // Description: we are using experimental styles so we need to 
@@ -423,8 +423,9 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         return css;
     },
 
-    // REFACTORING CANDIDATE: This is a temporary method to encapsulate some logic from the reflowable view that is
-    //   also duplicated in the adjustIframeColumns method in this model
+    // Description: This method accounts for the case in which the page-spread-* property is set on the current 
+    //   content document. When this property is set, it requires that the first page of content is offset by 1, 
+    //   creating a blank page as the first page in a synthetic spread.
     accountForOffset : function (readiumFlowingContent, isTwoUp, firstPageIsOffset, currentPages, ppd) {
 
         var $reflowableIframe = $(readiumFlowingContent);
@@ -492,48 +493,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         // margin on the <html> elem, or it will mess with our column code
         $(epubContentDocument).css( this.getBodyColumnCss() );
 
-        // If the first page is offset, adjust the window to only show one page
-        if (isTwoUp) {
-            
-            var firstPageIsOffset = firstPageOffset;
-            var firstPageOffsetValue;
-
-            // Rationale: A current page of [0, 1] indicates that the current display is synthetic, and that 
-            //   only the first page should be showing in that display
-            // REFACTORING CANDIDATE: This logic is similar to that in pageChangeHandler
-            var onFirstPage = 
-                currentPages[0] === 0 &&
-                currentPages[1] === 1 
-                ? true : false;
-
-            if (firstPageIsOffset && onFirstPage) {
-
-                if (ppd === "rtl") {
-
-                    firstPageOffset = -(2 * (this.page_width + this.gap_width));
-                    $frame.css("margin-left", firstPageOffset + "px");
-                }
-                // Left-to-right pagination
-                else {
-
-                    firstPageOffset = this.page_width + (this.gap_width * 2);
-                    $frame.css("margin-left", firstPageOffset + "px");
-                }
-
-                page = 1;
-            }
-            else {
-
-                $frame.css("margin-left", "0px");
-                page = currentPages[0];
-            }
-        }
-        else {
-
-            $frame.css("margin-left", "0px");
-            page = currentPages[0];
-        }
-
+        page = this.accountForOffset(readiumFlowingContent, isTwoUp, firstPageOffset, currentPages, ppd);
         return [this.calcNumPages(epubContentDocument, isTwoUp, offsetDir), page];
     },
 
