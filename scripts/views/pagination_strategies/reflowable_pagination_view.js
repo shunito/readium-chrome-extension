@@ -718,7 +718,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	// REFACTORING CANDIDATE: This might be part of the public interface
 	getElemPageNumberById: function(elemId) {
         var doc = $("#readium-flowing-content").contents()[0].documentElement;
-        var elem = $(doc).find("#" + elemId);
+        // escape periods for jquery
+        var elem = $(doc).find("#" + elemId.replace(".", "\\."));
         if (elem.length == 0) {
             return -1;
         }

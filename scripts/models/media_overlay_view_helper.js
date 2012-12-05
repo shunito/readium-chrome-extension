@@ -55,7 +55,8 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
 		if(currentMOFrag) {
     		$.each(currentPages, function(idx) {
                 var body = fixedLayoutView.getPageBody(this);
-                var newFrag = $(body).find("#" + currentMOFrag);
+                // escape periods for jquery
+                var newFrag = $(body).find("#" + currentMOFrag.replace(".", "\\."));
                 if (newFrag) {
                 	that.addActiveClass(newFrag);	
                 } 
@@ -98,7 +99,8 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
                 
 		if (currentMOFrag) {
             // add active class to the new MO fragment
-            var newFrag = $(body).find("#" + currentMOFrag);
+            // escape periods for jquery
+            var newFrag = $(body).find("#" + currentMOFrag.replace(".", "\\."));
             if (newFrag) {
                 this.addActiveClass(newFrag);
                 if (this.authorActiveClassExists() == false) {
