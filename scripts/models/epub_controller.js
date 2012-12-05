@@ -28,6 +28,14 @@ Readium.Models.EPUBController = Backbone.Model.extend({
         this.set("media_overlay_controller", 
             new Readium.Models.MediaOverlayController({epubController : this}));
 
+		if (this.get("two_up") != null) {
+			console.log("Legacy record with two_up: " + this.get("two_up"));
+			// older item, definitely non-scrolling
+			this.set("pagination_mode", !!this.get("two_up") ? "facing" : "single");
+		} else {
+			this.updatePaginationSettings();
+		}
+
 		// create a [`Paginator`](/docs/paginator.html) object used to initialize
 		// pagination strategies for the spine items of this book
 		this.paginator = new Readium.Models.PaginationStrategySelector({book: this});
@@ -56,7 +64,11 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 				that.set("has_toc", ( !!that.packageDocument.getTocItem() ) );
 			}
 		});
-        
+
+        // To maintain convenience for existing code, pagination_mode
+        // changes automagically set two_up attribute 
+		this.on("change:pagination_mode", this.updatePaginationSettings, this);
+
         // `change:spine_position` is triggered whenver the reader turns pages
 		// accross a `spine_item` boundary. We need to cache thier new position
 		// and 
@@ -96,7 +108,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 	defaults: {
 		"font_size": 10,
-    	"two_up": false,
+		"pagination_mode": "single",
     	"full_screen": false,
     	"toolbar_visible": true,
     	"toc_visible": false,
@@ -115,11 +127,19 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 			"updated_at": this.get("updated_at"),
 			"current_theme": this.get("current_theme"),
 			"current_margin": this.get("current_margin"),
-			"two_up": this.get("two_up"),
+			"pagination_mode": this.get("pagination_mode"),
 			"font_size": this.get("font_size"),
 			"key": this.get("key"),
 			"epubCFIs" : this.get("epubCFIs")
 		};
+	},
+
+	updatePaginationSettings: function() {
+		if (this.get("pagination_mode") == "facing") {
+			this.set("two_up", true);
+		} else {
+			this.set("two_up", false);
+		}
 	},
 
 	toggleFullScreen: function() {
