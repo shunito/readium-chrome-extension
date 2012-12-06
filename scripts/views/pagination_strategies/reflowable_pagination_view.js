@@ -192,19 +192,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		contentDocumentIdref = this.model.getCurrentSection().get("idref");
 
 		// Get the package document
-		// REFACTORING CANDIDATE: This is a temporary approach for retrieving a document representation of the 
-		//   package document. Probably best that the package model be able to return this representation of itself.
-        $.ajax({
-
-            type: "GET",
-            url: this.model.epub.get("root_url"),
-            dataType: "xml",
-            async: false,
-            success: function (response) {
-
-                packageDocument = response;
-            }
-        });
+		packageDocument = this.model.getPackageDocumentDOM();
 
 		// Save the position marker
 		generatedCFI = EPUBcfi.Generator.generateCharacterOffsetCFI(

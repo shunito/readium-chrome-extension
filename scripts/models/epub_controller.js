@@ -219,19 +219,27 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 	//  "PRIVATE" HELPERS                                                                   //
 	// ------------------------------------------------------------------------------------ //
 
-	handleCFIReference : function (CFI) {
+	// Description: Returns a text version of the EPUBs package document.
+	// Rationale: The AJAX call is implemented as a synchronous request 
+	getPackageDocumentDOM : function () {
 
 		var packageDocument;
-		var hrefOfFirstContentDoc;
-		var spinePos;
-		var elementId;
+		var packageDocumentUrl;
 
-		// REFACTORING CANDIDATE: This is a temporary approach for retrieving a document representation of the 
-		//   package document. Probably best that the package model be able to return this representation of itself.
-        $.ajax({
+		// Rationale: The root_url attribute is set if the persistence is client-side, using the Filesystem API. Otherwise
+		//   this attribute is undefined, which means the url specified with package_doc_path should be used to obtain the 
+		//   package document.
+		if (this.epub.get("root_url")) {
+			packageDocumentUrl = this.epub.get("root_url");
+		}
+		else {
+			packageDocumentUrl = this.epub.get("package_doc_path");
+		}
+
+		$.ajax({
 
             type: "GET",
-            url: this.epub.get("root_url"),
+            url: packageDocumentUrl,
             dataType: "xml",
             async: false,
             success: function (response) {
@@ -239,6 +247,19 @@ Readium.Models.EPUBController = Backbone.Model.extend({
                 packageDocument = response;
             }
         });
+
+		return packageDocument;
+	},
+
+
+	handleCFIReference : function (CFI) {
+
+		var packageDocument;
+		var hrefOfFirstContentDoc;
+		var spinePos;
+		var elementId;
+
+		packageDocument = this.getPackageDocumentDOM();
 
 		// get the href of the first content document
 		hrefOfFirstContentDoc = EPUBcfi.Interpreter.getContentDocHref(CFI, packageDocument);
