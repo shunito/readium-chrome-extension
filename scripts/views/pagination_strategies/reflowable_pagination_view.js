@@ -154,7 +154,14 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		var generatedCFI;
 
 		// Get first visible element with a text node 
-		$visibleTextNode = this.reflowableElementsInfo.findVisibleTextNode(this.getEpubContentDocument(), this.model.get("two_up"));
+		$visibleTextNode = this.reflowableElementsInfo.findVisibleTextNode(
+			this.getEpubContentDocument(), 
+			this.model.get("two_up"),
+			// REFACTORING CANDIDATE: These two properties should be stored another way. This should be 
+			//   temporary.
+			this.reflowableLayout.gap_width,
+			this.reflowableLayout.page_width
+			);
 
 		// Check if a last page marker already exists on this page
 		try {
