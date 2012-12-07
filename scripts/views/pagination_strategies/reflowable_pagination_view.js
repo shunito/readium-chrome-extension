@@ -153,7 +153,14 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		var generatedCFI;
 
 		// Get first visible element with a text node 
-		$visibleTextNode = this.reflowableElementsInfo.findVisibleTextNode(this.getEpubContentDocument(), this.model.get("two_up"));
+		$visibleTextNode = this.reflowableElementsInfo.findVisibleTextNode(
+			this.getEpubContentDocument(), 
+			this.model.get("two_up"),
+			// REFACTORING CANDIDATE: These two properties should be stored another way. This should be 
+			//   temporary.
+			this.reflowableLayout.gap_width,
+			this.reflowableLayout.page_width
+			);
 
 		// Check if a last page marker already exists on this page
 		try {
@@ -191,19 +198,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		contentDocumentIdref = this.model.getCurrentSection().get("idref");
 
 		// Get the package document
-		// REFACTORING CANDIDATE: This is a temporary approach for retrieving a document representation of the 
-		//   package document. Probably best that the package model be able to return this representation of itself.
-        $.ajax({
-
-            type: "GET",
-            url: this.model.epub.get("root_url"),
-            dataType: "xml",
-            async: false,
-            success: function (response) {
-
-                packageDocument = response;
-            }
-        });
+		packageDocument = this.model.getPackageDocumentDOM();
 
 		// Save the position marker
 		generatedCFI = EPUBcfi.Generator.generateCharacterOffsetCFI(

@@ -199,6 +199,7 @@
 	    <script src="/lib/jquery-1.7.1.min.js" type="text/javascript" ></script>
 		<!-- This one file: contains a bunch of libs minified and concatenated together -->
 		<script src="/scripts/libs/web_plugins.js" type="text/javascript" ></script>
+		<script src="/lib/2.5.3-crypto-sha1.js" type="text/javascript" ></script>
 
 		<!-- scripts concatenated and minified via build script -->
 		<!-- Include library data as a global var so we dont have to make an AJAX call-->
@@ -225,6 +226,8 @@
 		<script src="/scripts/models/trigger.js" type="text/javascript"></script>
 		<script src="/scripts/views/pagination_strategies/pagination_view_base.js" type="text/javascript"></script>
 		<script src="/scripts/views/pagination_strategies/fixed_pagination_view.js" type="text/javascript"></script>
+		<script src="/scripts/views/pagination_strategies/reflowable_layout.js" type="text/javascript"></script>
+		<script src="/scripts/views/pagination_strategies/reflowable_element_info.js" type="text/javascript"></script>
 		<script src="/scripts/views/pagination_strategies/reflowable_pagination_view.js" type="text/javascript"></script>
 		<script src="/scripts/views/pagination_strategies/scrolling_pagination_view.js" type="text/javascript"></script>
 		<script src="/scripts/views/toolbar_view.js" type="text/javascript"></script>
@@ -252,7 +255,7 @@
             config: ["readium.js"]
             });
         </script>
-        <script type="text/javascript" src="readium/lib/mathjax/MathJax.js"></script>
+        <script type="text/javascript" src="lib/mathjax/MathJax.js"></script>
 
 		<!-- Asynchronous Google Analytics snippet: mathiasbynens.be/notes/async-analytics-snippet -->
 	    <script>

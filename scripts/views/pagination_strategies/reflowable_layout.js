@@ -3,7 +3,6 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
 
     initialize: function (options) {
         // make sure we have proper vendor prefixed props for when we need them
-        this.stashModernizrPrefixedProps();
     },
 
     // ------------------------------------------------------------------------------------ //
@@ -114,24 +113,26 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
     //  PRIVATE HELPERS                                                                     //
     // ------------------------------------------------------------------------------------ //
 
-    // Description: we are using experimental styles so we need to 
-    //   use modernizr to generate prefixes
-    stashModernizrPrefixedProps: function() {
-        var cssIfy = function(str) {
-            return str.replace(/([A-Z])/g, function(str,m1){ 
-                return '-' + m1.toLowerCase(); 
-            }).replace(/^ms-/,'-ms-');
-        };
+    getColumnAxisCssName : function () {
+        var columnAxisName = Modernizr.prefixed('columnAxis') || 'columnAxis';
+        return this.createCssPropertyName(columnAxisName);
+    },
 
-        // ask modernizr for the vendor prefixed version
-        this.columnAxis =  Modernizr.prefixed('columnAxis') || 'columnAxis';
-        this.columnGap =  Modernizr.prefixed('columnGap') || 'columnGap';
-        this.columnWidth =  Modernizr.prefixed('columnWidth') || 'columnWidth';
+    getColumnGapCssName : function () {
+        var columnGapName = Modernizr.prefixed('columnGap') || 'columnGap';
+        return this.createCssPropertyName(columnGapName);
+    },
 
-        // we are interested in the css prefixed version
-        this.cssColumnAxis =  cssIfy(this.columnAxis);
-        this.cssColumnGap =  cssIfy(this.columnGap);
-        this.cssColumnWidth =  cssIfy(this.columnWidth);
+    getColumnWidthCssName : function () {
+        var columnWidthName = Modernizr.prefixed('columnWidth') || 'columnWidth';
+        return this.createCssPropertyName(columnWidthName);
+    },
+
+    createCssPropertyName : function (modernizrName) {
+
+        return modernizrName.replace(/([A-Z])/g, function (modernizrName, m1) {  
+            return '-' + m1.toLowerCase(); 
+        }).replace(/^ms-/,'-ms-');
     },
 
     // ------------------------------------------------------------------------------------ //
@@ -182,6 +183,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         return lastPageElementId;
     },
 
+    // REFACTORING CANDIDATE: It looks like this could go on the package document itself
     getBindings: function (packageDocument) {
         var packDoc = packageDocument;
         var bindings = packDoc.get('bindings');
@@ -409,9 +411,9 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
 
     getBodyColumnCss : function () {
         var css = {};
-        css[this.cssColumnAxis] = "horizontal";
-        css[this.cssColumnGap] = this.gap_width.toString() + "px";
-        css[this.cssColumnWidth] = this.page_width.toString() + "px";
+        css[this.getColumnAxisCssName()] = "horizontal";
+        css[this.getColumnGapCssName()] = this.gap_width.toString() + "px";
+        css[this.getColumnWidthCssName()] = this.page_width.toString() + "px";
         css["padding"] = "0px";
         css["margin"] = "0px";
         css["position"] = "absolute";

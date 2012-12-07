@@ -123,12 +123,10 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
     },
 
     // TODO: Extend this to be correct for right-to-left pagination
-    findVisibleTextNode: function (epubContentDocument, isTwoUp) {
+    findVisibleTextNode: function (epubContentDocument, isTwoUp, columnGap, columnWidth) {
 
         var documentLeft = 0;
         var documentRight;
-        var columnGap;
-        var columnWidth;
         var doc;
         var $elements;
         var $firstVisibleTextNode;
@@ -150,8 +148,6 @@ Readium.Views.ReflowableElementInfo = Backbone.Model.extend({
         doc = epubContentDocument;
 
         if (isTwoUp) {
-            columnGap = parseInt($(doc).css("-webkit-column-gap").replace("px",""));
-            columnWidth = parseInt($(doc).css("-webkit-column-width").replace("px",""));
             documentRight = documentLeft + columnGap + (columnWidth * 2);
         } 
         else {
