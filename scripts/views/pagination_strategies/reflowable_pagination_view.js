@@ -196,9 +196,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         doc = $("#readium-flowing-content").contents()[0].documentElement;
 
         if (this.model.get("two_up")) {
-        	columnGap = parseInt($(doc).css("-webkit-column-gap").replace("px",""));
-        	columnWidth = parseInt($(doc).css("-webkit-column-width").replace("px",""));
-        	documentRight = documentLeft + columnGap + (columnWidth * 2);
+        	documentRight = documentLeft + this.columnGap + (this.columnWidth * 2);
         } 
         else {
         	documentRight = documentLeft + $(doc).width();
