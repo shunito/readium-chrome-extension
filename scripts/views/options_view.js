@@ -121,12 +121,15 @@ Readium.Views.OptionsView = Backbone.View.extend({
 	},
 
   	selectTheme: function(e) {
-  		var el = e.srcElement;
-  		while (el != null && !el.classList.contains('theme-option')) {
-  			el = el.parentElement;
+        // Rationale: Firefox doesn't support e.srcElement
+        var eventSourceElement = e.target || e.srcElement;
+  		while (eventSourceElement != null && !eventSourceElement.classList.contains('theme-option')) {
+  			eventSourceElement = eventSourceElement.parentElement;
   		}
-  		var id = el ? el.id : '';
-		if(id && el && Acc.rg && Acc.rg.theme && el != Acc.rg.theme.selected) Acc.rg.theme.set(id);
+
+  		var id = eventSourceElement ? eventSourceElement.id : '';
+		if(id && eventSourceElement && Acc.rg && Acc.rg.theme && eventSourceElement != Acc.rg.theme.selected) Acc.rg.theme.set(id);
+
   		if(id === "default-theme-option" ) this.model.set("current_theme", "default-theme");
 		if(id === "night-theme-option" ) this.model.set("current_theme", "night-theme");
 		if(id === "parchment-theme-option" ) this.model.set("current_theme", "parchment-theme");
@@ -136,8 +139,12 @@ Readium.Views.OptionsView = Backbone.View.extend({
   	},
 
   	selectMargin: function(e) {
-  		var id = e.srcElement.id;
-		if (e.srcElement && Acc.rg && Acc.rg.margin && e.srcElement != Acc.rg.margin.selected) Acc.rg.margin.set(id);
+        // Rationale: Firefox doesn't support e.srcElement
+        var eventSourceElement = e.target || e.srcElement;
+  		var id = eventSourceElement.id;
+
+		if (eventSourceElement && Acc.rg && Acc.rg.margin && eventSourceElement != Acc.rg.margin.selected) Acc.rg.margin.set(id);
+
   		var num = id[id.length - 1];
   		if(num === "1" ) this.model.set("current_margin", 1);
 		if(num === "2" ) this.model.set("current_margin", 2);
@@ -148,12 +155,18 @@ Readium.Views.OptionsView = Backbone.View.extend({
   	},
 
   	selectPagination: function(e) {
-  		var el = e.srcElement;
-  		while (el != null && !el.classList.contains('pagination-option')) {
-  			el = el.parentElement;
+        // Rationale: Firefox doesn't support e.srcElement
+        var eventSourceElement = e.target || e.srcElement;
+
+  		while (eventSourceElement != null && !eventSourceElement.classList.contains('pagination-option')) {
+  			eventSourceElement = eventSourceElement.parentElement;
   		}
-  		var id = el ? el.id : '';
-		if (id && el && Acc.rg && Acc.rg.format && el != Acc.rg.pagination.selected) Acc.rg.pagination.set(id);
+
+  		var id = eventSourceElement ? eventSourceElement.id : '';
+		if (id && eventSourceElement && Acc.rg && Acc.rg.format && eventSourceElement != Acc.rg.pagination.selected) {
+            Acc.rg.pagination.set(id);
+        }
+
   		if(id === "one-up-option" ) this.model.set("pagination_mode", 'single');
   		if(id === "two-up-option" ) this.model.set("pagination_mode", 'facing');
   		if(id === "scrolling-option" ) this.model.set("pagination_mode", 'scrolling');
