@@ -57,26 +57,11 @@ Readium.Models.PackageDocumentParser.prototype.parse = function(xml_content) {
 		xmlDom = xml_content;
 	}
 
-	// Jath.resolver = function( prefix ) {
-	// 	var mappings = { 
- //    		def: "http://www.idpf.org/2007/opf",
-	// 		dc: "http://purl.org/dc/elements/1.1/"
-	// 	};
-	// 	return mappings[ prefix ];
-	// }
-
-	// if () {
-		json = {};
-		json.metadata = this.getJsonMetadata(xmlDom);
-		json.bindings = this.getJsonBindings(xmlDom);
-		json.spine = this.getJsonSpine(xmlDom);
-		json.manifest = this.getJsonManifest(xmlDom);
-
-	// }
-	// else {
-
-	// 	json = Jath.parse( Readium.Models.PackageDocumentParser.JathTemplate, xmlDom);	
-	// }
+	json = {};
+	json.metadata = this.getJsonMetadata(xmlDom);
+	json.bindings = this.getJsonBindings(xmlDom);
+	json.spine = this.getJsonSpine(xmlDom);
+	json.manifest = this.getJsonManifest(xmlDom);
 
 	// parse the page-progression-direction if it is present
 	json.paginate_backwards = this.paginateBackwards(xmlDom);
