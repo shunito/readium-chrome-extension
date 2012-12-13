@@ -63,8 +63,10 @@ css/sass/bootstrap_sass/stylesheets/responsive.scss:28
 /Users/justinhume/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.20/lib/sass/exec.rb:41:in `parse'
 /Users/justinhume/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.20/lib/sass/exec.rb:21:in `parse!'
 /Users/justinhume/.rvm/gems/ruby-1.9.3-p194@readium/gems/sass-3.1.20/bin/sass:8:in `<top (required)>'
-/Users/justinhume/.rvm/gems/ruby-1.9.3-p194@readium/bin/sass:23:in `load'
-/Users/justinhume/.rvm/gems/ruby-1.9.3-p194@readium/bin/sass:23:in `<main>'
+/Users/justinhume/.rvm/gems/ruby-1.9.3-p194@readium/bin/sass:19:in `load'
+/Users/justinhume/.rvm/gems/ruby-1.9.3-p194@readium/bin/sass:19:in `<main>'
+/Users/justinhume/.rvm/gems/ruby-1.9.3-p194@readium/bin/ruby_noexec_wrapper:14:in `eval'
+/Users/justinhume/.rvm/gems/ruby-1.9.3-p194@readium/bin/ruby_noexec_wrapper:14:in `<main>'
 */
 body:before {
   white-space: pre;
