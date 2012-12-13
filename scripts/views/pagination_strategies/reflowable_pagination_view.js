@@ -626,7 +626,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		//   the expected result in Chrome, Safari and Firefox, and on the subsequent call to this method (Readium
 		//   calls this method more than once when paginating - the first call is a bit redundant, so it is sufficient
 		//   for this method to function correctly the second time in IE, even though it appears to introduce a jerkiness
-		//   in the settings modal animation.) 
+		//   in the settings modal animation.)
 		if (!body) {
 			return this.pages.get("num_pages");
 		}
