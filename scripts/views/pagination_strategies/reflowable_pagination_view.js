@@ -619,6 +619,18 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// get a reference to the dom body
 		body = this.getBody();
 
+		// Rationale: This is a hack that exists to support IE 10. For some 
+		//   reason (that does not generate an error elsewhere), trying to get the content of the iframe with 
+		//   the getBody() call returns null. I'm not entirely sure how that's possible, given that when this 
+		//   call is made, the iframe clearly has content that is fully loaded. This call also seems to return 
+		//   the expected result in Chrome, Safari and Firefox, and on the subsequent call to this method (Readium
+		//   calls this method more than once when paginating - the first call is a bit redundant, so it is sufficient
+		//   for this method to function correctly the second time in IE, even though it appears to introduce a jerkiness
+		//   in the settings modal animation.) 
+		if (!body) {
+			return this.pages.get("num_pages");
+		}
+
 		// cache the current offset 
 		offset = body.style[this.offset_dir];
 
