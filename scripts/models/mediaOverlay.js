@@ -4,6 +4,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     smilModel: null,
     consoleTrace: false,
     url: null,
+    urlObj: null,
     
     // observable properties
     defaults: {
@@ -31,6 +32,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     // set the URL before calling fetch()
     setUrl: function(smilUrl) {
         this.url = smilUrl;
+        this.urlObj = new URI(this.url);
     },
     
     // start retrieving the data
@@ -53,7 +55,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         
         // very important piece of code: attach render functions to the model
         // at runtime, 'this' is the node in question
-        this.smilModel.addRenderers({
+        this.smilModel.addRenderers({            
             "audio": function() {
                 // have the audio player inform the node directly when it's done playing
                 var thisNode = this;
@@ -72,7 +74,10 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
             "text": function(){
                 var src = $(this).attr("src");
                 self.debugPrint("Text: " + src);
-                self.set("current_text_src", src);
+                // resolve text src relative to the MO URI
+        		var uri = new URI(src);
+        		var resolvedUri = uri.resolve(self.urlObj).toString();
+                self.set("current_text_src", resolvedUri);
             }
         });
         
