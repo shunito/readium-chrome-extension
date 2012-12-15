@@ -74,10 +74,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
             "text": function(){
                 var src = $(this).attr("src");
                 self.debugPrint("Text: " + src);
-                // resolve text src relative to the MO URI
-        		var uri = new URI(src);
-        		var resolvedUri = uri.resolve(self.urlObj).toString();
-                self.set("current_text_src", resolvedUri);
+                self.set("current_text_src", src);
             }
         });
         

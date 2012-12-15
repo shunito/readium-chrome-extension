@@ -266,12 +266,12 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         }
         else {
         	pageElms = this.currentView.findVisiblePageElements();
-            var doc_href = this.currentSection.get("href");
+            var docHref = this.currentSection.resolveUri(this.currentSection.get("href"));
             
 	        var node = null;
             for (var i = 0; i<pageElms.length; i++) {
 	            var id = $(pageElms[i]).attr("id");
-                var src = doc_href + "#" + id;
+                var src = docHref + "#" + id;
 	            node = this.mo.findNodeByTextSrc(src);
 	            if (node) {
 	                break;
