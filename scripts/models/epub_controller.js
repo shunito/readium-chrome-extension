@@ -272,12 +272,12 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 	hasNextSection: function() {
 		var start = this.get("spine_position");
-		return this.packageDocument.getPrevLinearSpinePostition(start) > -1;
+		return this.packageDocument.getNextLinearSpinePostition(start) > -1;
 	},
 
 	hasPrevSection: function() {
 		var start = this.get("spine_position");
-		return this.packageDocument.getNextLinearSpinePostition(start) > -1;
+		return this.packageDocument.getPrevLinearSpinePostition(start) > -1;
 	},
 	
 	// goes the next linear section in the spine. Non-linear sections should be

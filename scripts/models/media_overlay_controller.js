@@ -70,7 +70,6 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
     // main playback function
 	playMo: function() {
         if (this.mo == null) {
-            alert("Sorry, there is no audio for this section.");
             return;
         }
         

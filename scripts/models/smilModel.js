@@ -234,6 +234,9 @@ Readium.Models.SmilModel = function() {
             if ($(node).attr("src") != undefined) {
                 $(node).attr("src", resolveUrl($(node).attr("src")));
             }
+            if ($(node).attr("epub:textref") != undefined) {
+                $(node).attr("epub:textref", resolveUrl($(node).attr("epub:textref")));
+            }
         }
     }
     

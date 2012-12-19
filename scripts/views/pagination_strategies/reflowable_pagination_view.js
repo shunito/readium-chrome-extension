@@ -140,6 +140,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 			var page = this.getElemPageNumber(el);
             if (page > 0) {
+                //console.log(fragment + " is on page " + page);
                 this.pages.goToPage(page);	
 			}
 		}
