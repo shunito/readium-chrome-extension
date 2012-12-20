@@ -283,7 +283,7 @@ window.ReadiumLibraryData = [
 		spread: "",
 		src_url: "Local Directory: georgia-pls-ssml-20120322 (1)/",
 		title: "Georgia",
-		updated_at: "2012-12-14T00:28:02.150Z",
+		updated_at: "2012-12-14T00:28:02.150Z"
 	},
 
 	{
@@ -686,7 +686,7 @@ window.ReadiumLibraryData = [
 		spread: "",
 		src_url: "Local Directory: wasteland-otf-20120118/",
 		title: "The Waste Land",
-		updated_at: "2012-12-14T00:35:23.875Z",
+		updated_at: "2012-12-14T00:35:23.875Z"
 	},
 
 	{
