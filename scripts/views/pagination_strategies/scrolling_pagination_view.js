@@ -47,12 +47,7 @@ Readium.Views.ScrollingPaginationView = Readium.Views.PaginationViewBase.extend(
 					if (hashFragmentId) {
 						that.goToHashFragment(hashFragmentId);
 					} else {
-
-						if(goToLastPage) {
-							that.getFrame().contentWindow.scrollBy(0, that.getBody().scrollHeight);
-						} else {
-							that.getFrame().contentWindow.scrollTo(0, 0);
-						}
+						that.getFrame().contentWindow.scrollTo(0, 0);
 					}
 				}, 250);
 		});
