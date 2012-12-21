@@ -61,7 +61,7 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 	    else {
 
 			selector = new Readium.Models.AlternateStyleTagSelector;
-	    	bookDom = selector.activateAlternateStyleSet([""], bookDom);
+	    	bookDom = selector.activateAlternateStyleSet(["day"], bookDom);
 	    }
 	},
 
