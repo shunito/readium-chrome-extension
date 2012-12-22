@@ -35,7 +35,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         this.processingMoTextSrc = false;
         
         // media overlay playback starts here, if not null
-        this.moTargetNode = null;
+        this.targetHtmlId = null;
         
         // for mute/unmute
         this.savedVolume = 0;
@@ -49,7 +49,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
 		
         // trigger media overlay position updates
         this.epubController.on("change:spine_position", this.handleSpineChanged, this);   
-        
+        this.epubController.on("change:hash_fragment", this.handleHashFragmentChanged, this);
         this.on("change:rate", this.rateChanged, this);
         this.on("change:volume", this.volumeChanged, this);     
 	},
@@ -77,16 +77,24 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         this.mo.on("change:current_text_src", this.handleMoTextSrc, this);
 		this.mo.on("change:is_document_done", this.handleMoDocumentDone, this);
         
-        var target = this.moTargetNode;
-        this.moTargetNode = null;
-            
+        var moTargetNode;
+        var hadTargetHtmlId = this.targetHtmlId != null;
+        // find our target on this page (either a specific target, or the top of the page)
+        if (hadTargetHtmlId) {
+            moTargetNode = this.findTarget(this.targetHtmlId);
+        }
+        else {
+            moTargetNode = this.findFirstOnPage();
+        }
+        this.targetHtmlId = null;
+        
         // FXL
         if (this.currentSection.isFixedLayout()) {
-            if (this.mo.get("has_started_playback")) {
+            if (this.mo.get("has_started_playback") && hadTargetHtmlId == false) {
                 this.resumeMo();
             }
             else {
-                this.mo.startPlayback(null);
+                this.mo.startPlayback(moTargetNode);
             }
         }
             
@@ -101,11 +109,11 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             // if media overlays is on our current page, then resume playback
             var currMoPageIsVisible = this.pages.get("current_page").indexOf(currMoPage) != -1;
                 
-            if (currMoPageIsVisible) {   
+            if (currMoPageIsVisible && hadTargetHtmlId == false) {   
                 this.resumeMo();
             }
             else {
-                this.mo.startPlayback(target);
+                this.mo.startPlayback(moTargetNode);
             }
         }
 	},
@@ -148,6 +156,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
     
     // called by the reflowable view when the page changes
     reflowPageChanged: function() {
+        
         // if MO is driving navigation, don't process the page change
         // it's probably something we triggered ourselves
         if (this.processingMoTextSrc || this.autoplayNextSpineItem ) {
@@ -158,8 +167,6 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         if (wasPlaying) {
             this.pauseMo();
         }
-        
-        this.setMoTarget();
         
         // if media overlays were playing, then resume playback
         if (wasPlaying) {
@@ -196,6 +203,7 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             this.set("mo_text_id", null);
             return;
         }
+        
         this.processingMoTextSrc = true;
         this.epubController.goToHref(textSrc);
         var frag = "";
@@ -213,7 +221,6 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             }
         }
         
-        this.moTargetNode = null;
         this.pauseMo();
         // advance the spine position
         if (this.epubController.hasNextSection()) {
@@ -236,47 +243,92 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         this.currentSection = this.epubController.getCurrentSection();
         this.mo = this.currentSection.getMediaOverlay();
         if (this.mo == null) {
+            this.autoplayNextSpineItem = false;
             return;
         }
         
+        this.mo.reset();
         // keep the volume and rate consistent
         this.mo.setVolume(this.get("volume"));
         this.mo.setRate(this.get("rate"));
         
-        this.mo.reset();
         if (this.currentSection.isFixedLayout() && this.autoplayNextSpineItem) {
             this.autoplayNextSpineItem = false;
             this.playMo();
         }
     },
     
-    // look at the current page and find the first visible page element that also appears in the document's MO
-    setMoTarget: function() {
-    	var pageElms;
-    	var node;
-        // using this instead of "active_mo" because this function could be called when MO is not playing
-        if (this.mo == null) {
+    handleHashFragmentChanged: function() {
+        // if MO is driving navigation, don't process the hash fragment change
+        // it's probably something we triggered ourselves
+        if (this.processingMoTextSrc) {
             return;
         }
         
+        var hash = this.epubController.get("hash_fragment");
+        if (hash == undefined || hash == "") {
+            return;
+        }
+        this.targetHtmlId = hash;
+        this.pauseMo();
+        this.playMo();
+    },
+    
+    // find the MO starting point closest to targetId
+    findTarget: function(targetId) {
+        
+        if (targetId == null || targetId == undefined || targetId == "") {
+            return null;
+        }
+        // two issues here:
+        // 1. MO might not have a corresponding <text> pointing to #targetId
+        // In this case, we have to find the next-closest
+        //
+        // 2. we have to look at all elements, not just the currently visible ones. the pages get refreshed a few times
+        // and the target element might not be displayed until the second time around. however, we need to find what the
+        // most reasonable MO target is and can't risk coming up with nothing (because then MO starts at the top)
+        var allElms = this.currentView.getAllPageElementsWithId();
+        var docHref = this.currentSection.resolveUri(this.currentSection.get("href"));
+        var startHref = docHref + "#" + targetId;
+        var foundStart = false; 
+        var node = null;
+        
+        for (var i = 0; i<allElms.length; i++) {
+            var id = $(allElms[i]).attr("id");
+            var src = docHref + "#" + id;
+            if (src == startHref) {
+                foundStart = true;
+            }
+            // once we found our starting point in the set, start looking at MO nodes
+            if (foundStart) {
+                node = this.mo.findNodeByTextSrc(src);
+                if (node) {
+                    break;
+                }
+            }
+        }
+        return node;
+    },
+    
+    // find the first visible page element with an MO <text> equivalent
+    findFirstOnPage: function() {
+        // this is only useful for reflowable content
         if (this.currentSection.isFixedLayout()) {
-            // fixed layout doesn't need a target node: the top of the page is always the start of the document
-            this.moTargetNode = null;
+            return null;
         }
-        else {
-        	pageElms = this.currentView.findVisiblePageElements();
-            var docHref = this.currentSection.resolveUri(this.currentSection.get("href"));
+        
+        var pageElms = this.currentView.findVisiblePageElements();
+        var docHref = this.currentSection.resolveUri(this.currentSection.get("href"));
+        var node = null;
+        for (var i = 0; i<pageElms.length; i++) {
+            var id = $(pageElms[i]).attr("id");
+            var src = docHref + "#" + id;
             
-	        var node = null;
-            for (var i = 0; i<pageElms.length; i++) {
-	            var id = $(pageElms[i]).attr("id");
-                var src = docHref + "#" + id;
-	            node = this.mo.findNodeByTextSrc(src);
-	            if (node) {
-	                break;
-	            }
-	        }
-            this.moTargetNode = node;
+            node = this.mo.findNodeByTextSrc(src);
+            if (node) {
+                break;
+            }
         }
+        return node;
     }
 });

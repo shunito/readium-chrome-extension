@@ -18,7 +18,6 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     initialize: function() {
         var self = this;
         this.audioplayer = new Readium.Models.AudioClipPlayer();
-        this.audioplayer.setConsoleTrace(false);
 
         // always know whether we're playing or paused
         this.audioplayer.setNotifyOnPause(function() {
@@ -68,6 +67,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
                     // reset the node's property
                     this.isJumpTarget = false;
                 }
+
                 // play the node
                 self.audioplayer.play($(this).attr("src"), parseFloat($(this).attr("clipBegin")), parseFloat($(this).attr("clipEnd")), isJumpTarget);
             }, 
@@ -148,9 +148,11 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     reset: function() {
         this.set("current_text_src", null);
         this.set("has_started_playback", false);
+        this.audioplayer.reset();
     },
     setConsoleTrace: function(onOff) {
         this.consoleTrace = onOff;
+        this.audioplayer.setConsoleTrace(onOff);
     },
     debugPrint: function(str) {
         if (this.consoleTrace) {

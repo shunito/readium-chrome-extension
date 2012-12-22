@@ -226,8 +226,7 @@ Readium.Models.SmilModel = function() {
                 $(node).attr("clipEnd", resolveClockValue($(node).attr("clipEnd")));
             }
             else {
-                // TODO check if this is reasonable
-                $(node).attr("clipEnd", 9999999);
+                $(node).attr("clipEnd", -1);
             }
         }
         else if (node.tagName == "text") {

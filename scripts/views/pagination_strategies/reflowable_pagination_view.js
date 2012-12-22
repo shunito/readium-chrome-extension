@@ -83,6 +83,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		return [this.model.get("spine_position")];
 	},
 
+    // Description: return the set of currently-visible elements on this page. 
+    // Used by MO.
     findVisiblePageElements: function() {
 
         var $elements = $(this.getBody()).find("[id]");
@@ -93,7 +95,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         var doc_bottom = doc_top + $(doc).height();
         
         var visibleElms = this.filterElementsByPosition($elements, doc_top, doc_bottom, doc_left, doc_right);
-            
         return visibleElms;
     },
     
@@ -116,6 +117,14 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			this.mediaOverlayController.get("mo_text_id")
 		);
 	},
+    
+    // override
+    // Description: return the set of all elements for this spine item that have an @id attribute.
+    // Used by MO.
+    getAllPageElementsWithId: function() {
+        return $(this.getBody()).find("[id]");
+    },
+    
     
 	// Description: navigate to a url hash fragment by calculating the page of
 	//   the corresponding elem and setting the page number on `this.model`
