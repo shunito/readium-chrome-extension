@@ -12,6 +12,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		// call the super ctor
 		Readium.Views.PaginationViewBase.prototype.initialize.call(this, options);
 		this.page_template = Handlebars.templates.reflowing_template;
+		this.iframeId = "#readium-flowing-content";
 
 		// make sure we have proper vendor prefixed props for when we need them
 		this.stashModernizrPrefixedProps();
@@ -164,14 +165,15 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	//   the GC's get them. we need to remove all of the handlers
 	//   that were registered on the model
 	destruct: function() {
-		
+
 		this.pages.off("change:current_page", this.pageChangeHandler);
 		this.model.off("change:toc_visible", this.windowSizeChangeHandler);
 		this.model.off("repagination_event", this.windowSizeChangeHandler);
-		this.model.off("change:current_theme", this.windowSizeChangeHandler);
+		this.model.off("change:current_theme", this.injectTheme);
 		this.model.off("change:two_up", this.setUpMode);
 		this.model.off("change:two_up", this.adjustIframeColumns);
 		this.model.off("change:current_margin", this.marginCallback);
+		this.model.on("save_position", this.savePosition, this);
 		// call the super destructor
 		Readium.Views.PaginationViewBase.prototype.destruct.call(this);
 	},
@@ -204,9 +206,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         doc = $("#readium-flowing-content").contents()[0].documentElement;
 
         if (this.model.get("two_up")) {
-        	columnGap = parseInt($(doc).css("-webkit-column-gap").replace("px",""));
-        	columnWidth = parseInt($(doc).css("-webkit-column-width").replace("px",""));
-        	documentRight = documentLeft + columnGap + (columnWidth * 2);
+        	documentRight = documentLeft + this.columnGap + (this.columnWidth * 2);
         } 
         else {
         	documentRight = documentLeft + $(doc).width();
@@ -304,46 +304,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
         return $visibleElms;
     },
-
-	// Description: Handles clicks of anchor tags by navigating to
-	//   the proper location in the epub spine, or opening
-	//   a new window for external links
-	linkClickHandler: function (e) {
-		e.preventDefault();
-
-		var href;
-
-		// Check for both href and xlink:href attribute and get value
-		if (e.currentTarget.attributes["xlink:href"]) {
-			href = e.currentTarget.attributes["xlink:href"].value;
-		}
-		else {
-			href = e.currentTarget.attributes["href"].value;
-		}
-
-		// Resolve the relative path for the requested resource.
-		href = this.resolveRelativeURI(href);
-		if (href.match(/^http(s)?:/)) {
-			window.open(href);
-		} 
-		else {
-			this.model.goToHref(href);
-		}
-	},
-
-	// Rationale: For the purpose of looking up EPUB resources in the package document manifest, Readium expects that 
-	//   all relative links be specified as relative to the package document URI (or absolute references). However, it is 
-	//   valid XHTML for a link to another resource in the EPUB to be specfied relative to the current document's
-	//   path, rather than to the package document. As such, URIs passed to Readium must be either absolute references or 
-	//   relative to the package document. This method resolves URIs to conform to this condition. 
-	resolveRelativeURI: function (rel_uri) {
-		var relativeURI = new URI(rel_uri);
-
-		// Get URI for resource currently loaded in the view's iframe
-		var iframeDocURI = new URI($("#readium-flowing-content").attr("src"));
-
-		return relativeURI.resolve(iframeDocURI).toString();
-	},
 
 	applyKeydownHandler : function () {
 
@@ -514,19 +474,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		contentDocumentIdref = this.model.getCurrentSection().get("idref");
 
 		// Get the package document
-		// REFACTORING CANDIDATE: This is a temporary approach for retrieving a document representation of the 
-		//   package document. Probably best that the package model be able to return this representation of itself.
-        $.ajax({
-
-            type: "GET",
-            url: this.model.epub.get("root_url"),
-            dataType: "xml",
-            async: false,
-            success: function (response) {
-
-                packageDocument = response;
-            }
-        });
+		packageDocument = this.model.getPackageDocumentDOM();
 
 		// Save the position marker
 		generatedCFI = EPUBcfi.Generator.generateCharacterOffsetCFI(
@@ -680,6 +628,18 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		
 		// get a reference to the dom body
 		body = this.getBody();
+
+		// Rationale: This is a hack that exists to support IE 10. For some 
+		//   reason (that does not generate an error elsewhere), trying to get the content of the iframe with 
+		//   the getBody() call returns null. I'm not entirely sure how that's possible, given that when this 
+		//   call is made, the iframe clearly has content that is fully loaded. This call also seems to return 
+		//   the expected result in Chrome, Safari and Firefox, and on the subsequent call to this method (Readium
+		//   calls this method more than once when paginating - the first call is a bit redundant, so it is sufficient
+		//   for this method to function correctly the second time in IE, even though it appears to introduce a jerkiness
+		//   in the settings modal animation.)
+		if (!body) {
+			return this.pages.get("num_pages");
+		}
 
 		// cache the current offset 
 		offset = body.style[this.offset_dir];
@@ -838,41 +798,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		this.adjustIframeColumns();
 	},
 
-	// Rationale: sadly this is just a reprint of what is already in the
-	//   themes stylesheet. It isn't very DRY but the implementation is
-	//   cleaner this way
-	themes: {
-		"default-theme": {
-			"background-color": "white",
-			"color": "black",
-			"mo-color": "#777"
-		},
-
-		"vancouver-theme": {
-			"background-color": "#DDD",
-			"color": "#576b96",
-			"mo-color": "#777"
-		},
-
-		"ballard-theme": {
-			"background-color": "#576b96",
-			"color": "#DDD",
-			"mo-color": "#888"
-		},
-
-		"parchment-theme": {
-			"background-color": "#f7f1cf",
-			"color": "#774c27",
-			"mo-color": "#eebb22"
-		},
-
-		"night-theme": {
-			"background-color": "#141414",
-			"color": "white",
-			"mo-color": "#666"
-		}
-	},
-
 	injectTheme: function() {
 		var theme = this.model.get("current_theme");
 		if(theme === "default") theme = "default-theme";
@@ -880,7 +805,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			"color": this.themes[theme]["color"],
 			"background-color": this.themes[theme]["background-color"]
 		});
-		
+
 		// stop flicker due to application for alternate style sheets
 		// just set content to be invisible
 		$("#flowing-wrapper").css("visibility", "hidden");

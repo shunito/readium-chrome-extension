@@ -43,14 +43,13 @@ Readium.Models.PackageDocumentParser.JathTemplate = {
 		handler: "@handler",
 		media_type: "@media-type"
 	} ]
-	
 };
 
 // Parse an XML package document into a javascript object
 Readium.Models.PackageDocumentParser.prototype.parse = function(xml_content) {
 
 	var json, manifest, cover, xmlDom;
-	if(typeof(xml_content) === "string" ) {
+	if (typeof(xml_content) === "string" ) {
 		var parser = new window.DOMParser;
   		xmlDom = parser.parseFromString(xml_content, 'text/xml');
 	}
@@ -58,25 +57,21 @@ Readium.Models.PackageDocumentParser.prototype.parse = function(xml_content) {
 		xmlDom = xml_content;
 	}
 
-	Jath.resolver = function( prefix ) {
-		var mappings = { 
-    		def: "http://www.idpf.org/2007/opf",
-			dc: "http://purl.org/dc/elements/1.1/"
-		};
-		return mappings[ prefix ];
-	}
-
-	json = Jath.parse( Readium.Models.PackageDocumentParser.JathTemplate, xmlDom);
+	json = {};
+	json.metadata = this.getJsonMetadata(xmlDom);
+	json.bindings = this.getJsonBindings(xmlDom);
+	json.spine = this.getJsonSpine(xmlDom);
+	json.manifest = this.getJsonManifest(xmlDom);
 
 	// parse the page-progression-direction if it is present
 	json.paginate_backwards = this.paginateBackwards(xmlDom);
 
 	// try to find a cover image
 	cover = this.getCoverHref(xmlDom);
-	if(cover) {
+	if (cover) {
 		json.metadata.cover_href = this.resolveUri(cover);
 	}		
-	if(json.metadata.layout === "pre-paginated") {
+	if (json.metadata.layout === "pre-paginated") {
 		json.metadata.fixed_layout = true;
 	}
     
@@ -91,10 +86,97 @@ Readium.Models.PackageDocumentParser.prototype.parse = function(xml_content) {
 
 	// return the parse result
 	return json;
-
 };
 
-	
+Readium.Models.PackageDocumentParser.prototype.getJsonSpine = function (xmlDom) {
+
+	var $spineElements;
+	var jsonSpine = [];
+
+	$spineElements = $("spine", xmlDom).children();
+	$.each($spineElements, function (spineElementIndex, currSpineElement) {
+
+		var $currSpineElement = $(currSpineElement);
+		var spineItem = {
+
+			idref : $currSpineElement.attr("idref") ? $currSpineElement.attr("idref") : "",
+			linear : $currSpineElement.attr("linear") ? $currSpineElement.attr("linear") : "",
+			properties : $currSpineElement.attr("properties") ? $currSpineElement.attr("properties") : ""
+		};
+
+		jsonSpine.push(spineItem);
+	});
+
+	return jsonSpine;
+},
+
+Readium.Models.PackageDocumentParser.prototype.getJsonMetadata = function (xmlDom) {
+
+	var $metadata = $("metadata", xmlDom);
+	var jsonMetadata = {};
+
+	jsonMetadata.active_class = $("meta[property='media:active-class']", $metadata).text();
+	jsonMetadata.author = $("creator", $metadata).text();
+	jsonMetadata.description = $("description", $metadata).text();
+	jsonMetadata.epub_version = $("package", xmlDom).attr("version") ? $("package", xmlDom).attr("version") : "";
+	jsonMetadata.id = $("identifier", $metadata).text();
+	jsonMetadata.language = $("language", $metadata).text();
+	jsonMetadata.layout = $("meta[property='rendition:layout']", $metadata).text();
+	jsonMetadata.modified_date = $("meta[property='dcterms:modified']", $metadata).text();
+	jsonMetadata.ncx = $("spine", xmlDom).attr("toc") ? $("spine", xmlDom).attr("toc") : "";
+	jsonMetadata.orientation = $("meta[property='rendition:orientation']", $metadata).text();
+	jsonMetadata.page_prog_dir = $("spine", xmlDom).attr("page-progression-direction") ? $("spine", xmlDom).attr("page-progression-direction") : "";
+	jsonMetadata.pubdate = $("date", $metadata).text();
+	jsonMetadata.publisher = $("publisher", $metadata).text();
+	jsonMetadata.rights = $("rights").text();
+	jsonMetadata.spread = $("meta[property='rendition:spread']", $metadata).text();
+	jsonMetadata.title = $("title", $metadata).text();
+
+	return jsonMetadata;
+},
+
+Readium.Models.PackageDocumentParser.prototype.getJsonManifest = function (xmlDom) {
+
+	var $manifestItems = $("manifest", xmlDom).children(); 
+	var jsonManifest = [];
+
+	$.each($manifestItems, function (manifestElementIndex, currManifestElement) {
+
+		var $currManifestElement = $(currManifestElement);
+		var manifestItem = {
+
+			href : $currManifestElement.attr("href") ? $currManifestElement.attr("href") : "",
+			id : $currManifestElement.attr("id") ? $currManifestElement.attr("id") : "", 
+			media_overlay : $currManifestElement.attr("media-overlay") ? $currManifestElement.attr("media-overlay") : "",
+			media_type : $currManifestElement.attr("media-type") ? $currManifestElement.attr("media-type") : "",
+			properties : $currManifestElement.attr("properties") ? $currManifestElement.attr("properties") : ""
+		};
+
+		jsonManifest.push(manifestItem);
+	});
+
+	return jsonManifest;
+},
+
+Readium.Models.PackageDocumentParser.prototype.getJsonBindings = function (xmlDom) {
+
+	var $bindings = $("bindings", xmlDom).children();
+	var jsonBindings = [];
+
+	$.each($bindings, function (bindingElementIndex, currBindingElement) {
+
+		var $currBindingElement = $(currBindingElement);
+		var binding = {
+
+			handler : $currBindingElement.attr("handler") ? $currBindingElement.attr("handler") : "" ,
+			media_type : $currBindingElement.attr("media-type") ? $currBindingElement.attr("media-type") : "" 
+		};
+
+		jsonBindings.push(binding);
+	});
+
+	return jsonBindings;
+},
 
 Readium.Models.PackageDocumentParser.prototype.getCoverHref = function(dom) {
 	var manifest; var $imageNode;
@@ -183,7 +265,6 @@ Readium.Models.PackageDocumentParser.prototype.resolveMediaOverlays = function(m
 Readium.Models.PackageDocumentParser.prototype.paginateBackwards = function(xmlDom) {
 	return $('spine', xmlDom).attr('page-progression-direction') === "ltr";
 };
-
 
 // combine the spine item data with the corresponding manifest
 // data to build useful set of backbone objects
