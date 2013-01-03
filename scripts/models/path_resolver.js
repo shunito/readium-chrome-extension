@@ -101,21 +101,21 @@ var fixXhtmlLinks = function(content, resolver) {
 
 var fixFonts = function(content, resolver) {
 
-      if ((content.indexOf("OTTO") == 0)|| (content.indexOf("wOFF") == 0)) {
+    if ((content.indexOf("OTTO") == 0) || (content.indexOf("wOFF") == 0)) {
 		return content;
-      }
-      else
-      {
-	var prefix = content.slice(0, 1040);
-	var bytes = string2Bin(prefix);
-	var masklen = g_uid_hashed.length;
-	for (var i = 0; i < 1040; i++)
-	{
-		bytes[i] = bytes[i] ^ (g_uid_hashed[i % masklen]);
-	}
-	var results = bin2String(bytes);
-	return results + content.slice(1040);
-      }
+    }
+    else {
+    	var prefix = content.slice(0, 1040);
+    	var bytes = string2Bin(prefix);
+    	var masklen = g_uid_hashed.length;
+    	for (var i = 0; i < 1040; i++)
+    	{
+    		bytes[i] = bytes[i] ^ (g_uid_hashed[i % masklen]);
+    	}
+
+	    var results = bin2String(bytes);
+	    return results + content.slice(1040);
+    }
 }
 
 var getBinaryFileFixingStrategy = function(fileEntryUrl, uid) {
