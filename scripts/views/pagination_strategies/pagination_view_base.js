@@ -262,12 +262,12 @@ Readium.Views.PaginationViewBase = Backbone.View.extend({
 			href = e.currentTarget.attributes["href"].value;
 		}
 
-		// Resolve the relative path for the requested resource.
-		href = this.resolveRelativeURI(href);
 		if (href.match(/^http(s)?:/)) {
 			window.open(href);
 		} 
 		else {
+			// Resolve the relative path for the requested resource.
+			href = this.resolveRelativeURI(href);
 			this.model.goToHref(href);
 		}
 	},
