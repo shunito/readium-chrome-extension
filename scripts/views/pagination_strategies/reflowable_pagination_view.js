@@ -64,20 +64,17 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 				that.goToHashFragment(hashFragmentId);
 			}
+            else if (goToLastPage) {
+
+                that.pages.goToLastPage();
+            }
 			else if (lastPageElementId) {
 
 				that.goToHashFragment(lastPageElementId);
 			}
 			else {
-
-				if (goToLastPage) {
-
-					that.pages.goToLastPage();
-				}
-				else {
-
-					that.pages.goToPage(1);
-				}		
+				
+                that.pages.goToPage(1);
 			}
 		});
 		
@@ -206,7 +203,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         doc = $("#readium-flowing-content").contents()[0].documentElement;
 
         if (this.model.get("two_up")) {
-        	documentRight = documentLeft + this.columnGap + (this.columnWidth * 2);
+            columnGap = parseInt($(doc).css(this.cssColumGap).replace("px",""));
+            columnWidth = parseInt($(doc).css(this.cssColumWidth).replace("px",""));
+        	documentRight = documentLeft + columnGap + (columnWidth * 2);
         } 
         else {
         	documentRight = documentLeft + $(doc).width();
