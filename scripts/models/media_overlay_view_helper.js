@@ -20,7 +20,6 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
 	// ------------------------------------------------------------------------------------ //
 
 	initialize: function () {
-
 		this.epubController = this.get("epubController");
 	},
 
@@ -57,7 +56,7 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
                 var body = fixedLayoutView.getPageBody(this);
                 // escape periods for jquery
                 var newFrag = $(body).find("#" + currentMOFrag.replace(".", "\\."));
-                if (newFrag) {
+                if (newFrag.length > 0) {
                 	that.addActiveClass(newFrag);	
                 } 
            });
@@ -81,12 +80,10 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
 
     // highlight the text
 	renderReflowableMoFragHighlight: function(currentTheme, reflowableView, currentMOFrag) {
-
-		if (currentTheme === "default") {
+        if (currentTheme === "default") {
 			currentTheme = "default-theme";
 		}
-
-		// get rid of the last highlight
+        // get rid of the last highlight
 		var body = reflowableView.getBody();
         var lastFrag = this.removeActiveClass(body);
         
@@ -96,19 +93,26 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
                 $(lastFrag).css("color", "");
             }
         }
-                
-		if (currentMOFrag) {
+        if (currentMOFrag) {
             // add active class to the new MO fragment
             // escape periods for jquery
             var newFrag = $(body).find("#" + currentMOFrag.replace(".", "\\."));
-            if (newFrag) {
+            if (newFrag.length > 0) {
                 this.addActiveClass(newFrag);
                 if (this.authorActiveClassExists() == false) {
                     $(newFrag).css("color", reflowableView.themes[currentTheme]["color"]);   
                 }
             }
+            // If the element corresponding to currentMOFrag wasn't found, it might be because the document hasn't 
+            // completely loaded yet. Flag the view for re-highlighting.
+            // Example of where this helps: load Moby Dick, start playback in Ch 1, go to Ch 2 from Toc, back to Ch 1, back to Ch 2. 
+            // the highlight for the first phrase of the spine item isn't consistent without this rehighlighting function.
+            else {
+                reflowableView.flagRehighlight();
+            }
 		}
 	},	
+    
 
 	// reflowable pagination uses default readium themes, which include a 'fade' effect on the inactive MO text
 	renderReflowableMoPlaying: function(currentTheme, MOIsPlaying, reflowableView) {

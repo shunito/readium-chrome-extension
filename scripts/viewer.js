@@ -63,13 +63,38 @@ Acc.title = this.model.get('title') + ', by ' + this.model.get('author');
 		}
 
 		$(document).keydown(function(e) {
-			if(e.which == 39) {
+            // right arrow
+            if(e.which == 39) {
 				that.model.paginator.v.pages.goRight();
 			}
-							
+			
+            // left arrow	
 			if(e.which == 37) {
 				that.model.paginator.v.pages.goLeft();
 			}
+            
+            // Control over media overlays rate and volume
+            // keyboard shortcuts improve slider accessibility
+                        
+            // W
+            if (e.which == 87) {
+                that.model.get("media_overlay_controller").increaseVolume();
+            }
+            
+            // Q
+            if (e.which == 81) {
+                that.model.get("media_overlay_controller").decreaseVolume();
+            }
+            
+            // H
+            if (e.which == 72) {
+                that.model.get("media_overlay_controller").increaseRate();
+            }
+            
+            // L
+            if (e.which == 76) {
+                that.model.get("media_overlay_controller").decreaseRate();
+            }            
 		});
 
 		$("#readium-book-view-el").on("swipeleft", function(e) {

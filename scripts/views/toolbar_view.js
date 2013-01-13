@@ -132,12 +132,12 @@ Readium.Views.ToolbarView = Backbone.View.extend({
     // toggle play/pause
 	play_mo: function() {
         var moController = this.model.get("media_overlay_controller");
-		if (moController.get("active_mo")) {
-			moController.pauseMo();
+		if (moController.get("state") == "playing") {
+            moController.pauseMo();
 		}
 		else {
-			moController.playMo();
-		}
+			moController.playMo(true);
+        }
 	},
     
     set_mo_volume: function() {
@@ -145,6 +145,7 @@ Readium.Views.ToolbarView = Backbone.View.extend({
         var value = parseFloat(slider.val()).toFixed(1); 
         var moController = this.model.get("media_overlay_controller");
         moController.set("volume", value);
+        slider.attr("aria-valuenow", value);
     },
     
     mute_mo: function() {
@@ -158,11 +159,12 @@ Readium.Views.ToolbarView = Backbone.View.extend({
         var value = parseFloat(slider.val()).toFixed(1); 
         var moController = this.model.get("media_overlay_controller");
         moController.set("rate", value);
+        slider.attr("aria-valuenow", value);
     },
     
     reset_mo_rate: function() {
         var moController = this.model.get("media_overlay_controller");
-        moController.set("rate", 1.0);
+        moController.resetRate();
     }
     
 });

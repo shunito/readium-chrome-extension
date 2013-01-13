@@ -55,7 +55,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 			that.setNumPages();
 			that.applyKeydownHandler();
 
-			// Rationale: The assumption here is that if a hash fragment is specified, it is the result of Readium 
+            // Rationale: The assumption here is that if a hash fragment is specified, it is the result of Readium 
 			//   following a clicked linked, either an internal link, or a link from the table of contents. The intention
 			//   to follow a link should supersede restoring the last-page position, as this should only be done for the 
 			//   case where Readium is re-opening the book, from the library view. 
@@ -78,13 +78,17 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 					that.pages.goToPage(1);
 				}		
 			}
+            
+            
 		});
-		
+        
 		return [this.model.get("spine_position")];
 	},
 
     // Description: return the set of currently-visible elements on this page. 
-    // Used by MO.
+    // if strict is true, the elements must be entirely within the page
+    // if strict is false, then elements must be partially within the page
+    // used by media overlays
     findVisiblePageElements: function() {
 
         var $elements = $(this.getBody()).find("[id]");
@@ -99,28 +103,36 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
     },
     
     // override
+    // used by media overlays
 	indicateMoIsPlaying: function () {
 		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
-		moHelper.renderReflowableMoPlaying(
+        var isPlaying = this.mediaOverlayController.get("state") == "playing";
+        moHelper.renderReflowableMoPlaying(
 			this.model.get("current_theme"),
-			this.mediaOverlayController.get("active_mo"),
+            isPlaying,
 			this
 		);
 	},
 
     // override
+    // used by media overlays
 	highlightText: function () {
-		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
-		moHelper.renderReflowableMoFragHighlight(
+        var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
+        moHelper.renderReflowableMoFragHighlight(
 			this.model.get("current_theme"),
 			this,
 			this.mediaOverlayController.get("mo_text_id")
 		);
 	},
     
+    // sometimes we have to rehighlight if the page contents weren't fully loaded the first time
+    flagRehighlight: function() {
+        this.flagMoRehighlight = true; // this is a property of PaginationViewBase
+    },
+    
     // override
     // Description: return the set of all elements for this spine item that have an @id attribute.
-    // Used by MO.
+    // used by media overlays
     getAllPageElementsWithId: function() {
         return $(this.getBody()).find("[id]");
     },
@@ -149,7 +161,6 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 			var page = this.getElemPageNumber(el);
             if (page > 0) {
-                //console.log(fragment + " is on page " + page);
                 this.pages.goToPage(page);	
 			}
 		}
@@ -285,9 +296,11 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
 		return characterOffset;
 	},
-
-	// returns all the elements in the set that are inside the box
+    
+    // returns all the elements in the set that are inside the box
     // separated this function from the one above in order to debug it
+    // set strict to false to include elements that are partially inside the box
+    // used by media overlays
     filterElementsByPosition: function($elements, documentTop, documentBottom, documentLeft, documentRight) {
         
         var $visibleElms = $elements.filter(function(idx) {
@@ -304,8 +317,8 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 
         return $visibleElms;
     },
-
-	// Description: Handles clicks of anchor tags by navigating to
+    
+    // Description: Handles clicks of anchor tags by navigating to
 	//   the proper location in the epub spine, or opening
 	//   a new window for external links
 	linkClickHandler: function (e) {
@@ -362,7 +375,7 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 	},
 
 	// REFACTORING CANDIDATE: I think this is actually part of the public interface
-	goToPage: function(page) {
+    goToPage: function(page) {
         // check to make sure we're not already on that page
         if (this.model.get("current_page") != undefined && this.model.get("current_page").indexOf(page) != -1) {
             return;
@@ -371,10 +384,11 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 		$(this.getBody()).css(this.offset_dir, "-" + offset);
 		this.showContent();
         
+        // when we change the page, we have to tell MO to update its position
+        // if the display now contains a new page
         if (this.model.get("two_up") == false || 
             (this.model.get("two_up") && page % 2 === 1)) {
-                // when we change the page, we have to tell MO to update its position
-                this.mediaOverlayController.reflowPageChanged();
+                this.mediaOverlayController.updatePlaybackForReflowPageChange();
         }
 	},
 
@@ -780,9 +794,9 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
         var that = this;
 		this.hideContent();
 		setTimeout(function() {
-
+            
 			var $reflowableIframe = that.$("#readium-flowing-content");
-			if (that.model.get("two_up")) {
+            if (that.model.get("two_up")) {
 				// If the first page is offset, adjust the window to only show one page
 				var firstPageIsOffset = that.model.getCurrentSection().firstPageOffset();
 				var firstPageOffsetValue;
@@ -807,22 +821,20 @@ Readium.Views.ReflowablePaginationView = Readium.Views.PaginationViewBase.extend
 						firstPageOffset = that.page_width + (that.gap_width * 2);
 						$reflowableIframe.css("margin-left", firstPageOffset + "px");
 					}
-
-					that.goToPage(1);
+                    that.goToPage(1);
 				}
 				else {
 
 					$reflowableIframe.css("margin-left", "0px");
-					that.goToPage(that.pages.get("current_page")[0]);
+                    that.goToPage(that.pages.get("current_page")[0]);
 				}
 			}
 			else {
 
 				$reflowableIframe.css("margin-left", "0px");
-				that.goToPage(that.pages.get("current_page")[0]);
+                that.goToPage(that.pages.get("current_page")[0]);
 			}
-
-			that.savePosition();
+            that.savePosition();
 
 		}, 150);
 	},

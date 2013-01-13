@@ -144,6 +144,9 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 				this.epubController.set("spine_position", pos);
 			}
 		}
+        
+        // when we change the page, we have to tell MO about it
+        this.epubController.get("media_overlay_controller").userChangedPage();
 	},
 
 	nextPage: function() {
@@ -186,6 +189,8 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 				this.epubController.set("spine_position", pos);
 			}
 		}
+        // when we change the page, we have to tell MO about it
+        this.epubController.get("media_overlay_controller").userChangedPage();
 	},
 
 	// ------------------------------------------------------------------------------------ //

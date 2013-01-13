@@ -118,7 +118,7 @@ Readium.Models.AudioClipPlayer = function() {
         return rate;
     };
     this.reset = function() {
-        elm.setAttribute("src", undefined);
+        elm.setAttribute("src", "");
     };
     function loadData(){
         debugPrint("Loading file " + src);

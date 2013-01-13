@@ -1,19 +1,11 @@
-// Description: This model is responsible for coordinating actions for processing of media overlays 
-// it does the following:
-// - manages MO/spine interaction
-// - listens to MO events
-// - invokes MO play/pause/resume functions
-
-// Properties of this model: 
-//   active_mo
-//   mo_text_id
-
+// Description: This model is the primary integration layer between media overlays and the rest of Readium
+// It tracks which MO is playing, and controls what happens to playback when a page turns or an href gets loaded
 
 Readium.Models.MediaOverlayController = Backbone.Model.extend({
 
 	defaults: {
-		"active_mo" : null, // the currently-playing media overlay; null if nothing is being played
-        "mo_text_id": null, // the current MO text fragment identifier
+        "state": "unavailable", // "playing", "paused", "not_started", "unavailable"
+		"mo_text_id": null, // the current MO text fragment identifier
         "rate": 1.0, // the playback rate
         "volume": 1.0 // the volume
 	},
@@ -27,107 +19,107 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         // the current media overlay
         this.mo = null;
         
-        // we track the current section to see when it changes
-        this.currentSection = null; 
-        
-        // flags
-        this.autoplayNextSpineItem = false;
-        this.processingMoTextSrc = false;
-        
-        // media overlay playback starts here, if not null
-        this.targetHtmlId = null;
-        
         // for mute/unmute
         this.savedVolume = 0;
         
-        // readium pages object
-        this.pages = null;
-        // readium view
-        this.currentView = null;
+        // the node to start playback at
+        this.targetNode = null;
+        
+        // the current spine item
+        this.currentSpineItem = null;
+        
+        // flag that MO is processing a text src
+        this.isProcessingTextSrc = false;
+        
+        // flag that the user changed the page
+        this.flagUserPageChange = false;
+        
+        // flag that the user's position was restored
+        this.flagRestoredPosition = false;
+        
         // readium epub controller, set as a constructor option
 		this.epubController = this.get("epubController");
 		
-        // trigger media overlay position updates
-        this.epubController.on("change:spine_position", this.handleSpineChanged, this);   
-        this.epubController.on("change:hash_fragment", this.handleHashFragmentChanged, this);
+        // readium reflowable pagination view
+        this.view = null;
+        
         this.on("change:rate", this.rateChanged, this);
-        this.on("change:volume", this.volumeChanged, this);     
+        this.on("change:volume", this.volumeChanged, this);  
+        
+        this.epubController.on("change:spine_position", this.handleSpineChanged, this);   
+        
+        // print debug statements
+        this.consoleTrace = false;   
 	},
     
-    // each time there is a new pagination view created, it must call setPages
-    setPages: function(pages) {
-        if (this.pages != null) {
-            this.pages.off();
-        }
-        this.pages = pages;
-    },
-    
-    // each time there is a new pagination view created, it must call setView
     setView: function(view) {
-        this.currentView = view;
+        this.view = view;
     },
     
-    // main playback function
-	playMo: function() {
-        if (this.mo == null) {
+    // hooked up to the 'play/pause' button
+	playMo: function(forcePosition) {
+        if (this.currentSpineItem == null || !this.currentSpineItem.hasMediaOverlay()) {
+            this.mo = null;
+            this.set("state", "unavailable");
+            this.debugPrint("No overlay available for this spine item.");
             return;
         }
         
-        this.set("active_mo", this.mo);
-        this.mo.on("change:current_text_src", this.handleMoTextSrc, this);
-		this.mo.on("change:is_document_done", this.handleMoDocumentDone, this);
+        this.debugPrint("playMo");
         
-        var moTargetNode;
-        var hadTargetHtmlId = this.targetHtmlId != null;
-        // find our target on this page (either a specific target, or the top of the page)
-        if (hadTargetHtmlId) {
-            moTargetNode = this.findTarget(this.targetHtmlId);
+        // just verify that we have the correct MO loaded
+        // except when forcePosition is false -- then the MO was purposely set 
+        // to something different than our current spine item, because the user navigated there,
+        // and Readium will listen to MO regarding text display URLs
+        if (forcePosition && this.currentSpineItem.getMediaOverlay() != this.mo) {
+            this.mo = this.currentSpineItem.getMediaOverlay();
+            this.set("state", "not_started");
+        }
+        if (this.mo == null) {
+            return;
+        }
+        this.mo.setVolume(this.get("volume"));
+        this.mo.setRate(this.get("rate"));
+        this.mo.off(); // just to be safe
+        this.mo.on("change:current_text_src", this.handleMoTextSrcChanged, this);
+		this.mo.on("change:is_document_done", this.handleMoDocumentDoneChanged, this);
+        
+        // if we are processing a new page caused either by the user going to prev/next page
+        // or by the restored position that gets loaded initially
+        // there's a reason why this type of action is dealt with in 2 places: here and also mid-playback (see
+        // updatePlaybackForReflowPageChange() ). By the time the user presses play, enough screen refreshing has
+        // taken place that we can be more certain that the visible elements are the correct ones.
+        if (!this.currentSpineItem.isFixedLayout() && (this.flagUserPageChange || this.flagRestoredPosition)) {
+            this.flagUserPageChange = false;
+            this.flagRestoredPosition = false;
+            var visibleElms = this.view.findVisiblePageElements();
+            this.targetNode= this.findFirstOnPageReflow(visibleElms);
+            this.set("state", "not_started");
+        }
+        
+        if (this.get("state") == "paused") {
+            this.set("state", "playing");
+            this.resumeMo();
         }
         else {
-            moTargetNode = this.findFirstOnPage();
-        }
-        this.targetHtmlId = null;
-        
-        // FXL
-        if (this.currentSection.isFixedLayout()) {
-            if (this.mo.get("has_started_playback") && hadTargetHtmlId == false) {
-                this.resumeMo();
-            }
-            else {
-                this.mo.startPlayback(moTargetNode);
-            }
-        }
-            
-        // Reflowable
-        else {
-            var currMoPage = -1;
-            var currMoId = this.get("mo_text_id");
-            if (currMoId != null && currMoId != undefined && currMoId != "") {
-                currMoPage = this.currentView.getElemPageNumberById(currMoId);
-            }
-                
-            // if media overlays is on our current page, then resume playback
-            var currMoPageIsVisible = this.pages.get("current_page").indexOf(currMoPage) != -1;
-                
-            if (currMoPageIsVisible && hadTargetHtmlId == false) {   
-                this.resumeMo();
-            }
-            else {
-                this.mo.startPlayback(moTargetNode);
-            }
+            this.mo.reset();
+            this.set("state", "playing");
+            var target = this.targetNode;
+            this.targetNode = null;
+            this.mo.startPlayback(target);            
         }
 	},
 
-    // pause the media overlay playback
+    // hooked up to the 'play/pause' button
 	pauseMo: function() {
         if (this.mo) {
-			this.mo.off();
+            this.set("state", "paused");
+            this.mo.off();
 			this.mo.pause();
-			this.set("active_mo", null);             
 		}
 	},
     
-    // toggles mute/unmute
+    // hooked up to the 'mute/unmute' button
     mute: function() {
         if (this.mo) {
             // unmute
@@ -142,186 +134,308 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         }
     },
     
+    // hooked up to the volume slider
     volumeChanged: function() {
         if (this.mo) {
             this.mo.setVolume(this.get("volume"));
         }
     },
     
+    // hooked up to the rate slider
     rateChanged: function() {
         if (this.mo) {
             this.mo.setRate(this.get("rate"));
         }
     },
     
-    // called by the reflowable view when the page changes
-    reflowPageChanged: function() {
+    increaseVolume: function() {
+        var curr = this.get("volume");
+        if (curr >= 1.0) {
+            return;
+        }
+        if (curr + 0.1 >= 1.0) {
+            this.set("volume", 1.0);
+        }
+        else {
+            this.set("volume", curr + 0.1);
+        }
+    },
+    
+    decreaseVolume: function() {
+        var curr = this.get("volume");
+        if (curr <= 0) {
+            return;
+        }
+        if (curr - 0.1 < 0) {
+            this.set("volume", 0);
+        }
+        else {
+            this.set("volume", curr - 0.1);
+        }
         
-        // if MO is driving navigation, don't process the page change
-        // it's probably something we triggered ourselves
-        if (this.processingMoTextSrc || this.autoplayNextSpineItem ) {
+    },
+    
+    increaseRate: function() {
+        var curr = this.get("rate");
+        if (curr >= 2.5) {
+            return;
+        }
+        if (curr + 0.1 >= 2.5) {
+            this.set("rate", 2.5);
+        }
+        else {
+            this.set("rate", curr + 0.1);
+        }
+    },
+    
+    decreaseRate: function() {
+        var curr = this.get("rate");
+        if (curr <= 0.5) {
+            return;
+        }
+        if (curr - 0.1 <= 0.5) {
+            this.set("rate", 0.5);
+        }
+        else {
+            this.set("rate", curr - 0.1);
+        }
+    },
+    
+    resetRate: function() {
+        this.set("rate", 1.0);
+    },
+    
+    // move to a specific point in the book
+    // this could be the start of a section or bookmark etc
+    goToHref: function(href) {
+        // if we are in the middle of processing our own src, ignore it
+        if (this.isProcessingTextSrc) {
             return;
         }
         
-        var wasPlaying = this.get("active_mo") != null;
+        this.debugPrint("goToHref");
+        var wasPlaying = this.get("state") == "playing";
         if (wasPlaying) {
             this.pauseMo();
         }
-        
-        // if media overlays were playing, then resume playback
-        if (wasPlaying) {
-            this.playMo();
-        } 
+            
+        var splitUrl = href.match(/([^#]*)(?:#(.*))?/);
+        var spinePos = this.epubController.packageDocument.spineIndexFromHref(splitUrl[1]);
+        var spineItem = this.epubController.packageDocument.getSpineItem(spinePos);
+            
+        if (spineItem.hasMediaOverlay()) {
+            this.mo = spineItem.getMediaOverlay();
+            this.mo.reset();
+            this.set("state", "not_started");
+            // find the target node for the URI
+            this.targetNode = this.findTarget(spineItem, splitUrl[2]);
+            // if MO was playing, then stop and restart at this point
+            if (wasPlaying) {
+                this.playMo(false);
+            }
+        }
     },
     
-    // the pagination view calls this when it has reloaded the pages, for example when the spine item changes
-    // we need to wait for this event because the pages shuffle a bit during reloading, 
-    // which otherwise causes MO to start playback at the wrong point.
-    pagesLoaded: function() {
-        // just to be safe, ignore FXL
-        if (this.currentSection.isFixedLayout()) {
+    // called by the reflowable page view when the page changes
+    // applies only during playback
+    updatePlaybackForReflowPageChange: function() {
+        // just to be safe: ignore fxl
+        if (this.currentSpineItem.isFixedLayout()) {
             return;
         }
-        if (this.autoplayNextSpineItem == true) {
-            this.autoplayNextSpineItem = false;
-            this.playMo();
+        
+        // we only care about this if we are in the middle of playback
+        // this is safer because readium might call this function several times
+        if (this.get("state") == "playing" && 
+            (this.flagUserPageChange || this.flagRestoredPosition)) {
+            
+            var visibleElms = this.view.findVisiblePageElements();
+            
+            // make sure there are actually elements on the page
+            // if not, we can leave the flagged variables as-is, and 
+            // this function will get called again by reflowable pagination view
+            if (visibleElms.length > 0) {
+                this.debugPrint("updatePlaybackForReflowPageChange");
+                this.pauseMo();
+            
+                this.flagUserPageChange = false;
+                this.flagRestoredPosition = false;
+                this.set("state", "not_started");
+                
+                // make sure we're on the right spine item
+                if (this.currentSpineItem.hasMediaOverlay()) {
+                    if (this.mo != this.currentSpineItem.getMediaOverlay()) {
+                        this.mo = this.currentSpineItem.getMediaOverlay();
+                    }
+                    this.mo.reset();
+                    this.targetNode = this.findFirstOnPageReflow(visibleElms);  
+                    this.set("mo_text_id", null);
+                    this.playMo(true);
+                }
+                else {
+                    this.mo = null;
+                    this.set("mo_text_id", null);
+                    this.set("state", "unavailable");
+                }
+            }
         }
     },
     
-	// ------------------------------------------------------------------------------------ //
+    // called by the page view when the user used "go to (prev/next) page"
+    // if this flag is set, MO will respond to page refresh events
+    // this function is really only useful for reflowable content
+    userChangedPage: function() {
+        this.flagUserPageChange = true;   
+    },
+    
+    restoredPosition: function() {
+        this.flagRestoredPosition = true;
+    },
+    
+    // ------------------------------------------------------------------------------------ //
 	//  "PRIVATE" METHODS                                                                   //
 	// ------------------------------------------------------------------------------------ //
     resumeMo: function() {
         this.set("mo_text_id", null); // clear it so that any listeners re-hear the event
-        this.handleMoTextSrc();
+        this.handleMoTextSrcChanged();
         this.mo.resume();
     },
     
-    handleMoTextSrc: function() {
+    handleMoTextSrcChanged: function() {
+        this.debugPrint("handleMoTextSrcChanged " + this.mo.get("current_text_src"));
+        this.isProcessingTextSrc = true;
         var textSrc = this.mo.get("current_text_src");
         if (textSrc == null) {
             this.set("mo_text_id", null);
             return;
         }
         
-        this.processingMoTextSrc = true;
         this.epubController.goToHref(textSrc);
         var frag = "";
         if (textSrc.indexOf("#") != -1 && textSrc.indexOf("#") < textSrc.length -1) {
             frag = textSrc.substr(textSrc.indexOf("#")+1);
         }
         this.set("mo_text_id", frag);
-        this.processingMoTextSrc = false;    
+        this.isProcessingTextSrc = false;
     },
     
-    handleMoDocumentDone: function() {
+    // caveat: this gets called when is_document_done changes, so we need to check if the document is indeed done
+    handleMoDocumentDoneChanged: function() {
         if (this.mo != null && this.mo != undefined) {
             if (this.mo.get("is_document_done") == false) {
                 return;
             }
         }
-        
+        this.debugPrint("handleMoDocumentDoneChanged");
         this.pauseMo();
+        
         // advance the spine position
         if (this.epubController.hasNextSection()) {
-            this.autoplayNextSpineItem = true; 
             this.epubController.goToNextSection();
+            this.playMo(true);
         }
     },
     
+    // this acts as page change handler for fxl content
     handleSpineChanged: function() {
-        this.set("mo_text_id", null);
         // sometimes the spine changed event fires but the spine didn't actually change
-        if (this.epubController.getCurrentSection() == this.currentSection) {
+        if (this.epubController.getCurrentSection() == this.currentSpineItem) {
             return;
         }
-        // was something playing?
-        if (this.get("active_mo") != null) {
-            this.autoplayNextSpineItem = true; 
+        this.currentSpineItem = this.epubController.getCurrentSection();
+        
+        if (!this.currentSpineItem.isFixedLayout()) {
+            return;
+        }
+        
+        var wasPlaying = this.get("state") == "playing";    
+        if (wasPlaying) {
             this.pauseMo();
         }
-        this.currentSection = this.epubController.getCurrentSection();
-        this.mo = this.currentSection.getMediaOverlay();
+          
+        // make sure we're on the right spine item
+        if (this.currentSpineItem.hasMediaOverlay()) {
+            if (this.mo != this.currentSpineItem.getMediaOverlay()) {
+                this.mo = this.currentSpineItem.getMediaOverlay();
+            }
+        }
+        else {
+            this.mo = null;
+            this.set("mo_text_id", null);
+            this.set("state", "unavailable");
+        }
+        
         if (this.mo == null) {
-            this.autoplayNextSpineItem = false;
             return;
         }
-        
         this.mo.reset();
-        // keep the volume and rate consistent
-        this.mo.setVolume(this.get("volume"));
-        this.mo.setRate(this.get("rate"));
-        
-        if (this.currentSection.isFixedLayout() && this.autoplayNextSpineItem) {
-            this.autoplayNextSpineItem = false;
-            this.playMo();
+        this.targetNode = this.findFirstOnPageFxl();
+        this.set("state", "not_started");
+        if (wasPlaying) {
+            this.playMo(true);
         }
-    },
-    
-    handleHashFragmentChanged: function() {
-        // if MO is driving navigation, don't process the hash fragment change
-        // it's probably something we triggered ourselves
-        if (this.processingMoTextSrc) {
-            return;
-        }
-        
-        var hash = this.epubController.get("hash_fragment");
-        if (hash == undefined || hash == "") {
-            return;
-        }
-        this.targetHtmlId = hash;
-        this.pauseMo();
-        this.playMo();
     },
     
     // find the MO starting point closest to targetId
-    findTarget: function(targetId) {
+    findTarget: function(spineItem, targetId) {
         
-        if (targetId == null || targetId == undefined || targetId == "") {
+        if (targetId == null || targetId == undefined || targetId == "" ||
+            spineItem == null) {
             return null;
         }
         // two issues here:
-        // 1. MO might not have a corresponding <text> pointing to #targetId
+        // 1. MO might not have a corresponding <text> pointing to #fragId
         // In this case, we have to find the next-closest
         //
         // 2. we have to look at all elements, not just the currently visible ones. the pages get refreshed a few times
         // and the target element might not be displayed until the second time around. however, we need to find what the
         // most reasonable MO target is and can't risk coming up with nothing (because then MO starts at the top)
-        var allElms = this.currentView.getAllPageElementsWithId();
-        var docHref = this.currentSection.resolveUri(this.currentSection.get("href"));
-        var startHref = docHref + "#" + targetId;
-        var foundStart = false; 
-        var node = null;
         
-        for (var i = 0; i<allElms.length; i++) {
-            var id = $(allElms[i]).attr("id");
-            var src = docHref + "#" + id;
-            if (src == startHref) {
-                foundStart = true;
-            }
-            // once we found our starting point in the set, start looking at MO nodes
-            if (foundStart) {
-                node = this.mo.findNodeByTextSrc(src);
-                if (node) {
-                    break;
+        var mo = spineItem.getMediaOverlay();
+        var docHref = this.epubController.packageDocument.resolveUri(spineItem.get("href"));
+        var startHref = docHref + "#" + targetId;
+        var node = null;
+        $.ajax({
+            url: docHref,
+            async: false,
+            success: function(data, status, jqXHR) {
+                var allElms = $(data).find("[id]");
+                var foundStart = false; 
+                for (var i = 0; i<allElms.length; i++) {
+                    var id = $(allElms[i]).attr("id");
+                    var src = docHref + "#" + id;
+                    if (src == startHref) {
+                        foundStart = true;
+                    }
+                    // once we found our starting point in the set, start looking at MO nodes
+                    if (foundStart) {
+                        node = mo.findNodeByTextSrc(src);
+                        if (node) {
+                            break;
+                        }
+                    }
                 }
             }
-        }
+        });
         return node;
     },
     
-    // find the first visible page element with an MO <text> equivalent
-    findFirstOnPage: function() {
+    // find the MO element for the first visible page element with an MO <text> equivalent
+    findFirstOnPageReflow: function(visibleElms) {
         // this is only useful for reflowable content
-        if (this.currentSection.isFixedLayout()) {
+        if (this.currentSpineItem.isFixedLayout()) {
             return null;
         }
         
-        var pageElms = this.currentView.findVisiblePageElements();
-        var docHref = this.currentSection.resolveUri(this.currentSection.get("href"));
+        if (visibleElms.length == 0) {
+            this.debugPrint("No visible page elements");
+            return null;
+        }
+        
+        var docHref = this.currentSpineItem.resolveUri(this.currentSpineItem.get("href"));
         var node = null;
-        for (var i = 0; i<pageElms.length; i++) {
-            var id = $(pageElms[i]).attr("id");
+        for (var i = 0; i<visibleElms.length; i++) {
+            var id = $(visibleElms[i]).attr("id");
             var src = docHref + "#" + id;
             
             node = this.mo.findNodeByTextSrc(src);
@@ -330,5 +444,34 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
             }
         }
         return node;
+    },
+    
+    // find the MO element for the first element in the current spine item with an MO equivalent
+    findFirstOnPageFxl: function() {
+        var docHref = this.currentSpineItem.resolveUri(this.currentSpineItem.get("href"));
+        var mo = this.currentSpineItem.getMediaOverlay();
+        
+        $.ajax({
+            url: docHref,
+            async: false,
+            success: function(data, status, jqXHR) {
+                var allElms = $(data).find("[id]");
+                for (var i = 0; i<allElms.length; i++) {
+                    var id = $(allElms[i]).attr("id");
+                    var src = docHref + "#" + id;
+                    node = mo.findNodeByTextSrc(src);
+                    if (node) {
+                        break;
+                    }
+                }
+            }
+        });
+        return node;
+    },
+    
+    debugPrint: function(msg) {
+        if (this.consoleTrace) {
+            console.log("MO: " + msg);
+        }
     }
 });

@@ -6,10 +6,10 @@
     beforeEach(function() {
       var audioRender, dom, parser, textRender, xml_string;
       audioRender = function() {
-        return console.log("Audio media: " + SmilModel.smilNodeToString(this));
+        console.log("Audio media: " + SmilModel.smilNodeToString(this));
       };
       textRender = function() {
-        return console.log("Text media: " + SmilModel.smilNodeToString(this));
+        console.log("Text media: " + SmilModel.smilNodeToString(this));
       };
       this.addMatchers({
         toBeAnInstanceOf: function(expected) {

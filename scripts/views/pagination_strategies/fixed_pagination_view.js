@@ -52,7 +52,6 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 		}, 15);
 
 		this.showCurrentPages();
-
 		return rendered_spine_positions;
 	},
 
@@ -69,19 +68,22 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
     },
     
     // override
+    // used by media overlays
 	indicateMoIsPlaying: function () {
 		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
+        var isPlaying = this.mediaOverlayController.get("state") == "playing";
 		moHelper.renderFixedMoPlaying(
 			this.pages.get("current_page"),
-			this.mediaOverlayController.get("active_mo"),
+            isPlaying,
 			this
         );
 	},
     
     // override
+    // used by media overlays
 	highlightText: function () {
 		var moHelper = new Readium.Models.MediaOverlayViewHelper({epubController : this.model});
-		moHelper.renderFixedLayoutMoFragHighlight(
+        moHelper.renderFixedLayoutMoFragHighlight(
 			this.pages.get("current_page"),
 			this.mediaOverlayController.get("mo_text_id"),
 			this
@@ -90,7 +92,7 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
     
     // override
     // Description: return the set of all elements for this spine item that have an @id attribute.
-    // Used by MO.
+    // used by media overlays
     getAllPageElementsWithId: function() {
         return $('body').find("[id]");
     },

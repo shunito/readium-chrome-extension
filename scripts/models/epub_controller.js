@@ -45,6 +45,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 				// restore the position the reader left off at from cookie storage
 				var pos = that.restorePosition();
+                that.get("media_overlay_controller").restoredPosition();
 				that.set("spine_position", pos);
 
 				// tell the paginator to start rendering spine items from the 
@@ -170,16 +171,16 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 			if(splitUrl[1]) {
 				var spine_pos = this.packageDocument.spineIndexFromHref(splitUrl[1]);
 
-				// Rationale: If media overlays are playing, they will cause 
-				if (this.get("media_overlay_controller").mo &&
-					this.get("media_overlay_controller").mo.get("has_started_playback")) {
-					
-					this.setSpinePos(spine_pos, false, false, splitUrl[2]);
+				if (this.get("media_overlay_controller")) {
+                    this.get("media_overlay_controller").goToHref(href);
 				}
-				else {
-					this.setSpinePos(spine_pos, false, true, splitUrl[2]);	
-				}	
-
+                
+                var reRenderSpinePos = true;
+				// if media overlays are playing, don't re-render spine position. it causes flashing and breaks highlighting.
+                if (this.get("media_overlay_controller").get("state") != "unavailable") {
+                    reRenderSpinePos = false;
+                } 
+                this.setSpinePos(spine_pos, false, reRenderSpinePos, splitUrl[2]);	
 				this.set("hash_fragment", splitUrl[2]);
 			}
 		}
