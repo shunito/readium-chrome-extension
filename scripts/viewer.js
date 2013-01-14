@@ -76,23 +76,23 @@ Acc.title = this.model.get('title') + ', by ' + this.model.get('author');
             // Control over media overlays rate and volume
             // keyboard shortcuts improve slider accessibility
                         
-            // W
-            if (e.which == 87) {
+            // Ctrl + W
+            if (e.which == 87 && e.ctrlKey) {
                 that.model.get("media_overlay_controller").increaseVolume();
             }
             
-            // Q
-            if (e.which == 81) {
+            // Ctrl + Q
+            if (e.which == 81 && e.ctrlKey) {
                 that.model.get("media_overlay_controller").decreaseVolume();
             }
             
-            // H
-            if (e.which == 72) {
+            // Ctrl + H
+            if (e.which == 72 && e.ctrlKey) {
                 that.model.get("media_overlay_controller").increaseRate();
             }
             
-            // L
-            if (e.which == 76) {
+            // Ctrl + L
+            if (e.which == 76 && e.ctrlKey) {
                 that.model.get("media_overlay_controller").decreaseRate();
             }            
 		});
