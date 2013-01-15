@@ -40,11 +40,11 @@
 						<li>
 							<a title="Play/pause media overlays" accesskey="m" href="#" id='play-mo-btn' role="button">
 								<img src="/images/top_bar/ico_tts.png" class="nav-icon" alt="Play/pause media overlays"/>
-								<span class="offscreenText">Play/pause media overlays</span>
+								<span class="offscreenText">Play/pause audio narration</span>
 							</a>
 						</li>
                         <li>
-                            <span class="offscreenText">Volume for media overlays. Press F7 to increase, Shift + F7 to decrease.</span>
+                            <span class="offscreenText" id="mo-volume-slider-OT">Volume for audio narration. Press F7 to increase, Shift + F7 to decrease.</span>
                             <a href="#" id='mo-volume-btn-group' role="slider">
                                 <img src="/images/top_bar/ico_volume.png" id="mo-volume-btn" class="nav-icon" title="Mute" alt="Mute" accesskey="a"/>
                                 <img src="/images/top_bar/ico_volume_muted.png" id="mo-volume-muted-btn" class="nav-icon" title="Unmute" alt="Unmute"  accesskey="a"/>
@@ -53,7 +53,7 @@
                             </a>
                         </li>
                         <li>
-                            <span class="offscreenText">Rate for media overlays. Press F8 to increase, Shift + F8 to decrease.</span>
+                            <span class="offscreenText" id="mo-rate-slider-OT">Rate for audio narration. Press F9 to increase, Shift + F9 to decrease.</span>
                             <a href="#" id='mo-rate-btn-group' role="slider">
                                 <img src="/images/top_bar/ico_rate.png" id="mo-rate-btn" class="nav-icon" title="Reset rate" alt="Reset rate" accesskey="k"/>
                                 <input id="mo-rate-slider" type="range"  min="0.5" max="2.5" value="1.0" step=".05" title="Rate"

@@ -58,6 +58,8 @@ Readium.Views.ToolbarView = Backbone.View.extend({
             $("#play-mo-btn").show();
             $("#mo-volume-btn-group").show();
             $("#mo-rate-btn-group").show();
+            $("#mo-volume-slider-OT").show();
+            $("#mo-rate-slider-OT").show();
             this.renderVolumeButton();
             this.renderRateButton();
         }
@@ -65,6 +67,8 @@ Readium.Views.ToolbarView = Backbone.View.extend({
             $("#play-mo-btn").hide();
             $("#mo-volume-btn-group").hide();
             $("#mo-rate-btn-group").hide();
+            $("#mo-volume-slider-OT").hide();
+            $("#mo-rate-slider-OT").show();
         }
     },
     

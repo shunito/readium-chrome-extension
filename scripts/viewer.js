@@ -86,13 +86,13 @@ Acc.title = this.model.get('title') + ', by ' + this.model.get('author');
                 that.model.get("media_overlay_controller").decreaseVolume();
             }
             
-            // F8
-            if (e.which == 119 && !e.shiftKey) {
+            // F9
+            if (e.which == 120 && !e.shiftKey) {
                 that.model.get("media_overlay_controller").increaseRate();
             }
             
-            // Shift + F8
-            if (e.which == 119 && e.shiftKey) {
+            // Shift + F9
+            if (e.which == 120 && e.shiftKey) {
                 that.model.get("media_overlay_controller").decreaseRate();
             }            
 		});

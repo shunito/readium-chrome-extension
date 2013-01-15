@@ -124,7 +124,12 @@ Readium.Models.MediaOverlayController = Backbone.Model.extend({
         if (this.mo) {
             // unmute
             if (this.mo.getVolume() == 0) {
+                // if the last-used volume was already at 0, restore it to a quiet level
+                if (this.savedVolume == 0) {
+                    this.savedVolume = .1;
+                }
                 this.set("volume", this.savedVolume);
+                
             }
             // mute
             else {
