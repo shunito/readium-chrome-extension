@@ -68,7 +68,7 @@ Readium.Views.ToolbarView = Backbone.View.extend({
             $("#mo-volume-btn-group").hide();
             $("#mo-rate-btn-group").hide();
             $("#mo-volume-slider-OT").hide();
-            $("#mo-rate-slider-OT").show();
+            $("#mo-rate-slider-OT").hide();
         }
     },
     
