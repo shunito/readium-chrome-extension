@@ -20,3 +20,21 @@ for (var i = 0; i<elems.length; i++) {
                 }
         }
 }
+
+var titles = document.getElementsByTagName("title");
+for (var i = 0; i<titles.length; i++) {
+        if (titles[i].id == null) {
+                continue;
+        }
+        if (titles[i].id.indexOf("i18n_html_", 0) == 0) {
+                var msg = chrome.i18n.getMessage(titles[i].id);
+                if (msg != "") {
+                        titles[i].innerHTML = msg;
+                }
+        } else if (titles[i].id.indexOf("i18n_", 0) == 0) {
+                var msg = chrome.i18n.getMessage(titles[i].id);
+                if (msg != "") {
+                        titles[i].innerText = msg;
+                }
+        }
+}
