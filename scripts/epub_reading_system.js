@@ -5,7 +5,7 @@
 
 navigator.epubReadingSystem = {
 	name: "Readium",
-	version: "0.4.2",
+	version: "0.5.5.2",
 	layoutStyle: "paginated",
 
 	hasFeature: function(feature, version) {
