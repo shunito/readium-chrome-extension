@@ -73,8 +73,10 @@ Readium.Views.LibraryItemView = Backbone.View.extend({
 			e.preventDefault();
 			var confMessage;
 			var selector = "#details-modal-" + this.model.get('key');
-			confMessage  = "Are you sure you want to permanently delete " 
+			confMessage  = chrome.i18n.getMessage("i18n_are_you_sure");
+			confMessage += "'";			
 			confMessage += this.model.get('title');
+			confMessage += "'";	
 			confMessage += "?";
 
 

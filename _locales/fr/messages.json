@@ -78,7 +78,7 @@
     "message" : "extraction : "
   },
   "i18n_are_you_sure" : {
-    "message" : "Voulez-vous vraiment supprimer ce fichier de façon permanente ? "
+    "message" : "Voulez-vous vraiment supprimer "
   },
   "i18n_add_book_to_readium_library" : {
     "message" : "Ajoutez un livre à la bibliothèque de Readium :"
