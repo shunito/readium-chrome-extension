@@ -280,7 +280,7 @@ Readium.Models.ZipBookExtractor = Readium.Models.BookExtractorBase.extend({
 		else {
 			// this isn't exactly accurate but it will signal the user
 			// that we are still doing work
-			this.set("log_message", "extracting: " + this.entries[pos].filename);
+			this.set("log_message", chrome.i18n.getMessage("i18n_extracting") + this.entries[pos].filename);
 		}
 	},
 
