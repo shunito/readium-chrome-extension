@@ -6,7 +6,7 @@
     "message": "Un lecteur de livres numériques EPUB3."
   },
   "i18n_readium_library" : {
-    "message" : "Bibliothèque de Readium"
+    "message" : "Bibliothèque Readium"
   },
   "i18n_readium_options" : {
     "message" : "Options de Readium :"
@@ -78,7 +78,7 @@
     "message" : "extraction : "
   },
   "i18n_are_you_sure" : {
-    "message" : "Voulez-vous vraiment supprimer ce fichier de façon permanente ? "
+    "message" : "Voulez-vous vraiment supprimer "
   },
   "i18n_add_book_to_readium_library" : {
     "message" : "Ajoutez un livre à la bibliothèque de Readium :"
