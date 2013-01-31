@@ -39,6 +39,7 @@ src_files:
   - scripts/models/epub_controller.js
   - scripts/models/epub.js
   - scripts/models/readium_pagination.js
+  - scripts/models/readium_reflowable_pagination.js
   - scripts/models/page_number_display_logic.js
   - scripts/epub_reading_system.js
   - scripts/models/media_overlay_controller.js

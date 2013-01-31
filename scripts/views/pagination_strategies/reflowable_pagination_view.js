@@ -8,7 +8,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		// Initalize delegates and other models
 		this.reflowableLayout = new Readium.Views.ReflowableLayout();
 		this.reflowableElementsInfo = new Readium.Views.ReflowableElementInfo();
-		this.pages = new Readium.Models.ReadiumPagination({model : this.model});
+		this.pages = new Readium.Models.ReadiumReflowablePagination({model : this.model});
 		this.zoomer = options.zoomer;
         this.mediaOverlayController = this.model.get("media_overlay_controller");
         this.mediaOverlayController.setPages(this.pages);
