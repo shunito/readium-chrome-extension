@@ -14,7 +14,8 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		this.epubController = this.get("model");
 
 		// REFACTORING CANDIDATE: This is not ideal as it muddies the difference between the spine index position and 
-		//   the page numbers that result from pagination. 
+		//   the page numbers that result from pagination. This might only be necessary for fixed-layout content documents. It 
+		//   is NOT necessary for reflowable pages. This definitely needs to be fixed.
 		this.set("current_page", [this.epubController.get("spine_position") + 1]);
 
 		// Instantiate an object responsible for deciding which pages to display
@@ -24,7 +25,6 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 		// we need to adjust the the current page
 		// Probably a memory leak here, should add a destructor
 		this.on("change:num_pages", this.adjustCurrentPage, this);
-
 	},
 
 	// Description: This method determines which page numbers to display when switching
@@ -192,15 +192,18 @@ Readium.Models.ReadiumPagination = Backbone.Model.extend({
 	//  "PRIVATE" HELPERS                                                                   //
 	// ------------------------------------------------------------------------------------ //
 
+	// REFACTORING CANDIDATE: This method seems to correct the page position if the current page number 
+	//   exceeds the number of pages, which should not happen. 
 	adjustCurrentPage: function() {
 		var cp = this.get("current_page");
-		var num = this.get("num_pages");
+		// var num = this.get("num_pages");
 
-		if (cp[cp.length - 1] > num) {
-			this.goToLastPage();
-		}
+		// if (cp[cp.length - 1] > num) {
+		// 	this.goToLastPage();
+		// }
 
-Acc.page = '#' + cp;
+		// Removing this appears to cause a problem with backbone, somehow. This method should eventually be removed. 
+		Acc.page = '#' + cp;
 
 	},	
 

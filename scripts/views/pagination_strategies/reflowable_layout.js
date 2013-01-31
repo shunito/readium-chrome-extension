@@ -49,7 +49,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
             isTwoUp
             );
 
-        var pageInfo = this.adjustIframeColumns(
+        var page = this.adjustIframeColumns(
             offsetDir, 
             epubContentDocument, 
             readiumFlowingContent, 
@@ -67,7 +67,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
             isTwoUp
             );
 
-        return [numPages, pageInfo[1]];
+        return [numPages, page];
     },
 
     injectTheme : function (currentTheme, epubContentDocument, flowingWrapper) {
@@ -493,7 +493,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         $(epubContentDocument).css( this.getBodyColumnCss() );
 
         page = this.accountForOffset(readiumFlowingContent, isTwoUp, firstPageOffset, currentPages, ppd);
-        return [this.calcNumPages(epubContentDocument, isTwoUp, offsetDir), page];
+        return page;
     },
 
     // Rationale: sadly this is just a reprint of what is already in the

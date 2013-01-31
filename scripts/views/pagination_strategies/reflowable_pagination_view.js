@@ -64,6 +64,10 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		$(this.getReadiumFlowingContent()).on("load", function (e) {
 
 			var lastPageElementId = that.initializeContentDocument();
+
+			// Rationale: The content document must be paginated in order for the subsequent "go to page" methods
+			//   to have access to the number of pages in the content document.
+			that.paginateContentDocument();
 			that.mediaOverlayController.pagesLoaded();
 
 			// Rationale: The assumption here is that if a hash fragment is specified, it is the result of Readium 
@@ -372,8 +376,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			this.getReadiumFlowingContent(), 
 			this.keydownHandler
 			);
-
-		this.paginateContentDocument();
 
 		return elementId;
 	},
