@@ -7,6 +7,7 @@ describe("Readium.Models.ReadiumPagination", function () {
             this.packageDocument = Factory.spy("package_document");
             spyOn(Readium.Models, "PackageDocument").andReturn(this.packageDocument);
             
+            Acc = {};
             this.epub = new Readium.Models.EPUB({"package_doc_path": "some/file/path"});
             this.epubController = new Readium.Models.EPUBController({"epub": this.epub});
             this.pages = new Readium.Models.ReadiumPagination({"model": this.epubController});

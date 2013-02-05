@@ -7,9 +7,10 @@ describe("Readium.Models.ReadiumReflowablePagination", function () {
             this.packageDocument = Factory.spy("package_document");
             spyOn(Readium.Models, "PackageDocument").andReturn(this.packageDocument);
             
+            Acc = {};
             this.epub = new Readium.Models.EPUB({"package_doc_path": "some/file/path"});
             this.epubController = new Readium.Models.EPUBController({"epub": this.epub});
-            this.pages = new Readium.Models.ReadiumReflowablePagination({"model": this.epubController});
+            this.pages = new Readium.Models.ReadiumReflowablePagination({"model": this.epubController });
         });
 
         describe('toggling synthetic spread', function () {
@@ -34,13 +35,6 @@ describe("Readium.Models.ReadiumReflowablePagination", function () {
 
                 beforeEach(function () {
                     this.epub.set("page_prog_dir", "ltr");
-
-                    spyOn(this.pages.pageNumberDisplayLogic, "displayedPageIsRight").andCallFake(
-                        function (pageNum) { return pageNum % 2 === 0 ? true : false; } 
-                    );
-                    spyOn(this.pages.pageNumberDisplayLogic, "displayedPageIsLeft").andCallFake(
-                        function (pageNum) { return pageNum % 2 === 0 ? false : true; } 
-                    );
                 });
 
                 it('1 page -> 2 pages', function () {
@@ -82,15 +76,6 @@ describe("Readium.Models.ReadiumReflowablePagination", function () {
 
                 beforeEach(function () {
                     this.epub.set("page_prog_dir", "rtl");
-
-                    // A simple case for the rtl test: An odd page will be determined as a right page, while 
-                    //   an even page will be a left page
-                    spyOn(this.pages.pageNumberDisplayLogic, "displayedPageIsRight").andCallFake(
-                        function (pageNum) { return pageNum % 2 === 0 ? false : true; } 
-                    );
-                    spyOn(this.pages.pageNumberDisplayLogic, "displayedPageIsLeft").andCallFake(
-                        function (pageNum) { return pageNum % 2 === 0 ? true : false; } 
-                    );
                 });
 
                 it('1 page -> 2 pages', function () {
@@ -174,7 +159,7 @@ describe("Readium.Models.ReadiumReflowablePagination", function () {
 
                 it('calls goToNextSection if there are no more pages', function () {
 
-                    this.pages.set("num_pages", 1);
+                    this.pages.set("current_page", [10]);
                     spyOn(this.epubController, "goToNextSection");
                     this.pages.goRight();
 

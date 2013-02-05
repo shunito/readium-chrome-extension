@@ -2,7 +2,8 @@
 Readium.Models.ReadiumReflowablePagination = Backbone.Model.extend({ 
 
     defaults: {
-        "num_pages" : 0
+        "num_pages" : 0,
+        "current_page" : [1]
     },
 
     // ------------------------------------------------------------------------------------ //
@@ -13,13 +14,8 @@ Readium.Models.ReadiumReflowablePagination = Backbone.Model.extend({
 
         this.epubController = this.get("model");
 
-        // REFACTORING CANDIDATE: This is not ideal as it muddies the difference between the spine index position and 
-        //   the page numbers that result from pagination. This might only be necessary for fixed-layout content documents. It 
-        //   is NOT necessary for reflowable pages. This definitely needs to be fixed.
-        this.set("current_page", [this.epubController.get("spine_position") + 1]);
-
         // Instantiate an object responsible for deciding which pages to display
-        this.pageNumberDisplayLogic = new Readium.Models.PageNumberDisplayLogic();
+        this.pageNumberDisplayLogic = new Readium.Models.ReflowablePageNumberLogic();
         
         // if content reflows and the number of pages in the section changes
         // we need to adjust the the current page
@@ -36,8 +32,6 @@ Readium.Models.ReadiumReflowablePagination = Backbone.Model.extend({
             var newPages = this.pageNumberDisplayLogic.getPageNumbersForTwoUp (
                 this.epubController.get("two_up"), 
                 this.get("current_page"),
-                this.epubController.epub.get("page_prog_dir"),
-                this.epubController.getCurrentSection().isFixedLayout(),
                 this.epubController.getCurrentSection().firstPageOffset()
                 );
 
@@ -79,8 +73,6 @@ Readium.Models.ReadiumReflowablePagination = Backbone.Model.extend({
         var pagesToGoto = this.pageNumberDisplayLogic.getGotoPageNumsToDisplay(
                             gotoPageNumber,
                             this.epubController.get("two_up"),
-                            this.epubController.getCurrentSection().isFixedLayout(),
-                            this.epubController.epub.get("page_prog_dir"),
                             this.epubController.getCurrentSection().firstPageOffset()
                             );
         this.set("current_page", pagesToGoto);
@@ -108,14 +100,6 @@ Readium.Models.ReadiumReflowablePagination = Backbone.Model.extend({
 
             this.epubController.goToPrevSection();
         }
-        // REFACTORING CANDIDATE: The pagination/spine position relationship is still muddied. As a result, 
-        //   the assumption that a single content document (spine element) is rendered in every scrolling view must be
-        //   enforced here with this scrolling view specific check condition. 
-        else if (this.epubController.paginator.shouldScroll() &&
-                 !this.epubController.getCurrentSection().isFixedLayout()) {
-
-            this.epubController.goToPrevSection();
-        }
         // Single page navigation
         else if (!this.epubController.get("two_up")){
 
@@ -131,9 +115,7 @@ Readium.Models.ReadiumReflowablePagination = Backbone.Model.extend({
         else {
 
             var pagesToDisplay = this.pageNumberDisplayLogic.getPrevPageNumsToDisplay(
-                                lastPage,
-                                this.epubController.getCurrentSection().isFixedLayout(),
-                                this.epubController.epub.get("page_prog_dir")
+                                lastPage
                                 );
             this.set("current_page", pagesToDisplay);
 
@@ -173,9 +155,7 @@ Readium.Models.ReadiumReflowablePagination = Backbone.Model.extend({
         else {
 
             var pagesToDisplay = this.pageNumberDisplayLogic.getNextPageNumsToDisplay(
-                                firstPage,
-                                this.epubController.getCurrentSection().isFixedLayout(),
-                                this.epubController.epub.get("page_prog_dir")
+                                firstPage
                                 );
             this.set("current_page", pagesToDisplay);
 
@@ -196,12 +176,6 @@ Readium.Models.ReadiumReflowablePagination = Backbone.Model.extend({
     //   exceeds the number of pages, which should not happen. 
     adjustCurrentPage: function() {
         var cp = this.get("current_page");
-        // var num = this.get("num_pages");
-
-        // if (cp[cp.length - 1] > num) {
-        //  this.goToLastPage();
-        // }
-
         // Removing this appears to cause a problem with backbone, somehow. This method should eventually be removed. 
         Acc.page = '#' + cp;
 
