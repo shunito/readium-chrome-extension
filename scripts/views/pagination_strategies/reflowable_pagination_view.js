@@ -75,19 +75,20 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			//   to follow a link should supersede restoring the last-page position, as this should only be done for the 
 			//   case where Readium is re-opening the book, from the library view. 
 			if (hashFragmentId) {
-				that.goToHashFragment(hashFragmentId);
-			}
-            else if (goToLastPage) {
-
-                that.pages.goToLastPage();
+                that.goToHashFragment(hashFragmentId);
             }
-			else if (lastPageElementId) {
-				that.goToHashFragment(lastPageElementId);
-			}
-			else {
-				
-                that.pages.goToPage(1);
-			}
+            else if (lastPageElementId) {
+                that.goToHashFragment(lastPageElementId);
+            }
+            else {
+
+                if (goToLastPage) {
+                    that.pages.goToLastPage();
+                }
+                else {
+                    that.pages.goToPage(1);
+                }       
+            }
 		});
 		
 		return [this.model.get("spine_position")];
