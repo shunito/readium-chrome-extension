@@ -123,13 +123,6 @@
 
 	}
 
-	#two-up-options {
-		text-align: left;
-		.simple-radio {
-			margin-right: 35px;
-		}
-	}
-
 	.theme-option {
 		display: block;
 		text-align: left;
@@ -138,6 +131,12 @@
 		padding: 3px;
 		margin-bottom: 10px;
 	}
+
+	.pagination-option {
+		display: block;
+		text-align: left;
+		margin: 3px 0px;
+	}	
 
 	#settings-form-footer {
 		background-color: #000;

@@ -22,6 +22,8 @@ Readium.Views.TocViewBase = Backbone.View.extend({
 		this.model.handleLink(href);
 	},
 
+	// If the handled select is a CFI, it will not function correctly, as the web served version has no
+	//   persistence mechanism. 
 	handleSelect : function (e) {
 
 		var href = e.val;

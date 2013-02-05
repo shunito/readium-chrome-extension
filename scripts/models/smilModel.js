@@ -76,6 +76,7 @@ Readium.Models.SmilModel = function() {
                     "audio": NodeLogic.audioNotifyChildDone,
                     "text": function() {}}
     var url = null;
+    var urlObj = null;
     var notifySmilDone = null;
     var root = null;
     
@@ -87,6 +88,7 @@ Readium.Models.SmilModel = function() {
     // set this so the model can resolve src attributes
     this.setUrl = function(fileUrl) {
         url = fileUrl;
+        urlObj = new URI(url);
     };
     
     // set the callback for when the tree is done
@@ -125,44 +127,23 @@ Readium.Models.SmilModel = function() {
         if (root == null) return null;
         var res = null;
         var attr_ = attr;
-        if (attr_ == "src" || attr_ == "epub:textref") {
-            if (attr_ == "epub:textref") attr_ = "epub\\:textref"; // normalize for jquery
-            
-            // treat src and textref attrs differently
-            // TODO can get better filepath comparison with something like http://medialize.github.com/URI.js/
-            // for now, just look at the text file names
-            var doc_href = val.substr(val.lastIndexOf("/")+1); 
-            var selector = nodename + "[" + attr_ + "]";
-            var potentialMatches = $(root).find(selector);
-            if (val == "") {
-                res = potentialMatches[0];
-            }
-            else {
-                potentialMatches.each(function(idx) {
-                    var src = $(this).attr(attr_);
-                    if (src != undefined) {
-                        // TODO use a proper URI library to get more accurate filepath comparison (same as above)
-                        src = src.substr(src.lastIndexOf("/")+1);
-                        if (src === doc_href) {
-                            res = this;
-                            return false;
-                        }
-                    }
-                });
-            }
+        
+        if (attr_.indexOf(":") != -1) {
+            // normalize for jquery
+            attr_ = attr_.replace(":", "\\:");
         }
-        else {
-            var selector = nodename;
-            if (attr_ != "") {
-                selector += "[" + attr_;
-                if (val != "") {
-                    selector += "='" + val + "'";
-                }
-                selector += "]";
+        
+        var selector = nodename;
+        if (attr_ != "") {
+            selector += "[" + attr_;
+            if (val != "") {
+                selector += "='" + val + "'";
             }
-            res = $(root).find(selector);
-            res = res.length == 0 ? null : res[0]; // grab first result
-        }   
+            selector += "]";
+        }
+        res = $(root).find(selector);
+        res = res.length == 0 ? null : res[0]; // grab first result
+          
         return res;
     };
     
@@ -230,12 +211,10 @@ Readium.Models.SmilModel = function() {
     
     // make sure the attributes are to our liking
     function scrubAttributes(node) {
-        // TODO do we need to resolve the text srcs too, or does Readium want relative paths?
-        
         // process audio nodes' clock values
         if (node.tagName == "audio") {
             if ($(node).attr("src") != undefined) {
-                $(node).attr("src", resolveUrl($(node).attr("src"), url));
+                $(node).attr("src", resolveUrl($(node).attr("src")));
             }    
             if ($(node).attr("clipBegin") != undefined) {
                 $(node).attr("clipBegin", resolveClockValue($(node).attr("clipBegin")));
@@ -247,8 +226,15 @@ Readium.Models.SmilModel = function() {
                 $(node).attr("clipEnd", resolveClockValue($(node).attr("clipEnd")));
             }
             else {
-                // TODO check if this is reasonable
-                $(node).attr("clipEnd", 9999999);
+                $(node).attr("clipEnd", -1);
+            }
+        }
+        else if (node.tagName == "text") {
+            if ($(node).attr("src") != undefined) {
+                $(node).attr("src", resolveUrl($(node).attr("src")));
+            }
+            if ($(node).attr("epub:textref") != undefined) {
+                $(node).attr("epub:textref", resolveUrl($(node).attr("epub:textref")));
             }
         }
     }
@@ -258,16 +244,10 @@ Readium.Models.SmilModel = function() {
         return true;
     }
     
-    function resolveUrl(url, baseUrl) {
-        if (url.indexOf("://") != -1) {
-            return url;
-        }
-        
-        var base = baseUrl;
-        if (baseUrl[baseUrl.length-1] != "/") {
-            base = baseUrl.substr(0, baseUrl.lastIndexOf("/") + 1);
-        }
-        return base + url;
+    // resolve url against SmilModel's urlObj
+    function resolveUrl(url) {
+        var url_ = new URI(url);
+        return url_.resolve(urlObj).toString();
     }
     
     // parse the timestamp and return the value in seconds

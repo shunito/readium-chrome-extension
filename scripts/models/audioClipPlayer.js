@@ -117,6 +117,9 @@ Readium.Models.AudioClipPlayer = function() {
     this.getRate = function() {
         return rate;
     };
+    this.reset = function() {
+        elm.setAttribute("src", undefined);
+    };
     function loadData(){
         debugPrint("Loading file " + src);
         elm.setAttribute("src", src);
@@ -127,7 +130,9 @@ Readium.Models.AudioClipPlayer = function() {
             elm.removeEventListener("canplay", setThisTime);
             // TODO put something in here for remote files to make sure the file is buffered
         
-            if (clipEnd > elm.duration) {
+            //if clipEnd is -1, it means the value was not specified
+            // we handle unspecified clipBegin by setting it to 0 at parsetime
+            if (clipEnd == -1 || clipEnd > elm.duration) {
                 debugPrint("File is shorter than specified clipEnd time");
                 clipEnd = elm.duration;
             }
@@ -136,7 +141,10 @@ Readium.Models.AudioClipPlayer = function() {
             continueRender();        
         }
         
-        elm.addEventListener("ended", function() {
+        elm.addEventListener("ended", ended);
+        function ended() {
+            elm.removeEventListener("ended", ended);
+            debugPrint("Audio file ended.");
             // cancel the timer, if any
             if (intervalId != null) {
                 clearInterval(intervalId);
@@ -144,7 +152,7 @@ Readium.Models.AudioClipPlayer = function() {
             if (notifyClipDone != null) {
                 notifyClipDone();
             }
-        });
+        }
     }
     
     function continueRender() {
@@ -156,7 +164,7 @@ Readium.Models.AudioClipPlayer = function() {
         }
         else {
             elm.addEventListener("seeked", seeked);
-            debugPrint("setting currentTime from " + elm.currentTime + "to " + clipBegin);
+            debugPrint("setting currentTime from " + elm.currentTime + " to " + clipBegin);
             elm.currentTime = clipBegin;
             function seeked() {
                 elm.removeEventListener("seeked", seeked);
@@ -176,7 +184,8 @@ Readium.Models.AudioClipPlayer = function() {
         // we're using setInterval instead of monitoring the timeupdate event because timeupdate fires, at best, every 200ms, which messes up playback of short phrases.
         // 11ms seems to be chrome's finest allowed granularity for setInterval (and this is for when the tab is active; otherwise it fires about every second)
         intervalId = setInterval(function() {
-            if (elm.currentTime >= clipEnd) {
+            if (elm.currentTime >= clipEnd && clipEnd != -1) {
+                debugPrint(elm.currentTime + " >= " + clipEnd);
                 clearInterval(intervalId);
                 debugPrint("clip done");
                 if (notifyClipDone != null) {

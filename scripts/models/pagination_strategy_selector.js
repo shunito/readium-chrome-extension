@@ -19,8 +19,10 @@ Readium.Models.PaginationStrategySelector = Backbone.Model.extend({
 
 	initialize: function() {
 
+		var self = this;
 		this.model = this.get("book");
 		this.zoomer = new Readium.Views.FixedLayoutBookZoomer();
+		this.model.on("change:pagination_mode", function() { self.renderSpineItems(); });		
 	},
 
 	// Description: Determine what the current spine item is and render it
@@ -62,8 +64,6 @@ Readium.Models.PaginationStrategySelector = Backbone.Model.extend({
 	// ------------------------------------------------------------------------------------ //  
 
 	shouldScroll: function() {
-		var optionString = localStorage["READIUM_OPTIONS"];
-		var options = (optionString && JSON.parse(optionString) ) || {"singleton": {}};
-		return !options["singleton"]["paginate_everything"];
+		return this.model.get("pagination_mode") == "scrolling";
 	}
 });

@@ -47,7 +47,7 @@ This will start a webserver running on `port 8888`. To run the spect navigate to
 
 ## Contact
 
-* matthewr@evidentpoint.com
+* justinh@evidentpoint.com
 
 
 ## Download

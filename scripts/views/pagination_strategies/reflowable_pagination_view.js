@@ -77,17 +77,16 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			if (hashFragmentId) {
 				that.goToHashFragment(hashFragmentId);
 			}
+            else if (goToLastPage) {
+
+                that.pages.goToLastPage();
+            }
 			else if (lastPageElementId) {
 				that.goToHashFragment(lastPageElementId);
 			}
 			else {
-
-				if (goToLastPage) {
-					that.pages.goToLastPage();
-				}
-				else {
-					that.pages.goToPage(1);
-				}		
+				
+                that.pages.goToPage(1);
 			}
 		});
 		
@@ -138,6 +137,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 				this.getBody());
 
             if (page > 0) {
+                //console.log(fragment + " is on page " + page);
                 this.pages.goToPage(page);	
 			}
 		}

@@ -4,6 +4,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     smilModel: null,
     consoleTrace: false,
     url: null,
+    urlObj: null,
     
     // observable properties
     defaults: {
@@ -17,7 +18,6 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     initialize: function() {
         var self = this;
         this.audioplayer = new Readium.Models.AudioClipPlayer();
-        this.audioplayer.setConsoleTrace(false);
 
         // always know whether we're playing or paused
         this.audioplayer.setNotifyOnPause(function() {
@@ -31,6 +31,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     // set the URL before calling fetch()
     setUrl: function(smilUrl) {
         this.url = smilUrl;
+        this.urlObj = new URI(this.url);
     },
     
     // start retrieving the data
@@ -53,7 +54,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
         
         // very important piece of code: attach render functions to the model
         // at runtime, 'this' is the node in question
-        this.smilModel.addRenderers({
+        this.smilModel.addRenderers({            
             "audio": function() {
                 // have the audio player inform the node directly when it's done playing
                 var thisNode = this;
@@ -66,6 +67,7 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
                     // reset the node's property
                     this.isJumpTarget = false;
                 }
+
                 // play the node
                 self.audioplayer.play($(this).attr("src"), parseFloat($(this).attr("clipBegin")), parseFloat($(this).attr("clipEnd")), isJumpTarget);
             }, 
@@ -146,9 +148,11 @@ Readium.Models.MediaOverlay = Backbone.Model.extend({
     reset: function() {
         this.set("current_text_src", null);
         this.set("has_started_playback", false);
+        this.audioplayer.reset();
     },
     setConsoleTrace: function(onOff) {
         this.consoleTrace = onOff;
+        this.audioplayer.setConsoleTrace(onOff);
     },
     debugPrint: function(str) {
         if (this.consoleTrace) {

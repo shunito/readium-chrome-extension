@@ -37,7 +37,7 @@ Readium.Models.ManifestItem = Backbone.Model.extend({
 		if(!dom) {
 			return;
 		}
-		var viewportTag = dom.getElementsByName("viewport")[0];
+		var viewportTag = $("[name='viewport']", dom)[0];
 		if(!viewportTag) {
 			return null;
 		}

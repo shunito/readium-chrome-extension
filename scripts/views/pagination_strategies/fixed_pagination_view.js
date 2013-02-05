@@ -88,6 +88,14 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
         );
 	},
     
+    // override
+    // Description: return the set of all elements for this spine item that have an @id attribute.
+    // Used by MO.
+    getAllPageElementsWithId: function() {
+        return $('body').find("[id]");
+    },
+    
+    
 	// ------------------------------------------------------------------------------------ //
 	//  "PRIVATE" HELPERS                                                                   //
 	// ------------------------------------------------------------------------------------ //

@@ -1639,7 +1639,8 @@ button.btn, input[type="submit"].btn {
   background-image: -o-linear-gradient(top, #333333, #222222);
   background-image: linear, top, #333333, #222222;
   background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#333333)', endColorstr='ie-hex-str(#222222)', GradientType=0);
+  /*filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='ie-hex-str(#333333)', endColorstr='ie-hex-str(#222222)', GradientType=0);*/
+  filter: none;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
