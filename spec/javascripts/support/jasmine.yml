@@ -28,7 +28,7 @@ src_files:
   - scripts/models/epub_api/manifest_item.js
   - scripts/models/epub_rendering/pagination_strategy_selector.js
   - scripts/models/epub_api/packageDocument.js
-  - scripts/models/epub_api/epub_controller.js
+  - scripts/models/readium_viewer/epub_controller.js
   - scripts/models/epub_api/toc.js
   - scripts/models/epub_rendering/alternate_style_tag_selector.js
   - scripts/models/epub_api/package_document_parser.js
@@ -36,7 +36,7 @@ src_files:
   - scripts/models/epub_api/mediaOverlay.js
   - scripts/models/epub_rendering/audioClipPlayer.js
   - scripts/models/epub_api/ibooks_options_parser.js
-  - scripts/models/epub_api/epub_controller.js
+  - scripts/models/readium_viewer/epub_controller.js
   - scripts/models/epub_api/epub.js
   - scripts/models/epub_rendering/readium_pagination.js
   - scripts/models/epub_rendering/readium_reflowable_pagination.js
