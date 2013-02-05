@@ -22,28 +22,28 @@ src_files:
   - lib/URI.js
   - lib/modernizr-2.5.3.min.js
   - lib/modernizr.css-regions.js
-  - scripts/fileSystemApi.js
+  - scripts/models/readium_persistence/fileSystemApi.js
   - scripts/utils/bb_file_system_sync.js
   - scripts/utils/cookie_utils.js
-  - scripts/models/manifest_item.js
-  - scripts/models/pagination_strategy_selector.js
-  - scripts/models/packageDocument.js
-  - scripts/models/epub_controller.js
-  - scripts/models/toc.js
-  - scripts/models/alternate_style_tag_selector.js
-  - scripts/models/package_document_parser.js
-  - scripts/models/smilModel.js
-  - scripts/models/mediaOverlay.js
-  - scripts/models/audioClipPlayer.js
-  - scripts/models/ibooks_options_parser.js
-  - scripts/models/epub_controller.js
-  - scripts/models/epub.js
-  - scripts/models/readium_pagination.js
-  - scripts/models/readium_reflowable_pagination.js
-  - scripts/models/page_number_display_logic.js
-  - scripts/models/reflowable_page_number_logic.js
-  - scripts/epub_reading_system.js
-  - scripts/models/media_overlay_controller.js
+  - scripts/models/epub_api/manifest_item.js
+  - scripts/models/epub_rendering/pagination_strategy_selector.js
+  - scripts/models/epub_api/packageDocument.js
+  - scripts/models/epub_api/epub_controller.js
+  - scripts/models/epub_api/toc.js
+  - scripts/models/epub_rendering/alternate_style_tag_selector.js
+  - scripts/models/epub_api/package_document_parser.js
+  - scripts/models/epub_api/smilModel.js
+  - scripts/models/epub_api/mediaOverlay.js
+  - scripts/models/epub_rendering/audioClipPlayer.js
+  - scripts/models/epub_api/ibooks_options_parser.js
+  - scripts/models/epub_api/epub_controller.js
+  - scripts/models/epub_api/epub.js
+  - scripts/models/epub_rendering/readium_pagination.js
+  - scripts/models/epub_rendering/readium_reflowable_pagination.js
+  - scripts/models/epub_rendering/page_number_display_logic.js
+  - scripts/models/epub_rendering/reflowable_page_number_logic.js
+  - scripts/models/readium_library/epub_reading_system.js
+  - scripts/models/epub_api/media_overlay_controller.js
   - scripts/views/fixed_layout_book_zoomer.js
 
 

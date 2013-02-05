@@ -91,7 +91,7 @@ var fixXhtmlLinks = function(content, resolver) {
 		var head_content = head.innerHTML;
 		head_content = "<script type='text/javascript' src='" + 
 						window.location.origin + 
-						"/scripts/epub_reading_system.js' ></script>" + 
+						"/scripts/readium_library/epub_reading_system.js' ></script>" + 
 						head_content;
 		head.innerHTML = head_content;
 	}
