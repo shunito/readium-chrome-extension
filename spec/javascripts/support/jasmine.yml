@@ -25,19 +25,22 @@ src_files:
   - scripts/models/readium_persistence/fileSystemApi.js
   - scripts/utils/bb_file_system_sync.js
   - scripts/utils/cookie_utils.js
-  - scripts/models/epub_api/manifest_item.js
+  - scripts/models/epub_api/epub/manifest_item.js
+  - scripts/modesl/epub_api/epub/spine_item.js
+  - scripts/modesl/epub_api/epub/manifest.js
+  - scripts/modesl/epub_api/epub/spine.js
   - scripts/models/epub_rendering/pagination_strategy_selector.js
-  - scripts/models/epub_api/packageDocument.js
+  - scripts/models/epub_api/epub/package_document.js
   - scripts/models/readium_viewer/epub_controller.js
-  - scripts/models/epub_api/toc.js
+  - scripts/models/epub_api/epub/toc.js
   - scripts/models/epub_rendering/alternate_style_tag_selector.js
-  - scripts/models/epub_api/package_document_parser.js
+  - scripts/models/epub_api/parsing/package_document_parser.js
   - scripts/models/epub_api/smilModel.js
   - scripts/models/epub_api/mediaOverlay.js
   - scripts/models/epub_rendering/audioClipPlayer.js
-  - scripts/models/epub_api/ibooks_options_parser.js
+  - scripts/models/epub_api/parsing/ibooks_options_parser.js
   - scripts/models/readium_viewer/epub_controller.js
-  - scripts/models/epub_api/epub.js
+  - scripts/models/epub_api/epub/epub.js
   - scripts/models/epub_rendering/readium_pagination.js
   - scripts/models/epub_rendering/readium_reflowable_pagination.js
   - scripts/models/epub_rendering/page_number_display_logic.js
