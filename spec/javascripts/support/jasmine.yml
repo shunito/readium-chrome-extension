@@ -44,7 +44,7 @@ src_files:
   - scripts/models/epub_rendering/reflowable_page_number_logic.js
   - scripts/models/readium_library/epub_reading_system.js
   - scripts/models/epub_api/media_overlay_controller.js
-  - scripts/views/fixed_layout_book_zoomer.js
+  - scripts/views/epub_fixed/fixed_layout_book_zoomer.js
 
 
 # stylesheets
