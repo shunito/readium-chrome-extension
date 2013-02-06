@@ -5,3 +5,4 @@ build/custom_config.rb
 .jhw-cache/
 cross_browser_fixes.html
 cross_browser_fixes.md
+.npm-debug.log
