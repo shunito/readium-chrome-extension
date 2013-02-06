@@ -87,7 +87,7 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
 		}
 
 		// get rid of the last highlight
-		var body = reflowableView.getBody();
+		var body = reflowableView.getEpubContentDocument();
         var lastFrag = this.removeActiveClass(body);
         
         // if the author did not define an active class themselves
@@ -117,7 +117,7 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
         if (this.authorActiveClassExists()) {
             if (!MOIsPlaying) {
         		// get rid of the last highlight
-        		var body = reflowableView.getBody();
+        		var body = reflowableView.getEpubContentDocument();
                 var lastFrag = this.removeActiveClass(body);
             }
         }
@@ -126,7 +126,7 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
     			currentTheme = "default-theme";
     		}
         
-    		var body = reflowableView.getBody();
+    		var body = reflowableView.getEpubContentDocument();
             if (MOIsPlaying) {
                 // change the color of the body text so it looks inactive compared to the MO fragment that is playing
     			$(body).css("color", reflowableView.themes[currentTheme]["mo-color"]);
@@ -136,7 +136,7 @@ Readium.Models.MediaOverlayViewHelper = Backbone.Model.extend({
     			$(body).css("color", reflowableView.themes[currentTheme]["color"]);	
 
                 // remove style info from the last MO fragment
-                var lastFrag = this.removeActiveClass(reflowableView.getBody());
+                var lastFrag = this.removeActiveClass(reflowableView.getEpubContentDocument());
                 if (lastFrag) {
                     $(lastFrag).css("color", "");
                 }

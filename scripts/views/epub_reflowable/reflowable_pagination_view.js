@@ -43,7 +43,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.model.off("change:current_theme", this.themeChangeHandler, this);
 
         this.reflowableLayout.resetEl(
-        	this.getBody(), 
+        	this.getEpubContentDocument(), 
         	this.el, 
         	this.getSpineDivider(),
         	this.zoomer);
@@ -117,7 +117,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		// this method is triggered in response to 
 		var fragment = hashFragmentId;
 		if(fragment) {
-			var el = $("#" + fragment, this.getBody())[0];
+			var el = $("#" + fragment, this.getEpubContentDocument())[0];
 
 			if(!el) {
 				// couldn't find the el. just give up
@@ -134,7 +134,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 				this.offsetDirection(), 
 				this.reflowableLayout.page_width, 
 				this.reflowableLayout.gap_width,
-				this.getBody());
+				this.getEpubContentDocument());
 
             if (page > 0) {
                 //console.log(fragment + " is on page " + page);
@@ -225,12 +225,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	// ------------------------------------------------------------------------------------ //
 	//  PRIVATE GETTERS FOR VIEW                                                            //
 	// ------------------------------------------------------------------------------------ //    
-
-	// Rationale: This method is the same as epubContentDocument as other parts of readium call
-	//   this. It should be removed at some point.
-	getBody : function() {
-		return this.$('#readium-flowing-content').contents()[0].documentElement;
-	},
 
 	getReadiumBookViewEl : function () {
 		return this.el;
@@ -375,7 +369,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	showPage: function(page) {
 
 		var offset = this.calcPageOffset(page).toString() + "px";
-		$(this.getBody()).css(this.offsetDirection(), "-" + offset);
+		$(this.getEpubContentDocument()).css(this.offsetDirection(), "-" + offset);
 		this.showContent();
         
         if (this.model.get("two_up") == false || 
