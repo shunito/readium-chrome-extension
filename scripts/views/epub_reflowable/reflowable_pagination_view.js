@@ -236,10 +236,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		return this.el;
 	},
 
-	getContainer : function () {
-		return this.$('#container')[0];
-	},
-
 	getFlowingWrapper : function () {
 		return this.$("#flowing-wrapper")[0];
 	},
