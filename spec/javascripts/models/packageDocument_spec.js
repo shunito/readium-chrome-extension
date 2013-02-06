@@ -45,7 +45,7 @@ describe('PackageDocument', function() {
             
             expect($('title', this.xml).text()).toEqual("L'espagnol dans votre poche");
             expect(Jath.resolver).toBeDefined();
-            expect(Readium.Collections.ManifestItems).toBeDefined();
+            expect(Readium.Collections.Manifest).toBeDefined();
         });
 
         it('parses the spine nodes', function() {

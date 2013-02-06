@@ -193,7 +193,7 @@ describe("Readium.Models.PackageDocumentParser", function() {
         });
 
         it('creates a ManifestItems collection', function() {
-            return expect(Readium.Collections.ManifestItems).toBeDefined();
+            return expect(Readium.Collections.Manifest).toBeDefined();
         });
 
         it("parses the media:active-class metadata", function() {

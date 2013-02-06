@@ -76,7 +76,7 @@ Readium.Models.PackageDocumentParser.prototype.parse = function(xml_content) {
 	}
     
     // parse the manifest into a proper collection
-	json.manifest = new Readium.Collections.ManifestItems(json.manifest, {packageDocument: this});
+	json.manifest = new Readium.Collections.Manifest(json.manifest, {packageDocument: this});
 
 	// create a map of all the media overlay objects
 	json.mo_map = this.resolveMediaOverlays(json.manifest);
