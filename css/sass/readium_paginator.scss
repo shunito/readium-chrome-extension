@@ -29,10 +29,6 @@ body {
 	background-image: url($readium_image_path + 'paginator/previous_page.png');
 }
 
-#page-wrap {
-	position: relative;
-}
-
 #next-page-button, #prev-page-button {
 	position: absolute;
 	top: 50%;
@@ -44,7 +40,7 @@ body {
 	@include user-select(none);
 }
 
-#readium-book-view-el, #container, #page-wrap {
+#readium-book-view-el, #container, {
 	margin: 0;
     padding: 0;
     width: 100%;
