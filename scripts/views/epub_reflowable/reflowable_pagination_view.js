@@ -46,7 +46,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
         	this.getBody(), 
         	this.el, 
         	this.getSpineDivider(),
-        	this.getPageWrap(),
         	this.zoomer);
 	},
 
@@ -58,7 +57,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 		var that = this;
 		var json = this.model.getCurrentSection().toJSON();
-		$(this.getContainer()).html( Handlebars.templates.reflowing_template(json) );
+		$(this.getReadiumBookViewEl()).html( Handlebars.templates.reflowing_template(json) );
 		
 		// Wait for iframe to load EPUB content document
 		$(this.getReadiumFlowingContent()).on("load", function (e) {
@@ -243,10 +242,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 	getFlowingWrapper : function () {
 		return this.$("#flowing-wrapper")[0];
-	},
-
-	getPageWrap : function () {
-		return this.$("#page-wrap")[0];
 	},
 
 	getReadiumFlowingContent : function () {

@@ -93,7 +93,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         }, 100);
     },
 
-    resetEl : function (epubContentDocument, readiumBookViewEl, spineDivider, pageWrap, zoomer) {
+    resetEl : function (epubContentDocument, readiumBookViewEl, spineDivider, zoomer) {
 
         $("body", epubContentDocument).removeClass("apple-fixed-layout");
         $(readiumBookViewEl).attr("style", "");
@@ -101,7 +101,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         $(spineDivider).toggle(false);
         zoomer.reset();
 
-        $(pageWrap).css({
+        $(readiumBookViewEl).css({
             "position": "relative",
             "right": "0px", 
             "top": "0px",
