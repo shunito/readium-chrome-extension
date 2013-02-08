@@ -6,7 +6,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.epubController = this.model;
 
 		// Initalize delegates and other models
-		this.reflowableLayout = new Readium.Views.ReflowableContentDocumentLayout();
+		this.reflowableLayout = new Readium.Views.ReflowableLayout();
 		this.reflowablePaginator = new Readium.Views.ReflowablePaginator();
 		this.reflowableElementsInfo = new Readium.Views.ReflowableElementInfo();
 		this.pages = new Readium.Models.ReadiumReflowablePagination({model : this.epubController});

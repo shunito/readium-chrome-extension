@@ -1,5 +1,5 @@
 // REFACTORING CANDIDATE: Need a better name for this
-Readium.Views.ReflowableContentDocumentLayout = Backbone.Model.extend({
+Readium.Views.ReflowableLayout = Backbone.Model.extend({
 
     initialize: function (options) {
         // make sure we have proper vendor prefixed props for when we need them
