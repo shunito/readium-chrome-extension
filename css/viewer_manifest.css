@@ -1432,7 +1432,7 @@ body {
   /* start off invisible to prevent flicker */ }
 
 /* Style declarations for two up mode */
-.two-up #spine-divider {
+.two-up .reflowing-spine-divider {
   top: 3%;
   position: absolute;
   left: 50%;
