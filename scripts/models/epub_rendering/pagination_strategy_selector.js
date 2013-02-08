@@ -52,7 +52,7 @@ Readium.Models.PaginationStrategySelector = Backbone.Model.extend({
 		// A reflowable epub
 		else {
 
-			this.v = new Readium.Views.ReflowableSequenceView({model: book, zoomer: this.zoomer});
+			this.v = new Readium.Views.ReflowablePaginationView({ model: book });
 		}
 
 		this.rendered_spine_positions = this.v.render(!!renderToLast, hashFragmentId);

@@ -99,7 +99,7 @@ Readium.Views.ReflowableLayout = Backbone.Model.extend({
         $(readiumBookViewEl).attr("style", "");
         $(readiumBookViewEl).toggleClass("two-up", false);
         $(spineDivider).toggle(false);
-        zoomer.reset();
+        // zoomer.reset();
 
         $(readiumBookViewEl).css({
             "position": "relative",

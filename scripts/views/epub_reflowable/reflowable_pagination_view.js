@@ -1,8 +1,6 @@
 
 Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
-	// el: "#readium-book-view-el",
-
 	initialize : function () {
 
 		this.epubController = this.model;
@@ -33,8 +31,8 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	destruct : function() {
 	
 		// Remove all handlers so they don't hang around in memory	
-		this.mediaOverlayController.off("change:mo_text_id", this.highlightText, this);
-        this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying, this);
+		// this.mediaOverlayController.off("change:mo_text_id", this.highlightText, this);
+  //       this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying, this);
 		this.epubController.off("change:font_size", this.rePaginationHandler, this);
 		this.epubController.off("change:two_up", this.pages.toggleTwoUp, this.pages);
 		this.epubController.off("change:two_up", this.rePaginationHandler, this);
@@ -47,8 +45,9 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
         this.reflowableLayout.resetEl(
         	this.getEpubContentDocument(), 
         	this.el, 
-        	this.getSpineDivider(),
-        	this.zoomer);
+        	this.getSpineDivider());
+        	// ,
+        	// this.zoomer);
 	},
 
 	// ------------------------------------------------------------------------------------ //
@@ -63,6 +62,8 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		var json = this.epubController.getCurrentSection().toJSON();
 		this.setElement( Handlebars.templates.reflowing_template(json) ); // set element as iframe 
 		
+		$(this.getReadiumBookViewEl()).html(this.el);
+
 		// Wait for iframe to load EPUB content document
 		$(this.getReadiumFlowingContent()).on("load", function (e) {
 
@@ -94,8 +95,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
             }
 		});
 		
-		// return [this.model.get("spine_position")];
-		return this;
+		return [this.model.get("spine_position")];
 	},
     
 	// indicateMoIsPlaying: function () {
@@ -387,7 +387,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	// Rationale: For the purpose of looking up EPUB resources in the package document manifest, Readium expects that 
 	//   all relative links be specified as relative to the package document URI (or absolute references). However, it is 
 	//   valid XHTML for a link to another resource in the EPUB to be specfied relative to the current document's
-	//   path, rather than to the package document. As such, URIs passed to Readium must be either absolute references or 
+	//   path, rathƒer than to the package document. As such, URIs passed to Readium must be either absolute references or 
 	//   relative to the package document. This method resolves URIs to conform to this condition. 
 	resolveRelativeURI : function (rel_uri) {
 		var relativeURI = new URI(rel_uri);
