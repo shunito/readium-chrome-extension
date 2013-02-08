@@ -6,7 +6,8 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.epubController = this.model;
 
 		// Initalize delegates and other models
-		this.reflowableLayout = new Readium.Views.ReflowableLayout();
+		this.reflowableLayout = new Readium.Views.ReflowableContentDocumentLayout();
+		this.reflowablePaginator = new Readium.Views.ReflowablePaginator();
 		this.reflowableElementsInfo = new Readium.Views.ReflowableElementInfo();
 		this.pages = new Readium.Models.ReadiumReflowablePagination({model : this.epubController});
 		// this.zoomer = options.zoomer;
@@ -137,8 +138,8 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			var page = this.reflowableElementsInfo.getElemPageNumber(
 				el, 
 				this.offsetDirection(), 
-				this.reflowableLayout.page_width, 
-				this.reflowableLayout.gap_width,
+				this.reflowablePaginator.page_width, 
+				this.reflowablePaginator.gap_width,
 				this.getEpubContentDocument());
 
             if (page > 0) {
@@ -167,8 +168,8 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 			this.epubController.get("two_up"),
 			// REFACTORING CANDIDATE: These two properties should be stored another way. This should be 
 			//   temporary.
-			this.reflowableLayout.gap_width,
-			this.reflowableLayout.page_width
+			this.reflowablePaginator.gap_width,
+			this.reflowablePaginator.page_width
 			);
 
 		// Check if a last page marker already exists on this page
@@ -331,7 +332,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	// Rationale: This method delegates the pagination of a content document to the reflowable layout model
 	paginateContentDocument : function () {
 
-		var pageInfo = this.reflowableLayout.paginateContentDocument(
+		var pageInfo = this.reflowablePaginator.paginateContentDocument(
 			this.getReadiumBookViewEl(),
 			this.getSpineDivider(),
 			this.epubController.get("two_up"),
@@ -407,7 +408,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	},
 
 	calcPageOffset : function(page_num) {
-		return (page_num - 1) * (this.reflowableLayout.page_width + this.reflowableLayout.gap_width);
+		return (page_num - 1) * (this.reflowablePaginator.page_width + this.reflowablePaginator.gap_width);
 	},
 
 	offsetDirection : function () {
