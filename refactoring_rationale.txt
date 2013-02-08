@@ -1,0 +1,15 @@
+- To refactor a set of modules out of the current monolithic Readium structure into major components.
+    - Readium library
+    - Readium viewer
+    - epub api
+    - epub rendering 
+    - separate modules for each type of epub (reflowing, scrolling, fixed)
+    - parsing
+    - extraction
+    - persistence
+- To reduce dependencies between the various "components" of Readium and create clear, documented, APIs. 
+- To enable a more adaptable structure for requesting and rendering epub resources. Want to be able to pre-load resources from 
+  the epub and display them, when required. Want to be able to configure the pre-loading strategy. Want to be able to mix fixed and 
+  reflowable epubs on the same page
+- Want to be able to easily deploy fully client-side, or on server and client. 
+- Want to be able to integrate into major web frameworks easily. 

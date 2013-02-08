@@ -40,7 +40,7 @@ body {
 	@include user-select(none);
 }
 
-#readium-book-view-el, #container, {
+#readium-book-view-el, #container, .reflowing-sequence {
 	margin: 0;
     padding: 0;
     width: 100%;
@@ -70,7 +70,7 @@ body {
     clear: both;
 }
 
-#flowing-wrapper {
+.flowing-wrapper {
 	padding: 30px;
 	text-align: center;
 	padding-top: 3%;

@@ -241,7 +241,7 @@ templates['reflowing_template'] = template(function (Handlebars,depth0,helpers,p
   var buffer = "", stack1, foundHelper, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  buffer += "<div id=\"flowing-wrapper\" class='clearfix'>\n	<iframe scrolling=\"no\" \n			frameborder=\"0\" \n			marginwidth=\"0\" \n			marginheight=\"0\" \n			width=\"50%\" \n			height=\"100%\" \n			title=\"";
+  buffer += "<div id=\"flowing-wrapper\" class=\"flowing-wrapper clearfix\">\n	<iframe scrolling=\"no\" \n			frameborder=\"0\" \n			marginwidth=\"0\" \n			marginheight=\"0\" \n			width=\"50%\" \n			height=\"100%\" \n			title=\"";
   stack1 = depth0.data;
   stack1 = stack1 == null || stack1 === false ? stack1 : stack1.title;
   stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1;
@@ -249,7 +249,7 @@ templates['reflowing_template'] = template(function (Handlebars,depth0,helpers,p
   foundHelper = helpers.uri;
   if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.uri; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
-  buffer += escapeExpression(stack1) + "\"\n			id=\"readium-flowing-content\">\n	</iframe>\n</div>\n<div id='spine-divider'></div>\n";
+  buffer += escapeExpression(stack1) + "\"\n			id=\"readium-flowing-content\">\n	</iframe>\n	<div class=\"reflowing-spine-divider\"></div>\n</div>\n\n\n";
   return buffer;});
 templates['scrolling_page_template'] = template(function (Handlebars,depth0,helpers,partials,data) {
   helpers = helpers || Handlebars.helpers; data = data || {};

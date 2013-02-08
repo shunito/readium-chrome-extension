@@ -64,23 +64,26 @@ Acc.title = this.model.get('title') + ', by ' + this.model.get('author');
 
 		$(document).keydown(function(e) {
 			if(e.which == 39) {
-				that.model.paginator.v.pages.goRight();
+
+				// Rationale: This exists for refactoring purposes, until the fixed/reflowable/scrolling api is consistent
+				if ( $(that.model.paginator.v.el).hasClass("reflowing-sequence") ) {
+					that.model.paginator.v.goRight();
+				}
+				else {
+					that.model.paginator.v.pages.goRight();
+				}
 			}
 							
 			if(e.which == 37) {
-				that.model.paginator.v.pages.goLeft();
+
+				// Rationale: This exists for refactoring purposes, until the fixed/reflowable/scrolling api is consistent
+				if ( $(that.model.paginator.v.el).hasClass("reflowing-sequence") ) {
+					that.model.paginator.v.goLeft();
+				}
+				else {
+					that.model.paginator.v.pages.goLeft();	
+				}
 			}
-		});
-
-		$("#readium-book-view-el").on("swipeleft", function(e) {
-			e.preventDefault();
-			that.model.paginator.v.pages.goRight();
-			
-		});
-
-		$("#readium-book-view-el").on("swiperight", function(e) {
-			e.preventDefault();
-			that.model.paginator.v.pages.goLeft();
 		});
 	},
 
@@ -138,10 +141,24 @@ else $('#toggle-toc-btn').focus();
 	
 	events: {
 		"click #prev-page-button": 	function() { 
-			this.model.paginator.v.pages.goLeft();
+
+			// Rationale: This exists for refactoring purposes, until the fixed/reflowable/scrolling api is consistent
+			if ( $(this.model.paginator.v.el).hasClass("reflowing-sequence") ) {
+				this.model.paginator.v.goLeft();
+			}
+			else {
+				this.model.paginator.v.pages.goLeft();
+			}
 		},
 		"click #next-page-button": 	function() { 
-			this.model.paginator.v.pages.goRight();
+
+			// Rationale: This exists for refactoring purposes, until the fixed/reflowable/scrolling api is consistent
+			if ( $(this.model.paginator.v.el).hasClass("reflowing-sequence") ) {
+				this.model.paginator.v.goRight();
+			}
+			else {
+				this.model.paginator.v.pages.goRight();
+			}
 		}
   	}
 });
