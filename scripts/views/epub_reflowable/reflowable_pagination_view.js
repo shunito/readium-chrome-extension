@@ -293,13 +293,15 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		}
 	},	
 
+	// REFACTORING CANDIDATE: Don't really need to repaginate, could just show that page!
 	pageChangeHandler: function() {
 
         var that = this;
 		this.hideContent();
 		setTimeout(function () {
 
-			that.paginateContentDocument();
+			that.showPage(that.pages.get("current_page")[0]);
+			that.showContent();
 
 		}, 150);
 	},
