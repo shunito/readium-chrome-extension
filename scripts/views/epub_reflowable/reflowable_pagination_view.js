@@ -1,7 +1,10 @@
 
 Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
-	initialize : function () {
+	initialize : function (options) {
+
+		this.viewerModel = options.viewerModel;
+		this.spineItemModel = options.spineItemModel;
 
 		this.epubController = this.model;
 
@@ -18,14 +21,14 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
         // Initialize handlers
 		// this.mediaOverlayController.on("change:mo_text_id", this.highlightText, this);
         // this.mediaOverlayController.on("change:active_mo", this.indicateMoIsPlaying, this);
-		this.epubController.on("change:font_size", this.rePaginationHandler, this);
-		this.epubController.on("change:two_up", this.pages.toggleTwoUp, this.pages);
-		this.epubController.on("change:two_up", this.rePaginationHandler, this);
-		this.epubController.on("change:current_margin", this.rePaginationHandler, this);
+		this.viewerModel.on("change:font_size", this.rePaginationHandler, this);
+		this.viewerModel.on("change:two_up", this.pages.toggleTwoUp, this.pages);
+		this.viewerModel.on("change:two_up", this.rePaginationHandler, this);
+		this.viewerModel.on("change:current_margin", this.rePaginationHandler, this);
 		this.pages.on("change:current_page", this.pageChangeHandler, this);
-		this.epubController.on("change:toc_visible", this.windowSizeChangeHandler, this);
+		this.viewerModel.on("change:toc_visible", this.windowSizeChangeHandler, this);
 		this.epubController.on("repagination_event", this.windowSizeChangeHandler, this);
-		this.epubController.on("change:current_theme", this.themeChangeHandler, this);
+		this.viewerModel.on("change:current_theme", this.themeChangeHandler, this);
 	},
 
 	
@@ -34,14 +37,14 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		// Remove all handlers so they don't hang around in memory	
 		// this.mediaOverlayController.off("change:mo_text_id", this.highlightText, this);
   		// this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying, this);
-		this.epubController.off("change:font_size", this.rePaginationHandler, this);
-		this.epubController.off("change:two_up", this.pages.toggleTwoUp, this.pages);
-		this.epubController.off("change:two_up", this.rePaginationHandler, this);
-		this.epubController.off("change:current_margin", this.rePaginationHandler, this);
+		this.viewerModel.off("change:font_size", this.rePaginationHandler, this);
+		this.viewerModel.off("change:two_up", this.pages.toggleTwoUp, this.pages);
+		this.viewerModel.off("change:two_up", this.rePaginationHandler, this);
+		this.viewerModel.off("change:current_margin", this.rePaginationHandler, this);
 		this.pages.off("change:current_page", this.pageChangeHandler, this);
-		this.epubController.off("change:toc_visible", this.windowSizeChangeHandler, this);
+		this.viewerModel.off("change:toc_visible", this.windowSizeChangeHandler, this);
 		this.epubController.off("repagination_event", this.windowSizeChangeHandler, this);
-		this.epubController.off("change:current_theme", this.themeChangeHandler, this);
+		this.viewerModel.off("change:current_theme", this.themeChangeHandler, this);
 
         this.reflowableLayout.resetEl(
         	this.getEpubContentDocument(), 
@@ -59,7 +62,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 		var that = this;
 		// var json = this.model.getCurrentSection().toJSON();
-		var json = this.epubController.getCurrentSection().toJSON();
+		var json = this.spineItemModel.toJSON();
 		this.setElement( Handlebars.templates.reflowing_template(json) ); // set element as iframe 
 		
 		$(this.getReadiumBookViewEl()).html(this.el);
@@ -164,7 +167,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		// Get first visible element with a text node 
 		$visibleTextNode = this.reflowableElementsInfo.findVisibleTextNode(
 			this.getEpubContentDocument(), 
-			this.epubController.get("two_up"),
+			this.viewerModel.get("two_up"),
 			// REFACTORING CANDIDATE: These two properties should be stored another way. This should be 
 			//   temporary.
 			this.reflowablePaginator.gap_width,
@@ -196,7 +199,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		// REFACTORING CANDIDATE: This shortcut makes this method confusing, it needs to be refactored for simplicity
 		if (lastPageMarkerExists) {
 
-			this.epubController.addLastPageCFI(existingCFI, this.epubController.get("spine_position"));
+			this.epubController.addLastPageCFI(existingCFI, this.spineItemModel.get("spine_position"));
 			this.epubController.save();
 			return; 
 		}
@@ -204,7 +207,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		characterOffset = this.reflowableElementsInfo.findVisibleCharacterOffset($visibleTextNode, this.getEpubContentDocument());
 
 		// Get the content document idref
-		contentDocumentIdref = this.epubController.getCurrentSection().get("idref");
+		contentDocumentIdref = this.spineItemModel.get("idref");
 
 		// Get the package document
 		packageDocument = this.epubController.getPackageDocumentDOM();
@@ -221,7 +224,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 		this.epubController.addLastPageCFI(
 			generatedCFI, 
-			this.epubController.get("spine_position"));
+			this.spineItemModel.get("spine_position"));
 
 		// Save the last page marker been added
 		this.epubController.save();
@@ -321,7 +324,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	themeChangeHandler : function () {
 
 		this.reflowableLayout.injectTheme(
-			this.epubController.get("current_theme"), 
+			this.viewerModel.get("current_theme"), 
 			this.getEpubContentDocument(), 
 			this.getFlowingWrapper());
 	},
@@ -336,16 +339,16 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		var pageInfo = this.reflowablePaginator.paginateContentDocument(
 			this.getReadiumBookViewEl(),
 			this.getSpineDivider(),
-			this.epubController.get("two_up"),
+			this.viewerModel.get("two_up"),
 			this.offsetDirection(),
 			this.getEpubContentDocument(),
 			this.getReadiumFlowingContent(),
 			this.getFlowingWrapper(),
-			this.epubController.getCurrentSection().firstPageOffset(),
+			this.spineItemModel.firstPageOffset(),
 			this.pages.get("current_page"),
-			this.epubController.epub.get("page_prog_dir"),
-			this.epubController.get("current_margin"),
-			this.epubController.get("font_size")
+			this.spineItemModel.get("page_prog_dir"),
+			this.viewerModel.get("current_margin"),
+			this.viewerModel.get("font_size")
 			);
 
 		this.pages.set("num_pages", pageInfo[0]);
@@ -358,13 +361,13 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		var elementId = this.reflowableLayout.initializeContentDocument(
 			this.getEpubContentDocument(), 
 			this.epubController.get("epubCFIs"), 
-			this.epubController.get("spine_position"), 
+			this.spineItemModel.get("spine_position"), 
 			this.getReadiumFlowingContent(), 
 			this.epubController.packageDocument, 
 			Handlebars.templates.bindingTemplate, 
 			this.linkClickHandler, 
 			this, 
-			this.epubController.get("current_theme"), 
+			this.viewerModel.get("current_theme"), 
 			this.getFlowingWrapper(), 
 			this.getReadiumFlowingContent(), 
 			this.keydownHandler
@@ -379,8 +382,8 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		$(this.getEpubContentDocument()).css(this.offsetDirection(), "-" + offset);
 		this.showContent();
         
-        if (this.epubController.get("two_up") == false || 
-            (this.epubController.get("two_up") && page % 2 === 1)) {
+        if (this.viewerModel.get("two_up") == false || 
+            (this.viewerModel.get("two_up") && page % 2 === 1)) {
                 // when we change the page, we have to tell MO to update its position
                 // this.mediaOverlayController.reflowPageChanged();
         }
@@ -416,7 +419,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 		// if this book does right to left pagination we need to set the
 		// offset on the right
-		if (this.epubController.epub.get("page_prog_dir") === "rtl") {
+		if (this.spineItemModel.pageProgressionDirection() === "rtl") {
 			return "right";
 		}
 		else {

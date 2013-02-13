@@ -1,17 +1,31 @@
 Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
 
+    defaults : {
+        "height" : 0,
+        "width" : 0,
+        "page_class" : undefined,
+        "uri" : undefined,
+        "href" : undefined,
+        "id" : undefined,
+        "idref" : undefined,
+        "media_overlay" : undefined,
+        "media_type" : undefined,
+        "page_prog_dir" : "ltr",
+        "properties" : "",
+        "spine_index" : undefined
+    },
+
     initialize: function() {
-        if(this.isFixedLayout()) {
+        if (this.isFixedLayout()) {
             this.on("change:content", this.parseMetaTags, this);
             this.loadContent();
         }
-        
     },
 
     // this method creates the JSON representation of a manifest item
     // that is used to render out a page view.
     buildSectionJSON: function(manifest_item, spine_index) {
-        if(!manifest_item) {
+        if (!manifest_item) {
             return null;
         }
         var section = Object.create(null);
@@ -23,7 +37,7 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
     },
 
     toJSON: function() {
-        if(this.isFixedLayout()) {
+        if (this.isFixedLayout()) {
             this.parseMetaTags();
         }
         var json = {};
@@ -145,6 +159,12 @@ Readium.Models.SpineItem = Readium.Models.ManifestItem.extend({
                 }
             }
         }
+    },
+
+    pageProgressionDirection : function () {
+
+        var book = this.collection.packageDocument.get("book");
+        book.get("page_prog_dir");
     },
 
     isFixedLayout: function() {
