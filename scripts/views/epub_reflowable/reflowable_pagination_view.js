@@ -33,7 +33,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	
 		// Remove all handlers so they don't hang around in memory	
 		// this.mediaOverlayController.off("change:mo_text_id", this.highlightText, this);
-  //       this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying, this);
+  		// this.mediaOverlayController.off("change:active_mo", this.indicateMoIsPlaying, this);
 		this.epubController.off("change:font_size", this.rePaginationHandler, this);
 		this.epubController.off("change:two_up", this.pages.toggleTwoUp, this.pages);
 		this.epubController.off("change:two_up", this.rePaginationHandler, this);
@@ -59,7 +59,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 		var that = this;
 		// var json = this.model.getCurrentSection().toJSON();
-		// $(this.getReadiumBookViewEl()).html( Handlebars.templates.reflowing_template(json) );
 		var json = this.epubController.getCurrentSection().toJSON();
 		this.setElement( Handlebars.templates.reflowing_template(json) ); // set element as iframe 
 		
