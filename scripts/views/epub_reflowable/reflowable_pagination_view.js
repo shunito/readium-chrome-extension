@@ -1,4 +1,9 @@
 
+// API: 
+//  Methods that can be called when viewer settings change
+//  Methods that can be called to do things, such as move to the next page, go to a hash fragment, etc.
+//  Will probably also need to pass in a link click handler
+
 Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 	initialize : function (options) {
