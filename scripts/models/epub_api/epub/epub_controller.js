@@ -447,6 +447,7 @@ Readium.Models.EPUBController = Backbone.Model.extend({
 
 		// Add the new last page marker
 		this.get("epubCFIs")[CFI] = cfiPayload;	
+		this.save();
 	},
 
 	removeLastPageCFI : function () {

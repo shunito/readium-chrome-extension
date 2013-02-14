@@ -13,6 +13,10 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		this.reflowablePaginator = new Readium.Views.ReflowablePaginator();
 		this.reflowableElementsInfo = new Readium.Views.ReflowableElementInfo();
 		this.pages = new Readium.Models.ReadiumReflowablePagination({model : this.epubController});
+		this.annotations = new Readium.Models.ReflowableAnnotations({
+			saveCallback : this.epubController.addLastPageCFI,
+			callbackContext : this.epubController
+		});
 		// this.zoomer = options.zoomer;
         // this.mediaOverlayController = this.model.get("media_overlay_controller");
         // this.mediaOverlayController.setPages(this.pages);
@@ -119,6 +123,36 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 	// 	);
 	// },
 
+    // Description: Generates a CFI for an element is that is currently visible on the page. This CFI and a last-page payload
+    //   is then saved for the current EPUB.
+    savePosition : function () {
+
+        var $visibleTextNode;
+        var CFI;
+
+        // Get first visible element with a text node 
+        $visibleTextNode = this.reflowableElementsInfo.findVisibleTextNode(
+            this.getEpubContentDocument(), 
+            this.viewerModel.get("two_up"),
+            // REFACTORING CANDIDATE: These two properties should be stored another way. This should be 
+            //   temporary.
+            this.reflowablePaginator.gap_width,
+            this.reflowablePaginator.page_width
+            );
+
+        CFI = this.annotations.findExistingLastPageMarker($visibleTextNode);
+        if (!CFI) {
+
+        	CFI = this.annotations.generateCharacterOffsetCFI(
+        		this.reflowableElementsInfo.findVisibleCharacterOffset($visibleTextNode, this.getEpubContentDocument()),
+				$visibleTextNode[0],
+				this.spineItemModel.get("idref"),
+				this.epubController.getPackageDocumentDOM()
+	        	);
+        }
+        this.annotations.saveAnnotation(CFI, this.spineItemModel.get("spine_index"));
+    },
+
 	// Description: Find an element with this specified id and show the page that contains the element.
 	goToHashFragment: function(hashFragmentId) {
 
@@ -151,84 +185,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		}
 		// else false alarm no work to do
 	},
-
-	// Description: Generates a CFI for an element is that is currently visible on the page. This CFI and a last-page payload
-	//   is then saved for the current EPUB.
-	savePosition : function () {
-
-		var $visibleTextNode;
-		var existingCFI;
-		var lastPageMarkerExists = false;
-		var characterOffset;
-		var contentDocumentIdref;
-		var packageDocument;
-		var generatedCFI;
-
-		// Get first visible element with a text node 
-		$visibleTextNode = this.reflowableElementsInfo.findVisibleTextNode(
-			this.getEpubContentDocument(), 
-			this.viewerModel.get("two_up"),
-			// REFACTORING CANDIDATE: These two properties should be stored another way. This should be 
-			//   temporary.
-			this.reflowablePaginator.gap_width,
-			this.reflowablePaginator.page_width
-			);
-
-		// Check if a last page marker already exists on this page
-		try {
-			$.each($visibleTextNode.parent().contents(), function () {
-
-				if ($(this).hasClass("last-page")) {
-					lastPageMarkerExists = true;
-					existingCFI = $(this).attr("data-last-page-cfi");
-
-					// Break out of loop
-					return false;
-				}
-			});
-		}
-		catch (e) {
-
-			console.log("Could not generate CFI for non-text node as first visible element on page");
-
-			// No need to execute the rest of the save position method if the first visible element is not a text node
-			return;
-		}
-
-		// Re-add the CFI for the marker on this page
-		// REFACTORING CANDIDATE: This shortcut makes this method confusing, it needs to be refactored for simplicity
-		if (lastPageMarkerExists) {
-
-			this.epubController.addLastPageCFI(existingCFI, this.spineItemModel.get("spine_position"));
-			this.epubController.save();
-			return; 
-		}
-
-		characterOffset = this.reflowableElementsInfo.findVisibleCharacterOffset($visibleTextNode, this.getEpubContentDocument());
-
-		// Get the content document idref
-		contentDocumentIdref = this.spineItemModel.get("idref");
-
-		// Get the package document
-		packageDocument = this.epubController.getPackageDocumentDOM();
-
-		// Save the position marker
-		generatedCFI = EPUBcfi.Generator.generateCharacterOffsetCFI(
-			$visibleTextNode[0], 
-			characterOffset, 
-			contentDocumentIdref, 
-			packageDocument, 
-			["cfi-marker", "audiError"], 
-			[], 
-			["MathJax_Message"]);
-
-		this.epubController.addLastPageCFI(
-			generatedCFI, 
-			this.spineItemModel.get("spine_position"));
-
-		// Save the last page marker been added
-		this.epubController.save();
-	},	
 
 	// ------------------------------------------------------------------------------------ //
 	//  PRIVATE GETTERS FOR VIEW                                                            //
@@ -303,6 +259,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		setTimeout(function () {
 
 			that.showPage(that.pages.get("current_page")[0]);
+			that.savePosition();
 			that.showContent();
 
 		}, 150);
@@ -353,7 +310,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 		this.pages.set("num_pages", pageInfo[0]);
 		this.showPage(pageInfo[1]);
-		this.savePosition();
+		// this.savePosition(); Hmmmm, this might have to be here? 
 	},
 
 	initializeContentDocument : function () {
@@ -361,7 +318,7 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		var elementId = this.reflowableLayout.initializeContentDocument(
 			this.getEpubContentDocument(), 
 			this.epubController.get("epubCFIs"), 
-			this.spineItemModel.get("spine_position"), 
+			this.spineItemModel.get("spine_index"), 
 			this.getReadiumFlowingContent(), 
 			this.epubController.packageDocument, 
 			Handlebars.templates.bindingTemplate, 
