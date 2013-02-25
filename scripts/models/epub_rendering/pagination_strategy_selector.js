@@ -63,14 +63,27 @@ Readium.Models.PaginationStrategySelector = Backbone.Model.extend({
 				"toc_visible" : book.get("toc_visible")
 				});
 
-			this.v = new Readium.Views.ReflowablePaginationView({ 
-				model : book, 
-				spineItemModel : book.getCurrentSection(), // Passing a spine item here
-				viewerModel : viewerController
-			});
+						// Create the epub reader
+			this.epubReader = new Readium.Models.EpubReader(
+				{ 
+					model : book.epub.getPackageDocument().get("res_spine")
+				},
+				{ 
+					epubController : book,
+					viewerSettings : viewerController 
+				}
+			);
+
+			
+
+			// this.v = new Readium.Views.ReflowablePaginationView({ 
+			// 	model : book, 
+			// 	spineItemModel : book.getCurrentSection(), // Passing a spine item here
+			// 	viewerModel : viewerController
+			// });
 		}
 
-		this.rendered_spine_positions = this.v.render(!!renderToLast, hashFragmentId);
+		// this.rendered_spine_positions = this.v.render(!!renderToLast, hashFragmentId);
 		return this.rendered_spine_positions;
 	},
 

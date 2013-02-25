@@ -191,6 +191,34 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 		// else false alarm no work to do
 	},
 
+    onFirstPage : function () {
+
+        // Rationale: Need to check for both single and synthetic page spread
+        var oneOfCurrentPagesIsFirstPage = this.pages.get("current_page")[0] === 1 ? true :
+                                           this.pages.get("current_page")[1] === 1 ? true : false;
+
+        if (oneOfCurrentPagesIsFirstPage) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
+
+    onLastPage : function () {
+
+        // Rationale: Need to check for both single and synthetic page spread
+        var oneOfCurrentPagesIsLastPage = this.pages.get("current_page")[0] === this.pages.get("num_pages") ? true :
+                                          this.pages.get("current_page")[1] === this.pages.get("num_pages") ? true : false;
+
+        if (oneOfCurrentPagesIsLastPage) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
+
 	// ------------------------------------------------------------------------------------ //
 	//  PRIVATE GETTERS FOR VIEW                                                            //
 	// ------------------------------------------------------------------------------------ //    

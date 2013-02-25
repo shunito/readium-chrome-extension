@@ -50,6 +50,7 @@ src_files:
   - scripts/models/readium_library/epub_reading_system.js
   - scripts/models/epub_api/media_overlay_controller.js
   - scripts/views/epub_fixed/fixed_layout_book_zoomer.js
+  - scripts/models/epub_rendering/epub_reader.js
 
 
 # stylesheets

@@ -143,8 +143,15 @@ else $('#toggle-toc-btn').focus();
 		"click #prev-page-button": 	function() { 
 
 			// Rationale: This exists for refactoring purposes, until the fixed/reflowable/scrolling api is consistent
-			if ( $(this.model.paginator.v.el).hasClass("reflowing-sequence") ) {
-				this.model.paginator.v.goLeft();
+			// if ( $(this.model.paginator.v.el).hasClass("reflowing-sequence") ) {
+			// 	this.model.paginator.v.goLeft();
+			// }
+			// else {
+			// 	this.model.paginator.v.pages.goLeft();
+			// }
+
+			if (this.model.paginator.epubReader) {
+				this.model.paginator.epubReader.previousPage();
 			}
 			else {
 				this.model.paginator.v.pages.goLeft();
@@ -153,8 +160,15 @@ else $('#toggle-toc-btn').focus();
 		"click #next-page-button": 	function() { 
 
 			// Rationale: This exists for refactoring purposes, until the fixed/reflowable/scrolling api is consistent
-			if ( $(this.model.paginator.v.el).hasClass("reflowing-sequence") ) {
-				this.model.paginator.v.goRight();
+			// if ( $(this.model.paginator.v.el).hasClass("reflowing-sequence") ) {
+			// 	this.model.paginator.v.goRight();
+			// }
+			// else {
+			// 	this.model.paginator.v.pages.goRight();
+			// }
+
+			if (this.model.paginator.epubReader) {
+				this.model.paginator.epubReader.nextPage();
 			}
 			else {
 				this.model.paginator.v.pages.goRight();
