@@ -389,7 +389,6 @@ Readium.Views.ReflowablePaginationView = Backbone.View.extend({
 
 		// Get URI for resource currently loaded in the view's iframe
 		var iframeDocURI = new URI($(this.getReadiumFlowingContent()).attr("src"));
-
 		return relativeURI.resolve(iframeDocURI).toString();
 	},
 
