@@ -90,41 +90,20 @@ Readium.Models.ReadiumReflowablePagination = Backbone.Model.extend({
     //   multiple different cases involved in switching pages.
     prevPage: function() {
 
-        var curr_pg = this.get("current_page");
-        var lastPage = curr_pg[0] - 1;
+        var previousPage = this.get("current_page")[0] - 1;
 
-        // Clear the hash fragment if the user has decided to navigate away from it
-        this.epubController.set("hash_fragment", undefined);
-
-        if (curr_pg[0] <= 1) {
-
-            this.epubController.goToPrevSection();
-        }
         // Single page navigation
-        else if (!this.epubController.get("two_up")){
+        if (!this.epubController.get("two_up")){
 
-            this.set("current_page", [lastPage]);
-
-            // Reset spine position
-            if (this.epubController.get("rendered_spine_items").length > 1) {
-                var pos = this.epubController.get("rendered_spine_items")[lastPage - 1];
-                this.epubController.set("spine_position", pos);
-            }
+            this.set("current_page", [previousPage]);
         }
         // Move to previous page with two side-by-side pages
         else {
 
             var pagesToDisplay = this.pageNumberDisplayLogic.getPrevPageNumsToDisplay(
-                                lastPage
+                                previousPage
                                 );
             this.set("current_page", pagesToDisplay);
-
-            // Reset spine position
-            if (this.epubController.get("rendered_spine_items").length > 1) {
-                var ind = (lastPage > 1 ? lastPage - 2 : 0);
-                var pos = this.epubController.get("rendered_spine_items")[ind];
-                this.epubController.set("spine_position", pos);
-            }
         }
     },
 
@@ -133,23 +112,10 @@ Readium.Models.ReadiumReflowablePagination = Backbone.Model.extend({
         var curr_pg = this.get("current_page");
         var firstPage = curr_pg[curr_pg.length - 1] + 1;
 
-        // Clear the hash fragment if the user has decided to navigate away from it
-        this.epubController.set("hash_fragment", undefined);
-
-        if (curr_pg[curr_pg.length - 1] >= this.get("num_pages")) {
-
-            this.epubController.goToNextSection();
-        }
-        else if (!this.epubController.get("two_up")) {
+        // Single page is up
+        if (!this.epubController.get("two_up")) {
 
             this.set("current_page", [firstPage]);
-
-            // Reset the spine position
-            if (this.epubController.get("rendered_spine_items").length > 1) {
-
-                var pos = this.epubController.get("rendered_spine_items")[firstPage - 1];
-                this.epubController.set("spine_position", pos);
-            }
         }
         // Two pages are being displayed
         else {
@@ -158,13 +124,6 @@ Readium.Models.ReadiumReflowablePagination = Backbone.Model.extend({
                                 firstPage
                                 );
             this.set("current_page", pagesToDisplay);
-
-            // Reset the spine position
-            if (this.epubController.get("rendered_spine_items").length > 1) {
-
-                var pos = this.epubController.get("rendered_spine_items")[firstPage - 1];
-                this.epubController.set("spine_position", pos);
-            }
         }
     },
 
