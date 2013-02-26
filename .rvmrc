@@ -1,1 +1,1 @@
-rvm gemset use readium
+rvm gemset use readiumg --create
