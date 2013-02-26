@@ -14,59 +14,36 @@ Readium.Models.EpubReader = Backbone.Model.extend({
         // Rendering strategy option
         // 
 
-        // Render a number of page views based on strategy: STATIC STRATEGY ALL!! PEW PEW PEW PEW
-        this.epubSpine.each(function (spineItem) {
-            that.loadReflowableSpineItem(options.epubController, spineItem, options.viewerSettings);
-        });
+        this.loadSpineItems(options.epubController, options.viewerSettings);
 
         this.renderPageView(2, false, undefined); // TEMPORARY
-        this.set("currentPageView", 2);
-
-        // Apply the viewer settings to each view that has been rendered
     },
 
-    // ---- Public interface
+    // ---- Public interface ------------------------------------------------------------------------
 
-    // nextPage()
     nextPage : function () {
 
         var currentPageView = this.getCurrentPageView();
-
-        // If current view is not at the end of it's pages, delegate to turn page
-
-        // Not sure if this is required anymore 
-        // this.epubController.set("hash_fragment", undefined);
-
-        // if the number of pages has been reached
         if (currentPageView.onLastPage()) {
             this.goToNextPageView();
-            // this.epubController.goToNextSection();
         }
         else {
             currentPageView.pages.goRight();
         }
     },
 
-    // previousPage()
-
     previousPage : function () {
 
         var currentPageView = this.getCurrentPageView();
-
-        // If current view is not at the end of it's pages, delegate to turn page
-
-        // Not sure if this is required anymore 
-        // this.epubController.set("hash_fragment", undefined);
-
-        // if the number of pages has been reached
         if (currentPageView.onFirstPage()) {
             this.goToPreviousPageView();
-            // this.epubController.goToNextSection();
         }
         else {
             currentPageView.pages.goLeft();
         }
     },
+
+
     // goToHref()
     // goToCFI()
     // goToSpineItem()
@@ -74,38 +51,73 @@ Readium.Models.EpubReader = Backbone.Model.extend({
     // changeFontSize()
     // changeTheme()
     // addSpine() ---- not sure about this. Maybe just do the initialize
+    // toggleTOC()
 
 
-    // ---- Private helpers -----------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------ //  
+    //  "PRIVATE" HELPERS                                                                   //
+    // ------------------------------------------------------------------------------------ //  
 
     // spinePositionIsRendered()
     // renderSpinePosition()
 
+    // Description: This method chooses the appropriate page view to load for individual 
+    //   spine items, and sections of the spine. 
+    loadSpineItems : function (epubController, viewerSettings) {
 
-    // nextPageView()
+        var spineIndex;
+        var currSpineItem; 
+        var FXLStartIndex;
+        var FXLEndIndex;
+        for (spineIndex = 0; spineIndex <= this.epubSpine.length - 1; spineIndex++) {
+
+            currSpineItem = this.epubSpine.at(spineIndex);
+
+            // A fixed layout publication
+            if (currSpineItem.isFixedLayout()) {
+
+                FXLStartIndex = spineIndex;
+
+                // Another loop to find the start and end index of the current FXL part of the spine
+                spineIndex++;
+                for (spineIndex; spineIndex <= this.epubSpine.length - 1; spineIndex++) {
+
+                    currSpineItem = this.epubSpine.at(spineIndex);
+                    if (currSpineItem.isFixedLayout()) {
+                        FXLEndIndex = spineIndex;
+                    }
+                    else {
+                        break;
+                    }
+                }
+
+                // This is where the start and end index is passed to the method to load the FXL page view
+            }
+            // A scrolling epub
+            else if (this.shouldScroll(epubController)) {
+
+            }
+            // A reflowable epub
+            else {
+                this.loadReflowableSpineItem(epubController, currSpineItem, viewerSettings);
+            }
+        }
+    },
+
     goToNextPageView : function () {
 
-        // Check if it has one - Confirm that index bases are the same here
-        var hasNextPageView = this.get("currentPageView") < this.numPageViews() ? true : false;
         var nextPageViewIndex;
-
-        if (hasNextPageView) {
+        if (this.hasNextPageView()) {
             nextPageViewIndex = this.get("currentPageView") + 1;
-            this.set("currentPageView", nextPageViewIndex);
             this.renderPageView(nextPageViewIndex, false, undefined);
         }
     },
 
-    // previousPageView()
     goToPreviousPageView : function () {
 
-        // Check if it has one - Confirm that index bases are the same here
-        var hasPreviousPageView = this.get("currentPageView") > 0 ? true : false;
         var previousPageViewIndex;
-
-        if (hasPreviousPageView) {
+        if (this.hasPreviousPageView()) {
             previousPageViewIndex = this.get("currentPageView") - 1;
-            this.set("currentPageView", previousPageViewIndex);
             this.renderPageView(previousPageViewIndex, true, undefined);
         }
     },
@@ -115,9 +127,13 @@ Readium.Models.EpubReader = Backbone.Model.extend({
         return Object.keys(this.get("renderedPageViews")).length;
     },
 
+    hasNextPageView : function () {
+        return this.get("currentPageView") < this.numPageViews() ? true : false;
+    },
 
-    // hasNextPageView()
-    // hasPreviousPageView()
+    hasPreviousPageView : function () {
+        return this.get("currentPageView") > 0 ? true : false;
+    },
 
     loadReflowableSpineItem : function (epubController, spineItem, viewerSettings) {
 
@@ -131,13 +147,14 @@ Readium.Models.EpubReader = Backbone.Model.extend({
 
     renderPageView : function (pageViewIndex, renderLast, hashFragmentId) {
 
+        this.set("currentPageView", pageViewIndex);
         this.get("renderedPageViews")[pageViewIndex].render(renderLast, hashFragmentId);
     },
 
     getCurrentPageView : function () {
 
         return this.get("renderedPageViews")[this.get("currentPageView")];
-    }
+    },
 
 
 
@@ -157,62 +174,11 @@ Readium.Models.EpubReader = Backbone.Model.extend({
     //     this.model.on("change:pagination_mode", function() { self.renderSpineItems(); });       
     // },
 
-    // // Description: Determine what the current spine item is and render it
-    // //   Updates which spine items have been rendered in an array of rendered spine items
-    // renderSpineItems: function(renderToLast, hashFragmentId) {
-    //     var book = this.model;
-    //     var that = this;
-    //     var rendered_spine_positions = [];
+    
 
-    //     // clean up the old view if there is one
-    //     if (this.v) {
-    //         this.v.destruct();
-    //     }
-
-    //     // Spine items as found in the package document can have attributes that override global settings for the ebook. This 
-    //     // requires checking/creating the correct pagination strategy for each spine item
-    //     var spineItem = book.getCurrentSection();
-    //     if (spineItem.isFixedLayout()) {
-
-    //         this.v = new Readium.Views.FixedPaginationView({model: book, zoomer: this.zoomer});
-    //     }
-    //     // A scrolling epub
-    //     else if (this.shouldScroll()) {
-
-    //         this.v = new Readium.Views.ScrollingPaginationView({model: book, zoomer: this.zoomer});
-    //     }
-    //     // A reflowable epub
-    //     else {
-
-    //         // Create viewer model here
-
-    //         // Get the spine item model here
-    //         var viewerController = new Readium.Models.ViewerController({
-    //             "two_up" : book.get("two_up"),
-    //             "current_theme" : book.get("current_theme"),
-    //             "current_margin" : book.get("current_margin"),
-    //             "font_size" : book.get("font_size"),
-    //             "toc_visible" : book.get("toc_visible")
-    //             });
-
-    //         this.v = new Readium.Views.ReflowablePaginationView({ 
-    //             model : book, 
-    //             spineItemModel : book.getCurrentSection(), // Passing a spine item here
-    //             viewerModel : viewerController
-    //         });
-    //     }
-
-    //     this.rendered_spine_positions = this.v.render(!!renderToLast, hashFragmentId);
-    //     return this.rendered_spine_positions;
-    // },
-
-    // // ------------------------------------------------------------------------------------ //
-    // //  "PRIVATE" HELPERS                                                                   //
-    // // ------------------------------------------------------------------------------------ //  
-
-    // shouldScroll: function() {
-    //     return this.model.get("pagination_mode") == "scrolling";
-    // },
+    shouldScroll : function (epubController) {
+        return epubController.get("pagination_mode") === "scrolling";
+    },
 
     // updatePaginationSettings: function() {
     //     if (this.get("pagination_mode") == "facing") {
@@ -281,61 +247,6 @@ Readium.Models.EpubReader = Backbone.Model.extend({
 
     //             this.set("hash_fragment", splitUrl[2]);
     //         }
-    //     }
-    // },
-
-    // // Note: "Section" actually refers to a spine item
-    // getCurrentSection: function(offset) {
-    //     if(!offset) {
-    //         offset = 0;
-    //     }
-    //     var spine_pos = this.get("spine_position") + offset;
-    //     return this.packageDocument.getSpineItem(spine_pos);
-    // },
-
-    //     restorePosition: function() {
-    //     var pos = Readium.Utils.getCookie(this.epub.get("key"));
-    //     return parseInt(pos, 10) || this.packageDocument.getNextLinearSpinePostition();
-    // },
-
-    // savePosition: function() {
-    //     Readium.Utils.setCookie(this.epub.get("key"), this.get("spine_position"), 365);
-    // },
-
-    // resolvePath: function(path) {
-    //     return this.packageDocument.resolvePath(path);
-    // },
-
-    // hasNextSection: function() {
-    //     var start = this.get("spine_position");
-    //     return this.packageDocument.getNextLinearSpinePostition(start) > -1;
-    // },
-
-    // hasPrevSection: function() {
-    //     var start = this.get("spine_position");
-    //     return this.packageDocument.getPrevLinearSpinePostition(start) > -1;
-    // },
-
-    // // goes the next linear section in the spine. Non-linear sections should be
-    // // skipped as per [the spec](http://idpf.org/epub/30/spec/epub30-publications.html#sec-itemref-elem)
-    // // REFACTORING CANDIDATE: I think this is a public method and should be moved to the public section
-    // goToNextSection: function() {
-
-    //     var cp = this.get("spine_position");
-    //     var pos = this.packageDocument.getNextLinearSpinePostition(cp);
-    //     if(pos > -1) {
-    //         this.setSpinePos(pos, false, false);
-    //     }
-    // },
-    
-    // // goes the previous linear section in the spine. Non-linear sections should be
-    // // skipped as per [the spec](http://idpf.org/epub/30/spec/epub30-publications.html#sec-itemref-elem)
-    // // REFACTORING CANDIDATE: I think this is a public method and should be moved to the public section
-    // goToPrevSection: function() {
-    //     var cp = this.get("spine_position");
-    //     var pos = this.packageDocument.getPrevLinearSpinePostition(cp);
-    //     if(pos > -1) {
-    //         this.setSpinePos(pos, true, false);
     //     }
     // },
 
