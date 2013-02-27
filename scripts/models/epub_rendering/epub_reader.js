@@ -10,12 +10,12 @@ Readium.Models.EpubReader = Backbone.Model.extend({
         var that = this;
         this.epubSpine = this.get("model");
 
-
         // Rendering strategy option
         // 
 
-        this.loadSpineItems(options.epubController, options.viewerSettings);
 
+
+        this.loadSpineItems(options.epubController, options.viewerSettings);
         this.renderPageView(2, false, undefined); // TEMPORARY
     },
 
@@ -44,14 +44,19 @@ Readium.Models.EpubReader = Backbone.Model.extend({
     },
 
 
-    // goToHref()
-    // goToCFI()
-    // goToSpineItem()
+    // goToHref() <--- Probably not here, dereferencing hrefs can be in the epub controller thingy
+    // goToCFI() <--- Hmm, not sure how to handle this exactly. 
+    // goToSpineItem() <--- Gonna need this, for sure. 
+    // goToId() <---- Supply a spine item for this one.
+
+
+
+
     // changeMargin()
     // changeFontSize()
     // changeTheme()
     // addSpine() ---- not sure about this. Maybe just do the initialize
-    // toggleTOC()
+    // toggleTOC() <---- I don't think this should actually be part of it
 
 
     // ------------------------------------------------------------------------------------ //  
@@ -73,7 +78,7 @@ Readium.Models.EpubReader = Backbone.Model.extend({
 
             currSpineItem = this.epubSpine.at(spineIndex);
 
-            // A fixed layout publication
+            // A fixed layout epub
             if (currSpineItem.isFixedLayout()) {
 
                 FXLStartIndex = spineIndex;
@@ -128,10 +133,12 @@ Readium.Models.EpubReader = Backbone.Model.extend({
     },
 
     hasNextPageView : function () {
+
         return this.get("currentPageView") < this.numPageViews() ? true : false;
     },
 
     hasPreviousPageView : function () {
+
         return this.get("currentPageView") > 0 ? true : false;
     },
 
@@ -156,12 +163,10 @@ Readium.Models.EpubReader = Backbone.Model.extend({
         return this.get("renderedPageViews")[this.get("currentPageView")];
     },
 
-
-
-
-
-
-
+    shouldScroll : function (epubController) {
+        
+        return epubController.get("pagination_mode") === "scrolling";
+    },
 
 
 
@@ -173,12 +178,6 @@ Readium.Models.EpubReader = Backbone.Model.extend({
     //     this.zoomer = new Readium.Views.FixedLayoutBookZoomer();
     //     this.model.on("change:pagination_mode", function() { self.renderSpineItems(); });       
     // },
-
-    
-
-    shouldScroll : function (epubController) {
-        return epubController.get("pagination_mode") === "scrolling";
-    },
 
     // updatePaginationSettings: function() {
     //     if (this.get("pagination_mode") == "facing") {
