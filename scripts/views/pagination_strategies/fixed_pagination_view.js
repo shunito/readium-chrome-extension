@@ -220,7 +220,8 @@ Readium.Views.FixedPaginationView = Readium.Views.PaginationViewBase.extend({
 
 			this.$el.width(meta.width * 2);
 			this.$el.height(meta.height);
-			this.zoomer.fitToBest();
+	        
+			this.zoomer.fitToBest(this.pages.get("current_page").length);
 
 			if (!this.zoomed) {
 
