@@ -94,8 +94,8 @@ Readium.Models.BookExtractorBase = Backbone.Model.extend({
 		});
 	},
 
-	// sadly we need to manually go through and reslove all urls in the
-	// in the epub, because webkit filesystem urls are completely supported
+	// sadly we need to manually go through and resolve all urls in
+	// the epub, because webkit filesystem urls are not completely supported
 	// yet, see: http://code.google.com/p/chromium/issues/detail?id=114484
 	correctURIs: function() {
 	
