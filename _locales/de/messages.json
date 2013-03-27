@@ -3,13 +3,13 @@
     "message": "Readium"
   },
   "chrome_extension_description": {
-    "message": "A reader for EPUB3 books."
+    "message": "Ein Leseprogramm für EPUB3 Bücher."
   },
   "i18n_readium_library" : {
-    "message" : "Readium Library"
+    "message" : "Readium Bibliothek"
   },
   "i18n_readium_options" : {
-    "message" : "Readium Options:"
+    "message" : "Readium Einstellungen:"
   },
   "i18n_save_changes" : {
     "message" : "Änderungen speichern"
@@ -24,7 +24,7 @@
     "message" : "*.epub URLs automatisch in Readium öffnen"
   },
   "i18n_show_warning" : {
-    "message" : "Zeige Warnhinweis beim Auspacken von EPUB Dateien"
+    "message" : "Beim Auspacken von EPUB Dateien Warnung anzeigen"
   },
   "i18n_details" : {
     "message" : "Details"
@@ -45,10 +45,10 @@
     "message" : "Quelle: "
   },
   "i18n_pub_date" : {
-    "message" : "Datum der Veröffentlichung: "
+    "message" : "Veröffentlicht am: "
   },
   "i18n_modified_date" : {
-    "message" : "Datum der Änderung: "
+    "message" : "Zuletzt geändert am: "
   },
   "i18n_id" : {
     "message" : "ID: "
@@ -123,10 +123,10 @@
     "message" : "Rand"
   },
   "i18n_text_and_background_color" : {
-    "message" : "Text und Hintergrund Farbe"
+    "message" : "Text- und Hintergrundfarbe"
   },
   "i18n_black_and_white" : {
-    "message" : "Schwarz und Weiss"
+    "message" : "Schwarzweiss"
   },
   "i18n_arabian_nights" : {
     "message" : "Arabian Nights"
