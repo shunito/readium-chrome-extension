@@ -12,16 +12,16 @@
     "message" : "Readium Options:"
   },
   "i18n_save_changes" : {
-    "message" : "&Auml;nderungen speichern"
+    "message" : "Änderungen speichern"
   },
   "i18n_close" : {
-    "message" : "Schlie&szlig;en"
+    "message" : "Schließen"
   },
   "i18n_paginate_all" : {
-    "message" : "Flie&szlig;text des EPUB Inhalts paginieren"
+    "message" : "Fließtext des EPUB Inhalts paginieren"
   },
   "i18n_automatically" : {
-    "message" : "*.epub URLs automatisch in Readium &ouml;ffnen"
+    "message" : "*.epub URLs automatisch in Readium öffnen"
   },
   "i18n_show_warning" : {
     "message" : "Zeige Warnhinweis beim Auspacken von EPUB Dateien"
@@ -33,7 +33,7 @@
     "message" : "Lesen"
   },
   "i18n_delete" : {
-    "message" : "L&ouml;schen"
+    "message" : "Löschen"
   },
   "i18n_author" : {
     "message" : "Autor: "
@@ -45,10 +45,10 @@
     "message" : "Quelle: "
   },
   "i18n_pub_date" : {
-    "message" : "Datum der Ver&ouml;ffentlichung: "
+    "message" : "Datum der Veröffentlichung: "
   },
   "i18n_modified_date" : {
-    "message" : "Datum der &Auml;nderung: "
+    "message" : "Datum der Änderung: "
   },
   "i18n_id" : {
     "message" : "ID: "
@@ -63,28 +63,28 @@
     "message" : "Format: "
   },
   "i18n_added" : {
-    "message" : "Hinzugef&uuml;gt: "
+    "message" : "Hinzugefügt: "
   },
   "i18n_unknown" : {
     "message" : "Unbekannt"
   },
   "i18n_sorry" : {
-    "message" : "Das aktuelle EPUB enth&auml;t keinen Media Overlay zum Inhalt"
+    "message" : "Das aktuelle EPUB enthät keinen Media Overlay zum Inhalt"
   },
   "i18n_add_items" : {
-    "message" : "F&uuml;ge Werke zur </br>Bibliothek hinzu!"
+    "message" : "Füge Werke zur </br>Bibliothek hinzu!"
   },
   "i18n_extracting" : {
     "message" : "entpacke: "
   },
   "i18n_are_you_sure" : {
-    "message" : "Dauerhaft l&ouml;schen: Sicher? "
+    "message" : "Dauerhaft löschen: Sicher? "
   },
   "i18n_add_book_to_readium_library" : {
-    "message" : "Buch zur Readium Bibliothek hinzuf&uuml;gen:"
+    "message" : "Buch zur Readium Bibliothek hinzufügen:"
   },
   "i18n_add_book" : {
-    "message" : "F&uuml;ge Buch hinzu"
+    "message" : "Füge Buch hinzu"
   },
   "i18n_cancel" : {
     "message" : "Abbrechen"
@@ -102,10 +102,10 @@
     "message" : "Ausgepacktes Verzeichnis:"
   },
   "i18n_validate" : {
-    "message" : "Pr&uuml;fe:"
+    "message" : "Prüfe:"
   },
   "i18n_confirm_that_this_book" : {
-    "message" : "Best&auml;tigung, dass dieses Buch mit EPUB Standards &uuml;bereinstimmt"
+    "message" : "Bestätigung, dass dieses Buch mit EPUB Standards übereinstimmt"
   },
   "i18n_single_pages" : {
     "message" : "Einzelne Seiten"
@@ -117,7 +117,7 @@
     "message" : "Einstellungen speichern"
   },
   "i18n_font_size" : {
-    "message" : "Schriftgr&ouml;sse"
+    "message" : "Schriftgrösse"
   },
   "i18n_margins" : {
     "message" : "Rand"
@@ -144,7 +144,7 @@
     "message" : "Anzeigeformat"
   },
   "i18n_html_readium_tm_a_project" : {
-    "message" : "Readium<sup>TM</sup>, ein Projekt des International Digital Publishing Forum (IDPF) und weiterer Unterstützer ist ein quelloffenes Referenzsystem und ein Anzeigesystem für EPUB&reg; Veröffentlichungen. Mehr Informationen gibt es auf der <a href=\"http://readium.org/\">Project Homepage</a>. Zum aktuellen Zeitpunkt wurde die Entwicklung von <a href=\"http://evidentpoint.com/\">Evident Point</a> und <a href=\"http://www.bluefirereader.com/\">Bluefire Productions</a> geleitet. Um zum Projekt beizutragen, besuchen Sie <a href=\"https://github.com/readium/readium\">github repository</a>."
+    "message" : "Readium<sup>TM</sup>, ein Projekt des International Digital Publishing Forum (IDPF) und weiterer Unterstützer ist ein quelloffenes Referenzsystem und ein Anzeigesystem für EPUB® Veröffentlichungen. Mehr Informationen gibt es auf der <a href=\"http://readium.org/\">Project Homepage</a>. Zum aktuellen Zeitpunkt wurde die Entwicklung von <a href=\"http://evidentpoint.com/\">Evident Point</a> und <a href=\"http://www.bluefirereader.com/\">Bluefire Productions</a> geleitet. Um zum Projekt beizutragen, besuchen Sie <a href=\"https://github.com/readium/readium\">github repository</a>."
   },
   "chrome_accept_languages": {
     "message": "$CHROME$ akzeptiert $languages$ Sprachen",
