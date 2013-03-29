@@ -18,7 +18,7 @@ chrome.extension.onRequest.addListener(
 
 // create a context menu item
 chrome.contextMenus.create({
-  "title" : "Add to Readium Library",
+  "title" : chrome.i18n.getMessage("i18n_add_book"),
   "type" : "normal",
   "contexts" : ["link"],
   "onclick" : getClickHandler(),
