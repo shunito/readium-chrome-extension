@@ -21,7 +21,8 @@ chrome.contextMenus.create({
   "title" : "Add to Readium Library",
   "type" : "normal",
   "contexts" : ["link"],
-  "onclick" : getClickHandler()
+  "onclick" : getClickHandler(),
+  "targetUrlPatterns" : ["file:///*.epub","*://*/*.epub"] // specify the item to epub files only
 });
 
 
