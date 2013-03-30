@@ -99,6 +99,9 @@
    "i18n_id": {
       "message": "ID: "
    },
+  "i18n_loading" : {
+    "message" : "Loading Library"
+  },
    "i18n_margins": {
       "message": "MARGENS"
    },
