@@ -33,8 +33,8 @@ Readium.Views.FixedLayoutBookZoomer = Backbone.View.extend({
 
 	// apply the minimum scalar transormation to the div wrapping this books pages
 	// in order to have all content displayed 
-	fitToBest: function() {
-		var widthScale = this.fitToWidthScale();
+	fitToBest: function(nPages) {
+		var widthScale = this.fitToWidthScale(nPages);
 		var heightScale = this.fitToHeightScale();
 
 		if(widthScale < heightScale) {
@@ -46,8 +46,8 @@ Readium.Views.FixedLayoutBookZoomer = Backbone.View.extend({
 	},
 
 	// apply transformations that fit the books pages as best as possible linearly
-	fitToWidth: function() {
-		var scale = this.fitToWidthScale();
+	fitToWidth: function(nPages) {
+		var scale = this.fitToWidthScale(nPages);
 		this.applyScale(scale);
 	},
 
@@ -62,11 +62,11 @@ Readium.Views.FixedLayoutBookZoomer = Backbone.View.extend({
 	//  "PRIVATE" HELPERS                                                                   //
 	/* ------------------------------------------------------------------------------------ */
 
-	fitToWidthScale: function() {
-		return (this.containerWidth() - this.horizontalPad) / this.bookWidth();
+	fitToWidthScale: function(nPages) {
+		return (this.containerWidth() - this.horizontalPad) / (this.bookWidth() * (nPages <= 1 ? 0.5 : 1));
 	},
 
-	fitToHeightScale: function() {
+	fitToHeightScale: function() {		
 		return (this.containerHeight() - this.verticalPad) / this.bookHeight();
 	},
 

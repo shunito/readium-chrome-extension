@@ -107,6 +107,11 @@ Acc.title = this.model.get('title') + ', by ' + this.model.get('author');
 			e.preventDefault();
 			that.model.paginator.v.pages.goLeft();
 		});
+
+		$(document).on('webkitfullscreenchange', function() {
+			book.set({full_screen: document.webkitIsFullScreen});
+		});
+
 	},
 
 	render: function() {
