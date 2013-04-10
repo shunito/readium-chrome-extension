@@ -22,19 +22,19 @@
       "message": "Adicionar Livro"
    },
    "i18n_add_book_to_readium_library": {
-      "message": "Adicionar Livro \u00E0 Biblioteca Readium:"
+      "message": "Adicionar Livro à Biblioteca Readium:"
    },
    "i18n_add_items": {
-      "message": "Adicione itens para sua\u003C/br\u003Ebiblioteca aqui!"
+      "message": "Adicione itens para sua<br>biblioteca aqui!"
    },
    "i18n_added": {
       "message": "Adicionado: "
    },
    "i18n_arabian_nights": {
-      "message": "Noites \u00C1rabes"
+      "message": "Noites Árabes"
    },
    "i18n_are_you_sure": {
-      "message": "Voc\u00EA tem certeza de que deseja excluir permanentemente "
+      "message": "Você tem certeza de que deseja excluir permanentemente "
    },
    "i18n_author": {
       "message": "Autor: "
@@ -55,7 +55,7 @@
       "message": "Fechar"
    },
    "i18n_confirm_that_this_book": {
-      "message": "Confirmar que este livro obedece aos padr\u00F5es ePUB"
+      "message": "Confirmar que este livro obedece aos padrões ePUB"
    },
    "i18n_created_at": {
       "message": "Criado aos: "
@@ -67,16 +67,16 @@
       "message": "Detalhes"
    },
    "i18n_display_format": {
-      "message": "FORMATO DE EXIBI\u00C7\u00C3O"
+      "message": "FORMATO DE EXIBIÇÃO"
    },
    "i18n_double_pages": {
-      "message": "P\u00E1g. Duplas"
+      "message": "Pág. Duplas"
    },
    "i18n_enter_a_url": {
       "message": "Insira uma URL para um arquivo .epub"
    },
    "i18n_epub_version": {
-      "message": "Vers\u00E3o do EPUB: "
+      "message": "Versão do EPUB: "
    },
    "i18n_extracting": {
       "message": "extraindo: "
@@ -94,7 +94,7 @@
       "message": "Da Rede:"
    },
    "i18n_html_readium_tm_a_project": {
-      "message": "Readium\u003Csup\u003ETM\u003C/sup\u003E, a project of the International Digital Publishing Forum (IDPF) and supporters, is an open source reference system and rendering engine for EPUB&reg; publications.  To learn more, visit the \u003Ca href=\"http://readium.org/\"\u003Eproject homepage\u003C/a\u003E. To date, the project development has been lead by \u003Ca href=\"http://evidentpoint.com/\"\u003EEvident Point\u003C/a\u003E and \u003Ca href=\"http://www.bluefirereader.com/\"\u003EBluefire Productions\u003C/a\u003E. To contribute visit the \u003Ca href=\"https://github.com/readium/readium\"\u003Egithub repository\u003C/a\u003E"
+      "message": "Readium<sup>TM</sup>, a project of the International Digital Publishing Forum (IDPF) and supporters, is an open source reference system and rendering engine for EPUB&reg; publications.  To learn more, visit the <a href=\"http://readium.org/\">project homepage</a>. To date, the project development has been lead by <a href=\"http://evidentpoint.com/\">Evident Point</a> and <a href=\"http://www.bluefirereader.com/\">Bluefire Productions</a>. To contribute visit the <a href=\"https://github.com/readium/readium\">github repository</a>"
    },
    "i18n_id": {
       "message": "ID: "
@@ -106,13 +106,13 @@
       "message": "MARGENS"
    },
    "i18n_modified_date": {
-      "message": "Data de Modifica\u00E7\u00E3o: "
+      "message": "Data de Modificação: "
    },
    "i18n_paginate_all": {
-      "message": "Paginar todo o conte\u00FAdo ePUB flu\u00EDdo"
+      "message": "Paginar todo o conteúdo ePUB fluído"
    },
    "i18n_pub_date": {
-      "message": "Publica\u00E7\u00E3o: "
+      "message": "Publicação: "
    },
    "i18n_publisher": {
       "message": "Editora: "
@@ -124,25 +124,25 @@
       "message": "Biblioteca Readium"
    },
    "i18n_readium_options": {
-      "message": "Op\u00E7\u00F5es do Readium:"
+      "message": "Opções do Readium:"
    },
    "i18n_sands_of_dune": {
       "message": "Areias de Duna"
    },
    "i18n_save_changes": {
-      "message": "Salvar mudan\u00E7as"
+      "message": "Salvar mudanças"
    },
    "i18n_save_settings": {
-      "message": "Salvar Configura\u00E7\u00F5es"
+      "message": "Salvar Configurações"
    },
    "i18n_show_warning": {
       "message": "Exibir mensagem de alerta quando extraindo arquivos EPUB"
    },
    "i18n_single_pages": {
-      "message": "P\u00E1g. Simples"
+      "message": "Pág. Simples"
    },
    "i18n_sorry": {
-      "message": "Desculpe, o atual EPUB n\u00E3o cont\u00E9m uma m\u00EDdia de sobreposi\u00E7\u00E3o para este conte\u00FAdo"
+      "message": "Desculpe, o atual EPUB não contém uma mídia de sobreposição para este conteúdo"
    },
    "i18n_source": {
       "message": "Origem: "
@@ -154,12 +154,12 @@
       "message": "Desconhecido"
    },
    "i18n_unpacked_directory": {
-      "message": "Diret\u00F3rio Extraido:"
+      "message": "Diretório Extraido:"
    },
    "i18n_validate": {
       "message": "Validar:"
    },
    "i18n_vancouver_mist": {
-      "message": "N\u00E9voa de Vancouver"
+      "message": "Névoa de Vancouver"
    }
 }
