@@ -24,7 +24,7 @@ Readium.FileSystemApi = function(initCallback) {
 			// TODO add an error callback function to handle things
 			// a little more gracefully
 			console.log('Error', e);
-			console.log('Exectution will not continue');
+			console.log('Execution will not continue');
 		});
 	};
 

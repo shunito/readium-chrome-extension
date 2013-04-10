@@ -8,6 +8,9 @@
   "i18n_readium_library" : {
     "message" : "Readium 라이브러리"
   },
+  "i18n_loading" : {
+    "message" : "Loading Library"
+  },
   "i18n_readium_options" : {
     "message" : "Readium 옵션:"
   },
