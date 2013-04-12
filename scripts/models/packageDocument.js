@@ -221,7 +221,7 @@ Readium.Models.PackageDocument = Backbone.Model.extend({
 		//   from finding duplicate manifest items when different itemref elements in the spine reference
 		//   the same manifest item through the "idref" attribute.
 		$.each(bbSpine, function () {
-			this.id = this.id + this.spine_index;
+			this.id = this.id + '_' + this.spine_index;
 		});
 
 		return new Readium.Collections.Spine(bbSpine, {packageDocument: this});
