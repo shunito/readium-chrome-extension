@@ -109,9 +109,12 @@ Readium.Models.PackageDocumentParser.prototype.getCoverHref = function(dom) {
 
 	// some epub2's cover image is like this:
 	/*<meta name="cover" content="cover-image-item-id" />*/
+  // PragProg ebooks have two cover entries in meta, both
+  // referencing the same cover id from items; metaNode.length
+  // does not have to be just 1
 	var metaNode = $('meta[name="cover"]', dom);
 	var contentAttr = metaNode.attr("content");
-	if(metaNode.length === 1 && contentAttr) {
+	if(metaNode.length >= 1 && contentAttr) {
 		$imageNode = $('item[id="'+contentAttr+'"]', manifest);
 		if($imageNode.length === 1 && $imageNode.attr("href")) {
 			return $imageNode.attr("href");
