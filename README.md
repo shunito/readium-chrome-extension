@@ -17,7 +17,7 @@ Google Chrome Version 15+
 
 If you are a developer interested in hacking on the project, clone the repository and then follow the instruction for loading an unpacked extension from the [chrome extensions page](http://code.google.com/chrome/extensions/getstarted.html#load-ext)
 
-If you want to give the latest release a whirl, use teh one click install link below to add the extension to chrome.
+If you want to give the latest release a whirl, use the one click install link below to add the extension to chrome.
 
 * [Add To Chrome](http://github.readium.org/releases/readium.crx)
 
@@ -31,7 +31,7 @@ Then the specs can be run via the command:
 
     $ rake jasmine
 
-This will start a webserver running on `port 8888`. To run the spect navigate to (or refresh) `localhost:8888`.
+This will start a webserver running on `port 8888`. To run the specs navigate to (or refresh) `localhost:8888`.
 
 
 ## License
